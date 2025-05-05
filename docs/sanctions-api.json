@@ -20,7 +20,7 @@
     "/flhsmv-api/reopen": {
       "post": {
         "tags": [
-          "flhsmv-sanction-clearance-controller"
+          "HB-1077 Sanctions Clearance API"
         ],
         "description": "This endpoint provides the ability to reopen sanctions which were cleared within the last 24 hours.",
         "operationId": "reopen",
