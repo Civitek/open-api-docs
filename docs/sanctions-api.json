@@ -1,1 +1,819 @@
-{"openapi":"3.0.1","info":{"title":"OpenAPI definition","version":"v0"},"servers":[{"url":"https://testapi.flclerktools.com/dlservice","description":"Generated server url"}],"security":[{"bearerAuth":[]}],"paths":{"/flhsmv-api/reopen":{"post":{"tags":["flhsmv-sanction-clearance-controller"],"description":"This endpoint provides the ability to reopen sanctions which were cleared within the last 24 hours.","operationId":"reopen","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/ReopenRequest"}}},"required":true},"responses":{"500":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"400":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"404":{"description":"Not Found","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"405":{"description":"Method Not Allowed","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"403":{"description":"Forbidden","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"429":{"description":"Too Many Requests","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ReopenResponse"}}}}}}},"/flhsmv-api/notOnRecordClear":{"post":{"tags":["flhsmv-sanction-clearance-controller"],"description":"This method is used to clear FTC suspensions before they have been added to the customer driver record. The client must provide the Citation Number of the FTC to be cleared.  Each request can clear only one FTC suspension. Criminal Financial Obligation Suspensions cannot be cleared using this method","operationId":"notOnRecordClear","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/NotOnRecordClearRequest"}}},"required":true},"responses":{"500":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"400":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"404":{"description":"Not Found","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"405":{"description":"Method Not Allowed","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"403":{"description":"Forbidden","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"429":{"description":"Too Many Requests","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/NotOnRecordClearResponse"}}}}}}},"/flhsmv-api/clearance":{"post":{"tags":["flhsmv-sanction-clearance-controller"],"description":"This method is used to clear sanctions for the different scenarios – Court Requirement Met, Clearance prior to effective date and Clearance after effective date.","operationId":"clearance","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/ClearanceRequest"}}},"required":true},"responses":{"500":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"400":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"404":{"description":"Not Found","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"405":{"description":"Method Not Allowed","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"403":{"description":"Forbidden","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"429":{"description":"Too Many Requests","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ClearanceResponse"}}}}}}},"/flhsmv-api/customerSanctions/{driverLicenseNumber}":{"get":{"tags":["flhsmv-sanction-clearance-controller"],"description":"This method is used to retrieve sanctions that can be clear or reopen for a FLHSMV customer including name, driver license and demographic information.","operationId":"customerSanctions","parameters":[{"name":"driverLicenseNumber","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"500":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"400":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"404":{"description":"Not Found","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"405":{"description":"Method Not Allowed","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"403":{"description":"Forbidden","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"429":{"description":"Too Many Requests","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/CustomerSanctionResponse"}}}}}}}},"components":{"schemas":{"ReopenRequest":{"type":"object","properties":{"DriverLicenseNumber":{"type":"string","description":"Florida driver license number"},"Sanctions":{"type":"array","description":"List of Sanction Reopen Model","items":{"$ref":"#/components/schemas/SanctionReopenModel"}}}},"SanctionReopenModel":{"type":"object","properties":{"SanctionId":{"type":"integer","description":"Identifier of the sanction given by the HSMV","format":"int32"},"CountyCode":{"type":"integer","description":"Florida TCATS county number","format":"int32"}},"description":"List of Sanction Reopen Model"},"ErrorResponse":{"type":"object","properties":{"httpStatusCode":{"type":"integer","format":"int32"},"reason":{"type":"string"}}},"ReopenResponse":{"type":"object","properties":{"DriverLicenseNumber":{"type":"string","description":"Florida driver license number"},"TransactionId":{"type":"integer","description":"The identifier of the transaction ","format":"int32"},"ErrorCode":{"type":"integer","description":"Error code","format":"int32"},"ErrorMessage":{"type":"string","description":"Text describing the meaning of the error code"},"SanctionErrors":{"type":"array","description":"Populated if any errors occured in updating individual sanctions.","items":{"$ref":"#/components/schemas/SanctionError"}}}},"SanctionError":{"type":"object","properties":{"SanctionId":{"type":"integer","description":"Identifier of the sanction given by the FLHSMV","format":"int32"},"ErrorCode":{"type":"integer","description":"Error code","format":"int32"},"ErrorMessage":{"type":"string","description":"Text describing the meaning of the error code"}},"description":"Populated if any errors occured in updating individual sanctions."},"NotOnRecordClearRequest":{"type":"object","properties":{"DriverLicenseNumber":{"type":"string","description":"Florida driver license number"},"CitationNumber":{"type":"string","description":"The citation number of the FTC suspension to be cleared."}}},"NotOnRecordClearResponse":{"type":"object","properties":{"DriverLicenseNumber":{"type":"string","description":"Florida driver license number"},"ErrorCode":{"type":"integer","description":"Error code","format":"int32"},"ErrorMessage":{"type":"string","description":"Text describing the meaning of the error code"}}},"ClearanceRequest":{"type":"object","properties":{"DriverLicenseNumber":{"type":"string","description":"Florida driver license number"},"CountyCode":{"type":"integer","description":"Florida TCATS county number","format":"int32"},"Sanctions":{"type":"array","description":"List of Sanction Model","items":{"$ref":"#/components/schemas/Sanction"}},"FeeCollected":{"type":"boolean","description":"Is Reinstatement fee for FTC (aka D6 or DSU) sanctions is collected to reinstate the driver license (true or false).","example":true}},"description":"Clearance Request Model Information"},"Sanction":{"type":"object","properties":{"SanctionId":{"type":"integer","description":"Identifier of the sanction given by the FLHSMV","format":"int32"},"SanctionType":{"type":"string","description":"The type of the sanction","example":"DSU or SUS"},"SequenceNumber":{"type":"integer","description":"Helps to identify the sanction for the customer","format":"int32"},"CreateDate":{"type":"string","description":"The date when the sanction was created.","format":"date-time"},"EffectiveDate":{"type":"string","description":"The date when the sanction goes into effect.","format":"date-time"},"RestoreDate":{"type":"string","description":"The date when the sanction is cleared","format":"date-time"},"CountyCode":{"type":"integer","description":"Florida TCATS county number of the sanction.","format":"int32"},"SanctionReasonCode":{"type":"string","description":"Reason code for the sanction."},"CourtIdentifier":{"type":"string","description":"“Ticket Number” or “Citation Number” "},"CourtRequirementsMet":{"type":"boolean","description":"Is Court Requirement Met (true or false)."},"ReinstatementFeeCFORequired":{"type":"boolean","description":"Is Reinstatement fee for CFO sanctions is required (true or false)."},"ClearedByFCCC":{"type":"boolean","description":"Is Clearead by FCCC (true or false)."},"ReopenAllowed":{"type":"boolean","description":"Is Reopen Allowed (true or false).","example":true},"SanctionActions":{"type":"array","description":"List of Sanction Action Model","items":{"$ref":"#/components/schemas/SanctionAction"}},"FeeCollected":{"type":"boolean","description":"Is CFO Fee collected (true or false).","example":true},"RestoreDateAllowed":{"type":"boolean","description":"Is Restore Allowed (true or false).","example":true},"RequestedActionType":{"type":"string","description":"Requested Action Type","example":"CRM : CourtRequirementsMet, CLR: Clearance Request"},"RestoreMaxDate":{"type":"string","description":"Maximum date allowed on restore date.","format":"date-time"},"RestoreMinDate":{"type":"string","description":"Minimum date allowed on restore date.","format":"date-time"},"CourtRequirementsMetAllowed":{"type":"boolean","description":"Is Court Requirement Met Allowed (true or false).","example":true}},"description":"List of Sanction Model"},"SanctionAction":{"type":"object","properties":{"ActionCode":{"type":"string","description":"Identifier of a sanction action "},"ActionName":{"type":"string","description":"Descriptive name of the sanction action "}},"description":"List of Sanction Action Model"},"ClearanceResponse":{"type":"object","properties":{"DriverLicenseNumber":{"type":"string","description":"Florida driver license number"},"TransactionId":{"type":"integer","description":"The identifier of the transaction ","format":"int64"},"ErrorCode":{"type":"integer","description":"Error code","format":"int32"},"ErrorMessage":{"type":"string","description":"Text describing the meaning of the error code"},"Sanctions":{"type":"array","description":"List of SanctionResponse model","items":{"$ref":"#/components/schemas/SanctionResponse"}}}},"SanctionResponse":{"type":"object","properties":{"SanctionId":{"type":"integer","description":"Identifier of the sanction given by the FLHSMV","format":"int32"},"CountyCode":{"type":"integer","description":"Florida TCATS county number of the sanction.","format":"int32"},"SanctionReasonCode":{"type":"string","description":"Reason code for the sanction."},"CourtIdentifier":{"type":"string","description":"“Ticket Number” or “Citation Number” "},"Success":{"type":"boolean","description":"Is Success (true or false). "},"CourtRequirementsMet":{"type":"boolean","description":"Is Court Requirement Met (true or false). "},"ErrorCode":{"type":"integer","description":"ErrorCode ","format":"int32"},"ErrorMessage":{"type":"string","description":"ErrorMessage"}},"description":"List of SanctionResponse model"},"CustomerSanctionResponse":{"type":"object","properties":{"DriverLicenseNumber":{"type":"string","description":"Florida driver license number"},"CurrentDriverLicenseNumber":{"type":"string","description":"The current driver license number of the customer. Also known as a “cross reference”."},"ErrorCode":{"type":"integer","description":"Error code","format":"int32","example":1},"ErrorMessage":{"type":"string","description":"Text describing the meaning of the error code."},"FirstName":{"type":"string","description":"The first name of the customer"},"MiddleName":{"type":"string","description":"The middle name of the customer"},"LastName":{"type":"string","description":"The last name of the customer"},"DateOfBirth":{"type":"string","description":"The date of birth of the customer on the driver license.","format":"date-time"},"Sex":{"type":"string","description":"M – Male, F – Female"},"LicenseTypeCode":{"type":"string","description":"The type of driver license.(A or B or E etc...)"},"IssueDate":{"type":"string","description":"The date the driver license was issued.","format":"date-time"},"ExpireDate":{"type":"string","description":"The date the driver license expires.","format":"date-time"},"ReinstatementFeeFTCRequired":{"type":"boolean","description":"Is Reinstatement fee for FTC (aka D6 or DSU) sanctions is required to reinstate the driver license (true or false)."},"OtherOpenSanctionsCount":{"type":"integer","description":"The number of open sanctions of other types not including D6 suspensions or Financial Obligation Suspensions.","format":"int32"},"ReinstatementFeeFTCAllowed":{"type":"boolean","description":"Is Reinstatement fee for FTC (aka D6 or DSU) sanctions is allowed to reinstate the driver license (true or false)."},"Sanctions":{"type":"array","description":"List of Sanction model.","items":{"$ref":"#/components/schemas/Sanction"}},"DriverLicenceExpired":{"type":"boolean","description":"is Driver License Expired (true or false). "}}}},"securitySchemes":{"bearerAuth":{"type":"http","description":"Please provide the JWT token. For login information, please contact support.","scheme":"bearer","bearerFormat":"JWT"}}}}
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "HB 1077 Specifications",
+    "version": "v0",
+    "description": "API to manage HB1077 Sanctions"
+  },
+  "servers": [
+    {
+      "url": "https://testapi.flclerktools.com/dlservice",
+      "description": "Generated server url"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/flhsmv-api/reopen": {
+      "post": {
+        "tags": [
+          "flhsmv-sanction-clearance-controller"
+        ],
+        "description": "This endpoint provides the ability to reopen sanctions which were cleared within the last 24 hours.",
+        "operationId": "reopen",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReopenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReopenResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flhsmv-api/notOnRecordClear": {
+      "post": {
+        "tags": [
+          "flhsmv-sanction-clearance-controller"
+        ],
+        "description": "This method is used to clear FTC suspensions before they have been added to the customer driver record. The client must provide the Citation Number of the FTC to be cleared.  Each request can clear only one FTC suspension. Criminal Financial Obligation Suspensions cannot be cleared using this method",
+        "operationId": "notOnRecordClear",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotOnRecordClearRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotOnRecordClearResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flhsmv-api/clearance": {
+      "post": {
+        "tags": [
+          "flhsmv-sanction-clearance-controller"
+        ],
+        "description": "This method is used to clear sanctions for the different scenarios – Court Requirement Met, Clearance prior to effective date and Clearance after effective date.",
+        "operationId": "clearance",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClearanceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClearanceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flhsmv-api/customerSanctions/{driverLicenseNumber}": {
+      "get": {
+        "tags": [
+          "flhsmv-sanction-clearance-controller"
+        ],
+        "description": "This method is used to retrieve sanctions that can be clear or reopen for a FLHSMV customer including name, driver license and demographic information.",
+        "operationId": "customerSanctions",
+        "parameters": [
+          {
+            "name": "driverLicenseNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerSanctionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ReopenRequest": {
+        "type": "object",
+        "properties": {
+          "DriverLicenseNumber": {
+            "type": "string",
+            "description": "Florida driver license number"
+          },
+          "Sanctions": {
+            "type": "array",
+            "description": "List of Sanction Reopen Model",
+            "items": {
+              "$ref": "#/components/schemas/SanctionReopenModel"
+            }
+          }
+        }
+      },
+      "SanctionReopenModel": {
+        "type": "object",
+        "properties": {
+          "SanctionId": {
+            "type": "integer",
+            "description": "Identifier of the sanction given by the HSMV",
+            "format": "int32"
+          },
+          "CountyCode": {
+            "type": "integer",
+            "description": "Florida TCATS county number",
+            "format": "int32"
+          }
+        },
+        "description": "List of Sanction Reopen Model"
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "httpStatusCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "ReopenResponse": {
+        "type": "object",
+        "properties": {
+          "DriverLicenseNumber": {
+            "type": "string",
+            "description": "Florida driver license number"
+          },
+          "TransactionId": {
+            "type": "integer",
+            "description": "The identifier of the transaction ",
+            "format": "int32"
+          },
+          "ErrorCode": {
+            "type": "integer",
+            "description": "Error code",
+            "format": "int32"
+          },
+          "ErrorMessage": {
+            "type": "string",
+            "description": "Text describing the meaning of the error code"
+          },
+          "SanctionErrors": {
+            "type": "array",
+            "description": "Populated if any errors occured in updating individual sanctions.",
+            "items": {
+              "$ref": "#/components/schemas/SanctionError"
+            }
+          }
+        }
+      },
+      "SanctionError": {
+        "type": "object",
+        "properties": {
+          "SanctionId": {
+            "type": "integer",
+            "description": "Identifier of the sanction given by the FLHSMV",
+            "format": "int32"
+          },
+          "ErrorCode": {
+            "type": "integer",
+            "description": "Error code",
+            "format": "int32"
+          },
+          "ErrorMessage": {
+            "type": "string",
+            "description": "Text describing the meaning of the error code"
+          }
+        },
+        "description": "Populated if any errors occured in updating individual sanctions."
+      },
+      "NotOnRecordClearRequest": {
+        "type": "object",
+        "properties": {
+          "DriverLicenseNumber": {
+            "type": "string",
+            "description": "Florida driver license number"
+          },
+          "CitationNumber": {
+            "type": "string",
+            "description": "The citation number of the FTC suspension to be cleared."
+          }
+        }
+      },
+      "NotOnRecordClearResponse": {
+        "type": "object",
+        "properties": {
+          "DriverLicenseNumber": {
+            "type": "string",
+            "description": "Florida driver license number"
+          },
+          "ErrorCode": {
+            "type": "integer",
+            "description": "Error code",
+            "format": "int32"
+          },
+          "ErrorMessage": {
+            "type": "string",
+            "description": "Text describing the meaning of the error code"
+          }
+        }
+      },
+      "ClearanceRequest": {
+        "type": "object",
+        "properties": {
+          "DriverLicenseNumber": {
+            "type": "string",
+            "description": "Florida driver license number"
+          },
+          "CountyCode": {
+            "type": "integer",
+            "description": "Florida TCATS county number",
+            "format": "int32"
+          },
+          "Sanctions": {
+            "type": "array",
+            "description": "List of Sanction Model",
+            "items": {
+              "$ref": "#/components/schemas/Sanction"
+            }
+          },
+          "FeeCollected": {
+            "type": "boolean",
+            "description": "Is Reinstatement fee for FTC (aka D6 or DSU) sanctions is collected to reinstate the driver license (true or false).",
+            "example": true
+          }
+        },
+        "description": "Clearance Request Model Information"
+      },
+      "Sanction": {
+        "type": "object",
+        "properties": {
+          "SanctionId": {
+            "type": "integer",
+            "description": "Identifier of the sanction given by the FLHSMV",
+            "format": "int32"
+          },
+          "SanctionType": {
+            "type": "string",
+            "description": "The type of the sanction",
+            "example": "DSU or SUS"
+          },
+          "SequenceNumber": {
+            "type": "integer",
+            "description": "Helps to identify the sanction for the customer",
+            "format": "int32"
+          },
+          "CreateDate": {
+            "type": "string",
+            "description": "The date when the sanction was created.",
+            "format": "date-time"
+          },
+          "EffectiveDate": {
+            "type": "string",
+            "description": "The date when the sanction goes into effect.",
+            "format": "date-time"
+          },
+          "RestoreDate": {
+            "type": "string",
+            "description": "The date when the sanction is cleared",
+            "format": "date-time"
+          },
+          "CountyCode": {
+            "type": "integer",
+            "description": "Florida TCATS county number of the sanction.",
+            "format": "int32"
+          },
+          "SanctionReasonCode": {
+            "type": "string",
+            "description": "Reason code for the sanction."
+          },
+          "CourtIdentifier": {
+            "type": "string",
+            "description": "“Ticket Number” or “Citation Number” "
+          },
+          "CourtRequirementsMet": {
+            "type": "boolean",
+            "description": "Is Court Requirement Met (true or false)."
+          },
+          "ReinstatementFeeCFORequired": {
+            "type": "boolean",
+            "description": "Is Reinstatement fee for CFO sanctions is required (true or false)."
+          },
+          "ClearedByFCCC": {
+            "type": "boolean",
+            "description": "Is Clearead by FCCC (true or false)."
+          },
+          "ReopenAllowed": {
+            "type": "boolean",
+            "description": "Is Reopen Allowed (true or false).",
+            "example": true
+          },
+          "SanctionActions": {
+            "type": "array",
+            "description": "List of Sanction Action Model",
+            "items": {
+              "$ref": "#/components/schemas/SanctionAction"
+            }
+          },
+          "FeeCollected": {
+            "type": "boolean",
+            "description": "Is CFO Fee collected (true or false).",
+            "example": true
+          },
+          "RestoreDateAllowed": {
+            "type": "boolean",
+            "description": "Is Restore Allowed (true or false).",
+            "example": true
+          },
+          "RequestedActionType": {
+            "type": "string",
+            "description": "Requested Action Type",
+            "example": "CRM : CourtRequirementsMet, CLR: Clearance Request"
+          },
+          "RestoreMaxDate": {
+            "type": "string",
+            "description": "Maximum date allowed on restore date.",
+            "format": "date-time"
+          },
+          "RestoreMinDate": {
+            "type": "string",
+            "description": "Minimum date allowed on restore date.",
+            "format": "date-time"
+          },
+          "CourtRequirementsMetAllowed": {
+            "type": "boolean",
+            "description": "Is Court Requirement Met Allowed (true or false).",
+            "example": true
+          }
+        },
+        "description": "List of Sanction Model"
+      },
+      "SanctionAction": {
+        "type": "object",
+        "properties": {
+          "ActionCode": {
+            "type": "string",
+            "description": "Identifier of a sanction action "
+          },
+          "ActionName": {
+            "type": "string",
+            "description": "Descriptive name of the sanction action "
+          }
+        },
+        "description": "List of Sanction Action Model"
+      },
+      "ClearanceResponse": {
+        "type": "object",
+        "properties": {
+          "DriverLicenseNumber": {
+            "type": "string",
+            "description": "Florida driver license number"
+          },
+          "TransactionId": {
+            "type": "integer",
+            "description": "The identifier of the transaction ",
+            "format": "int64"
+          },
+          "ErrorCode": {
+            "type": "integer",
+            "description": "Error code",
+            "format": "int32"
+          },
+          "ErrorMessage": {
+            "type": "string",
+            "description": "Text describing the meaning of the error code"
+          },
+          "Sanctions": {
+            "type": "array",
+            "description": "List of SanctionResponse model",
+            "items": {
+              "$ref": "#/components/schemas/SanctionResponse"
+            }
+          }
+        }
+      },
+      "SanctionResponse": {
+        "type": "object",
+        "properties": {
+          "SanctionId": {
+            "type": "integer",
+            "description": "Identifier of the sanction given by the FLHSMV",
+            "format": "int32"
+          },
+          "CountyCode": {
+            "type": "integer",
+            "description": "Florida TCATS county number of the sanction.",
+            "format": "int32"
+          },
+          "SanctionReasonCode": {
+            "type": "string",
+            "description": "Reason code for the sanction."
+          },
+          "CourtIdentifier": {
+            "type": "string",
+            "description": "“Ticket Number” or “Citation Number” "
+          },
+          "Success": {
+            "type": "boolean",
+            "description": "Is Success (true or false). "
+          },
+          "CourtRequirementsMet": {
+            "type": "boolean",
+            "description": "Is Court Requirement Met (true or false). "
+          },
+          "ErrorCode": {
+            "type": "integer",
+            "description": "ErrorCode ",
+            "format": "int32"
+          },
+          "ErrorMessage": {
+            "type": "string",
+            "description": "ErrorMessage"
+          }
+        },
+        "description": "List of SanctionResponse model"
+      },
+      "CustomerSanctionResponse": {
+        "type": "object",
+        "properties": {
+          "DriverLicenseNumber": {
+            "type": "string",
+            "description": "Florida driver license number"
+          },
+          "CurrentDriverLicenseNumber": {
+            "type": "string",
+            "description": "The current driver license number of the customer. Also known as a “cross reference”."
+          },
+          "ErrorCode": {
+            "type": "integer",
+            "description": "Error code",
+            "format": "int32",
+            "example": 1
+          },
+          "ErrorMessage": {
+            "type": "string",
+            "description": "Text describing the meaning of the error code."
+          },
+          "FirstName": {
+            "type": "string",
+            "description": "The first name of the customer"
+          },
+          "MiddleName": {
+            "type": "string",
+            "description": "The middle name of the customer"
+          },
+          "LastName": {
+            "type": "string",
+            "description": "The last name of the customer"
+          },
+          "DateOfBirth": {
+            "type": "string",
+            "description": "The date of birth of the customer on the driver license.",
+            "format": "date-time"
+          },
+          "Sex": {
+            "type": "string",
+            "description": "M – Male, F – Female"
+          },
+          "LicenseTypeCode": {
+            "type": "string",
+            "description": "The type of driver license.(A or B or E etc...)"
+          },
+          "IssueDate": {
+            "type": "string",
+            "description": "The date the driver license was issued.",
+            "format": "date-time"
+          },
+          "ExpireDate": {
+            "type": "string",
+            "description": "The date the driver license expires.",
+            "format": "date-time"
+          },
+          "ReinstatementFeeFTCRequired": {
+            "type": "boolean",
+            "description": "Is Reinstatement fee for FTC (aka D6 or DSU) sanctions is required to reinstate the driver license (true or false)."
+          },
+          "OtherOpenSanctionsCount": {
+            "type": "integer",
+            "description": "The number of open sanctions of other types not including D6 suspensions or Financial Obligation Suspensions.",
+            "format": "int32"
+          },
+          "ReinstatementFeeFTCAllowed": {
+            "type": "boolean",
+            "description": "Is Reinstatement fee for FTC (aka D6 or DSU) sanctions is allowed to reinstate the driver license (true or false)."
+          },
+          "Sanctions": {
+            "type": "array",
+            "description": "List of Sanction model.",
+            "items": {
+              "$ref": "#/components/schemas/Sanction"
+            }
+          },
+          "DriverLicenceExpired": {
+            "type": "boolean",
+            "description": "is Driver License Expired (true or false). "
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "description": "Please provide the JWT token. For login information, please contact support.",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
