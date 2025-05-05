@@ -1,8 +1,8 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.0.3",
   "info": {
     "title": "HB 1077 Specifications",
-    "version": "v0",
+    "version": "1.0.0",
     "description": "API to manage HB1077 Sanctions"
   },
   "servers": [
