@@ -20,7 +20,7 @@
     "/flhsmv-api/reopen": {
       "post": {
         "tags": [
-          "HB-1077 Sanctions Clearance API"
+          "HB-1077 Sanctions Clearance"
         ],
         "description": "This endpoint provides the ability to reopen sanctions which were cleared within the last 24 hours.",
         "operationId": "reopen",
@@ -110,9 +110,6 @@
     },
     "/flhsmv-api/notOnRecordClear": {
       "post": {
-        "tags": [
-          "flhsmv-sanction-clearance-controller"
-        ],
         "description": "This method is used to clear FTC suspensions before they have been added to the customer driver record. The client must provide the Citation Number of the FTC to be cleared.  Each request can clear only one FTC suspension. Criminal Financial Obligation Suspensions cannot be cleared using this method",
         "operationId": "notOnRecordClear",
         "requestBody": {
@@ -196,13 +193,16 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "HB-1077 Sanctions Clearance"
+        ]
       }
     },
     "/flhsmv-api/clearance": {
       "post": {
         "tags": [
-          "flhsmv-sanction-clearance-controller"
+          "HB-1077 Sanctions Clearance"
         ],
         "description": "This method is used to clear sanctions for the different scenarios – Court Requirement Met, Clearance prior to effective date and Clearance after effective date.",
         "operationId": "clearance",
@@ -292,9 +292,6 @@
     },
     "/flhsmv-api/customerSanctions/{driverLicenseNumber}": {
       "get": {
-        "tags": [
-          "flhsmv-sanction-clearance-controller"
-        ],
         "description": "This method is used to retrieve sanctions that can be clear or reopen for a FLHSMV customer including name, driver license and demographic information.",
         "operationId": "customerSanctions",
         "parameters": [
@@ -378,7 +375,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "HB-1077 Sanctions Clearance"
+        ]
       }
     }
   },
