@@ -108,18 +108,18 @@
         ]
       }
     },
-    "/flhsmv-api/reopen": {
+    "/flhsmv-api/clearance": {
       "post": {
         "tags": [
           "HB-1077 Sanctions Clearance"
         ],
-        "description": "This endpoint provides the ability to reopen sanctions which were cleared within the last 24 hours.",
-        "operationId": "reopen",
+        "description": "This method is used to clear sanctions for the different scenarios – Court Requirement Met, Clearance prior to effective date and Clearance after effective date.",
+        "operationId": "clearance",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReopenRequest"
+                "$ref": "#/components/schemas/ClearanceRequest"
               }
             }
           },
@@ -131,7 +131,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReopenResponse"
+                  "$ref": "#/components/schemas/ClearanceResponse"
                 }
               }
             }
@@ -290,18 +290,18 @@
         ]
       }
     },
-    "/flhsmv-api/clearance": {
+    "/flhsmv-api/reopen": {
       "post": {
         "tags": [
           "HB-1077 Sanctions Clearance"
         ],
-        "description": "This method is used to clear sanctions for the different scenarios – Court Requirement Met, Clearance prior to effective date and Clearance after effective date.",
-        "operationId": "clearance",
+        "description": "This endpoint provides the ability to reopen sanctions which were cleared within the last 24 hours.",
+        "operationId": "reopen",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ClearanceRequest"
+                "$ref": "#/components/schemas/ReopenRequest"
               }
             }
           },
@@ -313,7 +313,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ClearanceResponse"
+                  "$ref": "#/components/schemas/ReopenResponse"
                 }
               }
             }
