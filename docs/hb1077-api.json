@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "HB 1077 Specifications",
+    "title": "HB1077 DL Sanctions Service Specifications",
     "version": "1.0.0",
-    "description": "API to manage HB1077 Sanctions"
+    "description": "API to manage HB1077 DL Sanctions"
   },
   "servers": [
     {
@@ -19,7 +19,7 @@
   "paths": {
     "/flhsmv-api/customerSanctions/{driverLicenseNumber}": {
       "get": {
-        "description": "This method is used to retrieve sanctions that can be clear or reopen for a FLHSMV customer including name, driver license and demographic information.",
+        "description": "This method accepts a parameter of driver license number and returns the DSU and SUS sanctions against the driver license that can be cleared or reopened by a county for a FLHSMV customer. The response includes driver's name, driver license number and demographic information and an array of sanction details.",
         "operationId": "customerSanctions",
         "parameters": [
           {
@@ -105,13 +105,22 @@
         },
         "tags": [
           "HB-1077 Sanctions Clearance"
-        ]
+        ],
+        "x-stoplight": {
+          "id": "0j2e4d5wyaxuu"
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "CustomerSanctions"
       }
     },
     "/flhsmv-api/clearance": {
       "post": {
         "tags": [
-          "HB-1077 Sanctions Clearance"
+          "HB1077 DL Sanctions Clearance"
         ],
         "description": "This method is used to clear sanctions for the different scenarios – Court Requirement Met, Clearance prior to effective date and Clearance after effective date.",
         "operationId": "clearance",
@@ -196,12 +205,16 @@
               }
             }
           }
-        }
+        },
+        "x-stoplight": {
+          "id": "nb2a7h74yvg9u"
+        },
+        "summary": "Clearance"
       }
     },
     "/flhsmv-api/notOnRecordClear": {
       "post": {
-        "description": "This method is used to clear FTC suspensions before they have been added to the customer driver record. The client must provide the Citation Number of the FTC to be cleared.  Each request can clear only one FTC suspension. Criminal Financial Obligation Suspensions cannot be cleared using this method",
+        "description": "This method is used to clear FTC (Failure to Comply) suspensions before they have been added to the customer driver record. The client must provide the Citation Number of the FTC suspension to be cleared.  \r\nEach request can clear only one FTC suspension. CFO (Criminal Financial Obligation) Suspensions cannot be cleared using this method",
         "operationId": "notOnRecordClear",
         "requestBody": {
           "content": {
@@ -287,7 +300,11 @@
         },
         "tags": [
           "HB-1077 Sanctions Clearance"
-        ]
+        ],
+        "x-stoplight": {
+          "id": "zdx3bbn5l9u5h"
+        },
+        "summary": "NotOnRecordClear"
       }
     },
     "/flhsmv-api/reopen": {
@@ -295,7 +312,7 @@
         "tags": [
           "HB-1077 Sanctions Clearance"
         ],
-        "description": "This endpoint provides the ability to reopen sanctions which were cleared within the last 24 hours.",
+        "description": "This method provides the ability to reopen sanctions which were cleared within the last 24 hours.",
         "operationId": "reopen",
         "requestBody": {
           "content": {
@@ -378,7 +395,11 @@
               }
             }
           }
-        }
+        },
+        "x-stoplight": {
+          "id": "3igy1dmc472v8"
+        },
+        "summary": "ReOpen"
       }
     }
   },
@@ -386,10 +407,18 @@
     "schemas": {
       "ReopenRequest": {
         "type": "object",
+        "x-stoplight": {
+          "id": "g090vewj6wa8x"
+        },
+        "description": "The model of data items included in a Reopen request.",
+        "required": [
+          "DriverLicenseNumber",
+          "Sanctions"
+        ],
         "properties": {
           "DriverLicenseNumber": {
             "type": "string",
-            "description": "Florida driver license number"
+            "description": "Florida driver license number for the sanction that is being reopened."
           },
           "Sanctions": {
             "type": "array",
@@ -402,10 +431,24 @@
       },
       "SanctionReopenModel": {
         "type": "object",
+        "description": "Model of the data items in the Sanction object for the Reopen request.",
+        "x-stoplight": {
+          "id": "zsch1n15cxzke"
+        },
+        "x-examples": {
+          "Example 1": {
+            "SanctionId": -2147483648,
+            "CountyCode": 1
+          }
+        },
+        "required": [
+          "SanctionId",
+          "CountyCode"
+        ],
         "properties": {
           "SanctionId": {
             "type": "integer",
-            "description": "Identifier of the sanction given by the HSMV",
+            "description": "Unique Identifier for the sanction set by FLHSMV.",
             "format": "int32"
           },
           "CountyCode": {
@@ -413,41 +456,77 @@
             "description": "Florida TCATS county number",
             "format": "int32"
           }
-        },
-        "description": "List of Sanction Reopen Model"
+        }
       },
       "ErrorResponse": {
         "type": "object",
+        "x-stoplight": {
+          "id": "6k8xocdbl7m4q"
+        },
+        "x-examples": {
+          "Example 1": {
+            "httpStatusCode": -2147483648,
+            "reason": "string"
+          }
+        },
+        "description": "Model of the data items in an Error response received from the API request.",
+        "required": [
+          "httpStatusCode"
+        ],
         "properties": {
           "httpStatusCode": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "description": "Three-digit code that indicate the outcome of an API request."
           },
           "reason": {
-            "type": "string"
+            "type": "string",
+            "description": "Description of the httpStatusCode."
           }
         }
       },
       "ReopenResponse": {
         "type": "object",
+        "x-stoplight": {
+          "id": "e2j7uc5avsbdy"
+        },
+        "description": "Model of data items in the response to a Reopen Request.",
+        "x-examples": {
+          "Example 1": {
+            "DriverLicenseNumber": "string",
+            "TransactionId": -2147483648,
+            "ErrorCode": -2147483648,
+            "ErrorMessage": "string",
+            "SanctionErrors": [
+              {
+                "SanctionId": 0,
+                "ErrorCode": 0,
+                "ErrorMessage": "string"
+              }
+            ]
+          }
+        },
+        "required": [
+          "DriverLicenseNumber"
+        ],
         "properties": {
           "DriverLicenseNumber": {
             "type": "string",
-            "description": "Florida driver license number"
+            "description": "Florida driver license number for the sanction that is being reopened."
           },
           "TransactionId": {
             "type": "integer",
-            "description": "The identifier of the transaction ",
+            "description": "Unique identifier for the reopen transaction set by FLHSMV.",
             "format": "int32"
           },
           "ErrorCode": {
             "type": "integer",
-            "description": "Error code",
+            "description": "Error code provided by FLHSMV if there was an error in completing the request.",
             "format": "int32"
           },
           "ErrorMessage": {
             "type": "string",
-            "description": "Text describing the meaning of the error code"
+            "description": "Text describing the meaning of the error code."
           },
           "SanctionErrors": {
             "type": "array",
@@ -460,26 +539,50 @@
       },
       "SanctionError": {
         "type": "object",
+        "description": "Model for the data items in the error object at Sanction level. Populated if any error occured in updating individual sanctions.",
+        "x-stoplight": {
+          "id": "sgey1keezbuqs"
+        },
+        "x-examples": {
+          "Example 1": {
+            "SanctionId": -2147483648,
+            "ErrorCode": -2147483648,
+            "ErrorMessage": "string"
+          }
+        },
         "properties": {
           "SanctionId": {
             "type": "integer",
-            "description": "Identifier of the sanction given by the FLHSMV",
+            "description": "Unique Identifier for the sanction set by FLHSMV.",
             "format": "int32"
           },
           "ErrorCode": {
             "type": "integer",
-            "description": "Error code",
+            "description": "Error code provided by FLHSMV if there was an error in completing the request.",
             "format": "int32"
           },
           "ErrorMessage": {
             "type": "string",
-            "description": "Text describing the meaning of the error code"
+            "description": "Text describing the meaning of the error code."
           }
-        },
-        "description": "Populated if any errors occured in updating individual sanctions."
+        }
       },
       "NotOnRecordClearRequest": {
         "type": "object",
+        "x-stoplight": {
+          "id": "txf2ovnwj8280"
+        },
+        "description": "Model of data items sent in a request for clearing sanctions which are not on record.",
+        "x-examples": {
+          "Example 1": {
+            "DriverLicenseNumber": "string",
+            "CitationNumber": "string"
+          }
+        },
+        "required": [
+          "DriverLicenseNumber",
+          "CitationNumber"
+        ],
         "properties": {
           "DriverLicenseNumber": {
             "type": "string",
@@ -493,32 +596,47 @@
       },
       "NotOnRecordClearResponse": {
         "type": "object",
+        "x-stoplight": {
+          "id": "jta9aoure8eu5"
+        },
+        "description": "Model of data items in the response received for a request to clear not on record sanctions.",
+        "required": [
+          "DriverLicenseNumber"
+        ],
         "properties": {
           "DriverLicenseNumber": {
             "type": "string",
-            "description": "Florida driver license number"
+            "description": "Florida driver license number."
           },
           "ErrorCode": {
             "type": "integer",
-            "description": "Error code",
+            "description": "Error code provided by FLHSMV if there was an error in completing the request.",
             "format": "int32"
           },
           "ErrorMessage": {
             "type": "string",
-            "description": "Text describing the meaning of the error code"
+            "description": "Text describing the meaning of the error code."
           }
         }
       },
       "ClearanceRequest": {
         "type": "object",
+        "description": "Model of data items sent in a request to clear sanctions.",
+        "x-stoplight": {
+          "id": "is1r4y4qxowsv"
+        },
+        "required": [
+          "DriverLicenseNumber",
+          "CountyCode"
+        ],
         "properties": {
           "DriverLicenseNumber": {
             "type": "string",
-            "description": "Florida driver license number"
+            "description": "Florida driver license number for which the sanction clearance request is being sent."
           },
           "CountyCode": {
             "type": "integer",
-            "description": "Florida TCATS county number",
+            "description": "Florida TCATS county number.",
             "format": "int32"
           },
           "Sanctions": {
@@ -530,33 +648,40 @@
           },
           "FeeCollected": {
             "type": "boolean",
-            "description": "Is Reinstatement fee for FTC (aka D6 or DSU) sanctions is collected to reinstate the driver license (true or false).",
+            "description": "This boolean data item indicates if the county has collected the fee to reinstate the driver license.",
             "example": true
           }
-        },
-        "description": "Clearance Request Model Information"
+        }
       },
       "Sanction": {
         "type": "object",
+        "description": "Model of data items in the Sanction object. This model will be used in both the request and response. So some of the fields will be populated for both, some are only set for the request and some will only have values for a response.",
+        "x-stoplight": {
+          "id": "wbajvvauirs1t"
+        },
+        "required": [
+          "SanctionId",
+          "SanctionType"
+        ],
         "properties": {
           "SanctionId": {
             "type": "integer",
-            "description": "Identifier of the sanction given by the FLHSMV",
+            "description": "Unique Identifier for the sanction set by FLHSMV.",
             "format": "int32"
           },
           "SanctionType": {
             "type": "string",
-            "description": "The type of the sanction",
+            "description": "The type of the sanction. It can be DSU or SUS.",
             "example": "DSU or SUS"
           },
           "SequenceNumber": {
             "type": "integer",
-            "description": "Helps to identify the sanction for the customer",
+            "description": "An interger value to identify the sanction for the customer.  This value is incremented by FLHSMV for each sanction added to the customer record.",
             "format": "int32"
           },
           "CreateDate": {
             "type": "string",
-            "description": "The date when the sanction was created.",
+            "description": "The date when the sanction was created in the FLHSMV system.",
             "format": "date-time"
           },
           "EffectiveDate": {
@@ -566,7 +691,7 @@
           },
           "RestoreDate": {
             "type": "string",
-            "description": "The date when the sanction is cleared",
+            "description": "The date when the sanction is cleared.  This will be null for inquiries which return open sanctions.",
             "format": "date-time"
           },
           "CountyCode": {
@@ -580,23 +705,23 @@
           },
           "CourtIdentifier": {
             "type": "string",
-            "description": "“Ticket Number” or “Citation Number” "
+            "description": "Also known as a 7 digit “Ticket Number” or “Citation Number” of the sanction in the FLHSMV system, in the case of a Criminal Financial Obligation or Child Support sanction this is a 22 digit “Warrant Case Id”."
           },
           "CourtRequirementsMet": {
             "type": "boolean",
-            "description": "Is Court Requirement Met (true or false)."
+            "description": "Boolean value that indicates if Court Requirements are met (true or false)."
           },
           "ReinstatementFeeCFORequired": {
             "type": "boolean",
-            "description": "Is Reinstatement fee for CFO sanctions is required (true or false)."
+            "description": "Boolean value that indicates if the Reinstatement fee for CFO sanctions is required (true or false). This is returned the Sanctions Inquiry response."
           },
           "ClearedByFCCC": {
             "type": "boolean",
-            "description": "Is Clearead by FCCC (true or false)."
+            "description": "Boolean value that indicates whether the sanction has been cleared."
           },
           "ReopenAllowed": {
             "type": "boolean",
-            "description": "Is Reopen Allowed (true or false).",
+            "description": "Boolean value that indicates if a reopen of a cleared sanction is allowed. ",
             "example": true
           },
           "SanctionActions": {
@@ -606,73 +731,73 @@
               "$ref": "#/components/schemas/SanctionAction"
             }
           },
-          "FeeCollected": {
-            "type": "boolean",
-            "description": "Is CFO Fee collected (true or false).",
-            "example": true
-          },
           "RestoreDateAllowed": {
             "type": "boolean",
-            "description": "Is Restore Allowed (true or false).",
+            "description": "Boolean value returned in Inquiry response to indicate if a restore date can be set to reinstate the license.",
             "example": true
           },
           "RequestedActionType": {
             "type": "string",
-            "description": "Requested Action Type",
+            "description": "This string value is set in the request to clear sanctions. The two values are:\r\nCRM : CourtRequirementsMet \r\nCLR : Clearance Request",
             "example": "CRM : CourtRequirementsMet, CLR: Clearance Request"
           },
           "RestoreMaxDate": {
             "type": "string",
-            "description": "Maximum date allowed on restore date.",
+            "description": "This value is set in the response for sanctions inquiry. It indicates the maximum date allowed on restore date.",
             "format": "date-time"
           },
           "RestoreMinDate": {
             "type": "string",
-            "description": "Minimum date allowed on restore date.",
+            "description": "This value is set in the response for sanctions inquiry. It indicates the minimum date allowed on restore date.",
             "format": "date-time"
           },
           "CourtRequirementsMetAllowed": {
             "type": "boolean",
-            "description": "Is Court Requirement Met Allowed (true or false).",
+            "description": "This boolean is set in the response for sanctions inquiry. It indicates if the sanction can be cleared by setting CourtRequirementsMet to true.",
             "example": true
           }
-        },
-        "description": "List of Sanction Model"
+        }
       },
       "SanctionAction": {
         "type": "object",
+        "description": "Model of data items in SanctionAction object.",
+        "x-stoplight": {
+          "id": "au3y84eug65uc"
+        },
         "properties": {
           "ActionCode": {
             "type": "string",
-            "description": "Identifier of a sanction action "
+            "description": "Identifier of a sanction action in the FLHSMV system."
           },
           "ActionName": {
             "type": "string",
-            "description": "Descriptive name of the sanction action "
+            "description": "Descriptive name of the sanction action in the FLHSMV system."
           }
-        },
-        "description": "List of Sanction Action Model"
+        }
       },
       "ClearanceResponse": {
         "type": "object",
+        "x-stoplight": {
+          "id": "vsbx0ra688s3a"
+        },
         "properties": {
           "DriverLicenseNumber": {
             "type": "string",
-            "description": "Florida driver license number"
+            "description": "Florida driver license number for which the sanction clearance request is being sent."
           },
           "TransactionId": {
             "type": "integer",
-            "description": "The identifier of the transaction ",
+            "description": "Unique Identifier for the sanction set by FLHSMV.",
             "format": "int64"
           },
           "ErrorCode": {
             "type": "integer",
-            "description": "Error code",
+            "description": "Error code provided by FLHSMV if there was an error in completing the request.",
             "format": "int32"
           },
           "ErrorMessage": {
             "type": "string",
-            "description": "Text describing the meaning of the error code"
+            "description": "Text describing the meaning of the error code."
           },
           "Sanctions": {
             "type": "array",
@@ -681,14 +806,19 @@
               "$ref": "#/components/schemas/SanctionResponse"
             }
           }
-        }
+        },
+        "description": "Model of data items received in the response to Clearance Request."
       },
       "SanctionResponse": {
         "type": "object",
+        "description": "Model of data items in the SanctionResponse object included in a ClearanceResponse. ",
+        "x-stoplight": {
+          "id": "c1cn0g4ruwa8y"
+        },
         "properties": {
           "SanctionId": {
             "type": "integer",
-            "description": "Identifier of the sanction given by the FLHSMV",
+            "description": "Unique Identifier for the sanction set by FLHSMV.",
             "format": "int32"
           },
           "CountyCode": {
@@ -702,30 +832,32 @@
           },
           "CourtIdentifier": {
             "type": "string",
-            "description": "“Ticket Number” or “Citation Number” "
+            "description": "Also known as a 7 digit “Ticket Number” or “Citation Number” of the sanction in the FLHSMV system, in the case of a Criminal Financial Obligation or Child Support sanction this is a 22 digit “Warrant Case Id”."
           },
           "Success": {
             "type": "boolean",
-            "description": "Is Success (true or false). "
+            "description": "Boolean value that indicates if the clearance request for this sanction was successful or not.(true or false). "
           },
           "CourtRequirementsMet": {
             "type": "boolean",
-            "description": "Is Court Requirement Met (true or false). "
+            "description": "Boolean value that indicates if Court Requirements are Met (true or false). "
           },
           "ErrorCode": {
             "type": "integer",
-            "description": "ErrorCode ",
+            "description": "Error code provided by FLHSMV if there was an error in completing the request.",
             "format": "int32"
           },
           "ErrorMessage": {
             "type": "string",
-            "description": "ErrorMessage"
+            "description": "Text describing the meaning of the error code."
           }
-        },
-        "description": "List of SanctionResponse model"
+        }
       },
       "CustomerSanctionResponse": {
         "type": "object",
+        "x-stoplight": {
+          "id": "7035h217c0ubv"
+        },
         "properties": {
           "DriverLicenseNumber": {
             "type": "string",
@@ -737,7 +869,7 @@
           },
           "ErrorCode": {
             "type": "integer",
-            "description": "Error code",
+            "description": "Error code provided by FLHSMV if there was an error in completing the request.",
             "format": "int32",
             "example": 1
           },
@@ -782,7 +914,7 @@
           },
           "ReinstatementFeeFTCRequired": {
             "type": "boolean",
-            "description": "Is Reinstatement fee for FTC (aka D6 or DSU) sanctions is required to reinstate the driver license (true or false)."
+            "description": "Boolean value that indicates if Reinstatement fee for DSU and SUS sanctions is required to reinstate the driver license (true or false)."
           },
           "OtherOpenSanctionsCount": {
             "type": "integer",
@@ -791,7 +923,7 @@
           },
           "ReinstatementFeeFTCAllowed": {
             "type": "boolean",
-            "description": "Is Reinstatement fee for FTC (aka D6 or DSU) sanctions is allowed to reinstate the driver license (true or false)."
+            "description": "Boolean value that indicates if Reinstatement fee for DSU and SUS sanctions is allowed to reinstate the driver license (true or false)."
           },
           "Sanctions": {
             "type": "array",
@@ -802,9 +934,10 @@
           },
           "DriverLicenceExpired": {
             "type": "boolean",
-            "description": "is Driver License Expired (true or false). "
+            "description": "Boolean value that indicates if the Driver License is expired (true or false). "
           }
-        }
+        },
+        "description": "Model of the data items received in response to Custom Sanctions Inquiry Request."
       }
     },
     "securitySchemes": {
