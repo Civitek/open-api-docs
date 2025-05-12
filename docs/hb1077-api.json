@@ -830,6 +830,7 @@
         "x-stoplight": {
           "id": "vsbx0ra688s3a"
         },
+        "description": "Model of data items received in the response to Clearance Request.",
         "properties": {
           "DriverLicenseNumber": {
             "type": "string",
@@ -837,7 +838,7 @@
           },
           "TransactionId": {
             "type": "integer",
-            "description": "Unique Identifier for the sanction set by FLHSMV.",
+            "description": "A unique identifier assigned to each clearance transaction.",
             "format": "int64"
           },
           "ErrorCode": {
@@ -856,8 +857,7 @@
               "$ref": "#/components/schemas/SanctionResponse"
             }
           }
-        },
-        "description": "Model of data items received in the response to Clearance Request."
+        }
       },
       "SanctionResponse": {
         "type": "object",
