@@ -38,6 +38,56 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/CustomerSanctionResponse"
+                },
+                "examples": {
+                  "example-1": {
+                    "value": {
+                      "DriverLicenseNumber": "string",
+                      "CurrentDriverLicenseNumber": "string",
+                      "ErrorCode": 1,
+                      "ErrorMessage": "string",
+                      "FirstName": "string",
+                      "MiddleName": "string",
+                      "LastName": "string",
+                      "DateOfBirth": "2019-08-24T14:15:22Z",
+                      "Sex": "string",
+                      "LicenseTypeCode": "string",
+                      "IssueDate": "2019-08-24T14:15:22Z",
+                      "ExpireDate": "2019-08-24T14:15:22Z",
+                      "ReinstatementFeeFTCRequired": true,
+                      "OtherOpenSanctionsCount": 0,
+                      "ReinstatementFeeFTCAllowed": true,
+                      "Sanctions": [
+                        {
+                          "SanctionId": 0,
+                          "SanctionType": "DSU or SUS",
+                          "SequenceNumber": 0,
+                          "CreateDate": "2019-08-24T14:15:22Z",
+                          "EffectiveDate": "2019-08-24T14:15:22Z",
+                          "RestoreDate": "2019-08-24T14:15:22Z",
+                          "CountyCode": 0,
+                          "SanctionReasonCode": "string",
+                          "CourtIdentifier": "string",
+                          "CourtRequirementsMet": true,
+                          "ReinstatementFeeCFORequired": true,
+                          "ClearedByFCCC": true,
+                          "ReopenAllowed": true,
+                          "SanctionActions": [
+                            {
+                              "ActionCode": "string",
+                              "ActionName": "string"
+                            }
+                          ],
+                          "RestoreDateAllowed": true,
+                          "RequestedActionType": "CRM : CourtRequirementsMet, CLR: Clearance Request",
+                          "RestoreMaxDate": "2019-08-24T14:15:22Z",
+                          "RestoreMinDate": "2019-08-24T14:15:22Z",
+                          "CourtRequirementsMetAllowed": true
+                        }
+                      ],
+                      "DriverLicenceExpired": true
+                    }
+                  }
                 }
               }
             }
@@ -120,7 +170,7 @@
     "/flhsmv-api/clearance": {
       "post": {
         "tags": [
-          "HB1077 DL Sanctions Clearance"
+          "HB-1077 Sanctions Clearance"
         ],
         "description": "This method is used to clear sanctions for the different scenarios – Court Requirement Met, Clearance prior to effective date and Clearance after effective date.",
         "operationId": "clearance",
