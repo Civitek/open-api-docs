@@ -105,6 +105,20 @@
 					}
 				}
 			},
+			"ItemAttribute": {
+				"type": "object",
+				"properties": {
+					"fieldName": {
+						"type": "string"
+					},
+					"fieldValue": {
+						"type": "string"
+					},
+					"receiptDisplay": {
+						"type": "boolean"
+					}
+				}
+			},
 			"TpePaymentResponse": {
 				"type": "object",
 				"properties": {
