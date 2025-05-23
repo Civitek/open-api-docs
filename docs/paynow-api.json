@@ -105,17 +105,14 @@
 					}
 				}
 			},
-			"ItemAttribute": {
+			"AttributeValue": {
 				"type": "object",
 				"properties": {
-					"fieldName": {
+					"attribute": {
 						"type": "string"
 					},
-					"fieldValue": {
+					"value": {
 						"type": "string"
-					},
-					"receiptDisplay": {
-						"type": "boolean"
 					}
 				}
 			},
