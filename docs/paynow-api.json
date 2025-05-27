@@ -113,13 +113,13 @@
 					"errorMessage": {
 						"type": "string"
 					},
+					"amount": {
+						"type": "number"
+					},
 					"feeAmount": {
 						"type": "number"
 					},
 					"totalAmount": {
-						"type": "number"
-					},
-					"amount": {
 						"type": "number"
 					},
 					"itemSku": {
