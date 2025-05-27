@@ -33,7 +33,7 @@
 						"content": {
 							"*/*": {
 								"schema": {
-									"$ref": "#/components/schemas/TpePaymentResponse"
+									"$ref": "#/components/schemas/IvrResponse"
 								}
 							}
 						}
@@ -41,7 +41,7 @@
 				},
 				"security": [
 					{
-						"bearerAuth": []
+						"basicAuth": []
 					}
 				]
 			}
