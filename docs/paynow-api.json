@@ -62,14 +62,6 @@
 					"itemKey": {
 						"type": "string"
 					},
-					"deliveryMethod": {
-						"maximum": 2,
-						"exclusiveMaximum": false,
-						"minimum": 0,
-						"exclusiveMinimum": false,
-						"type": "integer",
-						"format": "int32"
-					},
 					"transactionAmount": {
 						"minimum": 1,
 						"exclusiveMinimum": false,
@@ -105,6 +97,30 @@
 					}
 				}
 			},
+			"IvrResponse": {
+				"type": "object",
+				"properties": {
+					"orderId": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"status": {
+						"type": "string"
+					},
+					"errorMessage": {
+						"type": "string"
+					},
+					"feeAmount": {
+						"type": "number"
+					},
+					"totalAmount": {
+						"type": "number"
+					},
+					"sku": {
+						"type": "string"
+					}
+				}
+			},
 			"AttributeValue": {
 				"type": "object",
 				"properties": {
@@ -115,36 +131,12 @@
 						"type": "string"
 					}
 				}
-			},
-			"TpePaymentResponse": {
-				"type": "object",
-				"properties": {
-					"orderId": {
-						"type": "integer",
-						"format": "int64"
-					},
-					"subscriptionId": {
-						"type": "string"
-					},
-					"status": {
-						"type": "string"
-					},
-					"errorMessage": {
-						"type": "string"
-					},
-					"retry": {
-						"type": "boolean"
-					},
-					"review": {
-						"type": "boolean"
-					}
-				}
 			}
 		},
 		"securitySchemes": {
-			"bearerAuth": {
+			"basicAuth": {
 				"type": "http",
-				"scheme": "bearer"
+				"scheme": "basic"
 			}
 		}
 	}
