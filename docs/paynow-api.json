@@ -11,17 +11,17 @@
 		}
 	],
 	"paths": {
-		"/payment/ivr": {
+		"/payment/createOrder": {
 			"post": {
 				"tags": [
 					"Payment Service"
 				],
-				"operationId": "ivrPayment",
+				"operationId": "createOrder",
 				"requestBody": {
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/IvrRequest"
+								"$ref": "#/components/schemas/OrderRequest"
 							}
 						}
 					},
@@ -33,7 +33,7 @@
 						"content": {
 							"*/*": {
 								"schema": {
-									"$ref": "#/components/schemas/IvrResponse"
+									"$ref": "#/components/schemas/OrderResponse"
 								}
 							}
 						}
@@ -49,12 +49,10 @@
 	},
 	"components": {
 		"schemas": {
-			"IvrRequest": {
+			"OrderRequest": {
 				"required": [
-					"email",
 					"itemKey",
 					"itemSku",
-					"phone",
 					"transactionAmount"
 				],
 				"type": "object",
@@ -74,7 +72,6 @@
 						"type": "string"
 					},
 					"phone": {
-						"pattern": "^\\d{10}$",
 						"type": "string"
 					},
 					"firstName": {
@@ -97,7 +94,7 @@
 					}
 				}
 			},
-			"IvrResponse": {
+			"OrderResponse": {
 				"type": "object",
 				"properties": {
 					"orderId": {
@@ -105,7 +102,13 @@
 						"format": "int64"
 					},
 					"status": {
-						"type": "string"
+						"type": "string",
+						"description": "Status of the order",
+						"example": "success",
+						"enum": [
+							"success",
+							"failed"
+						]
 					},
 					"errorMessage": {
 						"type": "string"
@@ -116,7 +119,10 @@
 					"totalAmount": {
 						"type": "number"
 					},
-					"sku": {
+					"amount": {
+						"type": "number"
+					},
+					"itemSku": {
 						"type": "string"
 					}
 				}
