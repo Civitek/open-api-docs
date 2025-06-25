@@ -54,9 +54,9 @@
                       "LicenseTypeCode": "string",
                       "IssueDate": "2019-08-24T14:15:22Z",
                       "ExpireDate": "2019-08-24T14:15:22Z",
-                      "ReinstatementFeeFTCRequired": true,
+                      "ReinstatementFeeRequired": true,
                       "OtherOpenSanctionsCount": 0,
-                      "ReinstatementFeeFTCAllowed": true,
+                      "ReinstatementFeeAllowed": true,
                       "Sanctions": [
                         {
                           "SanctionId": 0,
@@ -69,7 +69,6 @@
                           "SanctionReasonCode": "string",
                           "CourtIdentifier": "string",
                           "CourtRequirementsMet": true,
-                          "ReinstatementFeeCFORequired": true,
                           "ClearedByFCCC": true,
                           "ReopenAllowed": true,
                           "SanctionActions": [
@@ -761,10 +760,6 @@
             "type": "boolean",
             "description": "Boolean value that indicates if Court Requirements are met (true or false)."
           },
-          "ReinstatementFeeCFORequired": {
-            "type": "boolean",
-            "description": "Boolean value that indicates if the Reinstatement fee for CFO sanctions is required (true or false). This is returned the Sanctions Inquiry response."
-          },
           "ClearedByFCCC": {
             "type": "boolean",
             "description": "Boolean value that indicates whether the sanction has been cleared."
@@ -962,7 +957,7 @@
             "description": "The date the driver license expires.",
             "format": "date-time"
           },
-          "ReinstatementFeeFTCRequired": {
+          "ReinstatementFeeRequired": {
             "type": "boolean",
             "description": "Boolean value that indicates if Reinstatement fee for DSU and SUS sanctions is required to reinstate the driver license (true or false)."
           },
@@ -971,7 +966,7 @@
             "description": "The number of open sanctions of other types not including D6 suspensions or Financial Obligation Suspensions.",
             "format": "int32"
           },
-          "ReinstatementFeeFTCAllowed": {
+          "ReinstatementFeeAllowed": {
             "type": "boolean",
             "description": "Boolean value that indicates if Reinstatement fee for DSU and SUS sanctions is allowed to reinstate the driver license (true or false)."
           },
