@@ -80,7 +80,7 @@
 					},
 					"phone": {
 						"type": "string",
-						"description": "Phone nuumber of the customer making the payment. Optional."
+						"description": "Phone number of the customer making the payment. Optional."
 					},
 					"firstName": {
 						"type": "string",
