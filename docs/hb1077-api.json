@@ -674,10 +674,6 @@
         "x-stoplight": {
           "id": "is1r4y4qxowsv"
         },
-        "required": [
-          "DriverLicenseNumber",
-          "CountyCode"
-        ],
         "properties": {
           "DriverLicenseNumber": {
             "type": "string",
@@ -685,7 +681,7 @@
           },
           "CountyCode": {
             "type": "integer",
-            "description": "Florida TCATS county number.",
+            "description": "Florida TCATS county number of the sanction. Out of State (OOS) and PTS sanctions will return a 0.",
             "format": "int32"
           },
           "Sanctions": {
@@ -700,7 +696,11 @@
             "description": "This boolean data item indicates if the county has collected the fee to reinstate the driver license.",
             "example": true
           }
-        }
+        },
+        "required": [
+          "DriverLicenseNumber",
+          "CountyCode"
+        ]
       },
       "Sanction": {
         "type": "object",
