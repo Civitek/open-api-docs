@@ -19,7 +19,7 @@
   "paths": {
     "/flhsmv-api/customerSanctions/{driverLicenseNumber}": {
       "get": {
-        "description": "This method accepts a parameter of driver license number and returns the DSU and SUS sanctions against the driver license that can be cleared or reopened by a county for a FLHSMV customer. The response includes driver's name, driver license number and demographic information and an array of sanction details.",
+        "description": "This method accepts a parameter of driver license number and returns the sanctions (DSU, SUS, or PTS) that can be cleared or reopened by a county for a FLHSMV customer. The response includes driver's name, driver license number and demographic information and an array of sanction details.",
         "operationId": "customerSanctions",
         "parameters": [
           {
@@ -171,7 +171,7 @@
         "tags": [
           "HB-1077 Sanctions Clearance"
         ],
-        "description": "This method is used to clear sanctions for the different scenarios – Court Requirement Met, Clearance prior to effective date and Clearance after effective date.",
+        "description": "This method is used to clear sanctions for the different scenarios – Court Requirement Met, Clearance Prior to Effective Date and Clearance After Effective Date.",
         "operationId": "clearance",
         "requestBody": {
           "content": {
@@ -263,7 +263,7 @@
     },
     "/flhsmv-api/notOnRecordClear": {
       "post": {
-        "description": "This method is used to clear FTC (Failure to Comply) suspensions before they have been added to the customer driver record. The client must provide the Citation Number of the FTC suspension to be cleared.  \r\nEach request can clear only one FTC suspension. CFO (Criminal Financial Obligation) Suspensions cannot be cleared using this method",
+        "description": "This method is used to clear DSU FTC (Failure to Comply) suspensions before they have been added to the customer driver record. The client must provide the Citation Number of the DSU sanction to be cleared.\nEach request can clear only one DSU/FTC suspension. SUS (Criminal Financial Obligation and Child Support) and PTS suspensions cannot be cleared using this method.",
         "operationId": "notOnRecordClear",
         "requestBody": {
           "content": {
@@ -361,7 +361,7 @@
         "tags": [
           "HB-1077 Sanctions Clearance"
         ],
-        "description": "This method provides the ability to reopen sanctions which were cleared within the last 24 hours.",
+        "description": "This method provides the ability to reopen sanctions which were cleared by a Clerk of Court (ClearedbyFCCC) within the last 24 hours. PTS sanctions cannot be cleared reopened using this method.",
         "operationId": "reopen",
         "requestBody": {
           "content": {
@@ -628,10 +628,6 @@
             "CitationNumber": "string"
           }
         },
-        "required": [
-          "DriverLicenseNumber",
-          "CitationNumber"
-        ],
         "properties": {
           "DriverLicenseNumber": {
             "type": "string",
@@ -639,9 +635,13 @@
           },
           "CitationNumber": {
             "type": "string",
-            "description": "The citation number of the FTC suspension to be cleared."
+            "description": "The citation number of the DSU (D6/FTC) suspension to be cleared."
           }
-        }
+        },
+        "required": [
+          "DriverLicenseNumber",
+          "CitationNumber"
+        ]
       },
       "NotOnRecordClearResponse": {
         "type": "object",
@@ -674,10 +674,6 @@
         "x-stoplight": {
           "id": "is1r4y4qxowsv"
         },
-        "required": [
-          "DriverLicenseNumber",
-          "CountyCode"
-        ],
         "properties": {
           "DriverLicenseNumber": {
             "type": "string",
@@ -685,7 +681,7 @@
           },
           "CountyCode": {
             "type": "integer",
-            "description": "Florida TCATS county number.",
+            "description": "Florida TCATS county number of the sanction. Out of State (OOS) and PTS sanctions will return a 0.",
             "format": "int32"
           },
           "Sanctions": {
@@ -700,7 +696,11 @@
             "description": "This boolean data item indicates if the county has collected the fee to reinstate the driver license.",
             "example": true
           }
-        }
+        },
+        "required": [
+          "DriverLicenseNumber",
+          "CountyCode"
+        ]
       },
       "Sanction": {
         "type": "object",
@@ -708,10 +708,6 @@
         "x-stoplight": {
           "id": "wbajvvauirs1t"
         },
-        "required": [
-          "SanctionId",
-          "SanctionType"
-        ],
         "properties": {
           "SanctionId": {
             "type": "integer",
@@ -720,7 +716,7 @@
           },
           "SanctionType": {
             "type": "string",
-            "description": "The type of the sanction. It can be DSU or SUS.",
+            "description": "The type of the sanction: DSU, SUS, or PTS.",
             "example": "DSU or SUS"
           },
           "SequenceNumber": {
@@ -745,7 +741,7 @@
           },
           "CountyCode": {
             "type": "integer",
-            "description": "Florida TCATS county number of the sanction.",
+            "description": "Florida TCATS county number of the sanction. Out of State (OOS) and PTS sanctions will return a 0.",
             "format": "int32"
           },
           "SanctionReasonCode": {
@@ -801,7 +797,11 @@
             "description": "This boolean is set in the response for sanctions inquiry. It indicates if the sanction can be cleared by setting CourtRequirementsMet to true.",
             "example": true
           }
-        }
+        },
+        "required": [
+          "SanctionId",
+          "SanctionType"
+        ]
       },
       "SanctionAction": {
         "type": "object",
@@ -903,6 +903,7 @@
         "x-stoplight": {
           "id": "7035h217c0ubv"
         },
+        "description": "Model of the data items received in response to Custom Sanctions Inquiry Request.",
         "properties": {
           "DriverLicenseNumber": {
             "type": "string",
@@ -963,7 +964,7 @@
           },
           "OtherOpenSanctionsCount": {
             "type": "integer",
-            "description": "The number of open sanctions of other types not including D6 suspensions or Financial Obligation Suspensions.",
+            "description": "The number of open sanctions unavailable to the Clerks of Court. The count does not include any DSU (D6) or SUS (Criminal Financial Obligation or Child Support) sanctions.",
             "format": "int32"
           },
           "ReinstatementFeeAllowed": {
@@ -981,8 +982,7 @@
             "type": "boolean",
             "description": "Boolean value that indicates if the Driver License is expired (true or false). "
           }
-        },
-        "description": "Model of the data items received in response to Custom Sanctions Inquiry Request."
+        }
       }
     },
     "securitySchemes": {
