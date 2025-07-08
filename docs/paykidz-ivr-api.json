@@ -16,12 +16,15 @@
       "bearerAuth": []
     }
   ],
+  
   "paths": {
     "/payment/ivr": {
       "post": {
         "tags": [
           "Payment Service"
         ],
+        "summary": "Start IVR payment process",
+        "description": "This method is used to initiate child support payments via our payment processing service. It will accept an payment request to identify the type of payment, payment amount and any other identifying data. It will initiate the payment in the system and return an Order Id that uniquely identifies this payment transaction.",
         "operationId": "ivrPayment",
         "requestBody": {
           "content": {
@@ -96,7 +99,7 @@
           },
           "phone": {
             "type": "string",
-            "description": "Phone number of the customer making the payment."
+            "description": "Phone number of the customer making the payment. Optional."
           },
           "email": {
             "type": "string",
