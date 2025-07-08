@@ -96,7 +96,7 @@
           },
           "phone": {
             "type": "string",
-            "description": "Phone number of the customer making the payment. Optional."
+            "description": "Phone number of the customer making the payment."
           },
           "email": {
             "type": "string",
