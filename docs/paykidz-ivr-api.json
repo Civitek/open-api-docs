@@ -3,7 +3,7 @@
   "info": {
     "title": "PayKidz API Specifications",
     "version": "1.0.0",
-    "description": "API to manage and track PayKidz IVR payment transactions."
+    "description": "This API is used to create orders for PayKidz IVR payment processing."
   },
   "servers": [
     {
