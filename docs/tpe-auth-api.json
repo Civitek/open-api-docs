@@ -1,0 +1,92 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "TPE user authorization.",
+    "description": "API documentation for TPE AUTH",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8097",
+      "description": "Generated server url"
+    }
+  ],
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ],
+  "paths": {
+    "/api/auth/token": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "summary": "Supports Basic Auth and Refresh Token",
+        "description": "This endpoint supports two types of authentication:\n- Basic Auth (via Authorization header)\n- Refresh Token (via request body)",
+        "operationId": "createToken",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RefreshRequest": {
+        "type": "object",
+        "description": "Request body for refreshing an access token. Includes optional custom claims and token expiration override.",
+        "properties": {
+          "claims": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object"
+            },
+            "description": "Optional custom claims to be included in the new access token. These will be merged with the default claims."
+          },
+          "expireMinutes": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Optional override for the access token's expiration time in minutes. If not provided, the default expiry will be used.",
+            "example": 60
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "description": "For login information, please contact support.",
+        "scheme": "basic"
+      }
+    }
+  }
+}
