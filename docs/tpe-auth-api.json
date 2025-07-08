@@ -7,8 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:8097",
-      "description": "Generated server url"
+      "url": "https:testapi.civikestpayment.com"
     }
   ],
   "security": [
@@ -16,14 +15,20 @@
       "basicAuth": []
     }
   ],
+  "tags": [
+    {
+      "name": "Authentication Service",
+      "description": "Provides endpoints for generating access and refresh tokens using Basic Authentication or a refresh token."
+    }
+  ],
   "paths": {
     "/api/auth/token": {
       "post": {
         "tags": [
-          "auth-controller"
+          "Authentication Service"
         ],
         "summary": "Token",
-        "description": "This endpoint supports two types of authentication:\n- Basic Auth (via Authorization header)\n- Refresh Token (via request body)",
+        "description": "This endpoint supports Basic authentication:\n- Refresh Request (Optional)",
         "operationId": "createToken",
         "parameters": [
           {
@@ -45,6 +50,16 @@
           }
         },
         "responses": {
+          "200": {
+            "description": "Token generated successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuth2TokenResponse"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Invalid username or password",
             "content": {
@@ -66,13 +81,66 @@
                 }
               }
             }
-          },
+          }
+        }
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "tags": [
+          "Authentication Service"
+        ],
+        "summary": "Refresh-Token",
+        "description": "This endpoint supports bearer authentication:\n- Refresh Token (Guid - In header)- Refresh Request (Optional)",
+        "operationId": "refreshToken",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              }
+            }
+          }
+        },
+        "responses": {
           "200": {
             "description": "Token generated successfully",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/OAuth2TokenResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid username or password",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "example": "Invalid username or password"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "example": "Server Exception: ..."
                 }
               }
             }
