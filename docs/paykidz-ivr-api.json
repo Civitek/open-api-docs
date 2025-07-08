@@ -23,7 +23,7 @@
         "tags": [
           "Payment Service"
         ],
-        "summary": "Start IVR payment process",
+        "summary": "Instantiate IVR Payment Transaction",
         "description": "This method is used to initiate child support payments via our payment processing service. It will accept an payment request to identify the type of payment, payment amount and any other identifying data. It will initiate the payment in the system and return an Order Id that uniquely identifies this payment transaction.",
         "operationId": "ivrPayment",
         "requestBody": {
