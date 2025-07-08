@@ -20,7 +20,7 @@
     "/payment/ivr": {
       "post": {
         "tags": [
-          "payment-controller"
+          "Payment Service"
         ],
         "operationId": "ivrPayment",
         "requestBody": {
