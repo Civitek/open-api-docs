@@ -22,7 +22,7 @@
         "tags": [
           "auth-controller"
         ],
-        "summary": "Supports Basic Auth and Refresh Token",
+        "summary": "Token",
         "description": "This endpoint supports two types of authentication:\n- Basic Auth (via Authorization header)\n- Refresh Token (via request body)",
         "operationId": "createToken",
         "parameters": [
@@ -45,12 +45,34 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "401": {
+            "description": "Invalid username or password",
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "object"
+                  "type": "string",
+                  "example": "Invalid username or password"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "example": "Server Exception: ..."
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Token generated successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuth2TokenResponse"
                 }
               }
             }
@@ -77,6 +99,34 @@
             "format": "int32",
             "description": "Optional override for the access token's expiration time in minutes. If not provided, the default expiry will be used.",
             "example": 60
+          }
+        }
+      },
+      "OAuth2TokenResponse": {
+        "type": "object",
+        "description": "Represents the response returned after a successful OAuth2 authentication, including access and refresh tokens.",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "description": "The access token issued by the authorization server. Used to authenticate API requests.",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "tokenType": {
+            "type": "string",
+            "default": "Bearer",
+            "description": "The type of the token issued. Typically 'Bearer'.",
+            "example": "Bearer"
+          },
+          "expiresIn": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The number of seconds until the access token expires.",
+            "example": 3600
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "The refresh token, represented as a GUID, used to obtain a new access token.",
+            "example": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
           }
         }
       }
