@@ -1,54 +1,46 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "TPE user authorization.",
-    "description": "API documentation for TPE AUTH",
+    "title": "TPE User Authorization",
+    "description": "This service provides endpoints for obtaining and refreshing OAuth2-style tokens.\n\n### Usage Flow\n1. Call **`/api/auth/token`** with Basic Authentication to generate an access token and a refresh token.\n2. Use the **access token** (JWT) in the `Authorization` header (`Bearer {accessToken}`) to access secured APIs.\n3. When the access token expires, call **`/api/auth/refresh`** with the refresh token (in the `Authorization` header) to obtain a new access token without re-sending Basic Auth credentials.",
     "version": "1.0"
   },
   "servers": [
     {
-      "url": "https://testauthgateway.civikestpayment.com/api/auth/token"
-    }
-  ],
-  "security": [
-    {
-      "basicAuth": [],
-      "bearerAuth": []
+      "url": "https://testauthgateway.civikestpayment.com"
     }
   ],
   "tags": [
     {
       "name": "Authentication Service",
-      "description": "Provides endpoints for generating access and refresh tokens using Basic Authentication or a refresh token."
+      "description": "Provides endpoints for generating and refreshing access tokens."
     }
   ],
   "paths": {
     "/api/auth/token": {
       "post": {
-        "tags": [
-          "Authentication Service"
-        ],
-        "summary": "Token",
-        "description": "This endpoint supports Basic authentication",
+        "tags": ["Authentication Service"],
+        "summary": "Generate Token",
+        "description": "Authenticate using **Basic Authentication** (username and password or client credentials).\n\nReturns both an **access token** (short-lived) and a **refresh token** (longer-lived).\n\nExample:\n```\nAuthorization: Basic base64(username:password)\n```",
         "operationId": "createToken",
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
         "responses": {
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string",
-                  "example": "Server Exception: ..."
-                }
-              }
-            }
-          },
           "200": {
             "description": "Token generated successfully",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/OAuth2TokenResponse"
+                },
+                "example": {
+                  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  "tokenType": "Bearer",
+                  "expiresIn": 3600,
+                  "refreshToken": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
                 }
               }
             }
@@ -56,69 +48,79 @@
           "401": {
             "description": "Invalid username or password",
             "content": {
-              "*/*": {
+              "text/plain": {
                 "schema": {
                   "type": "string",
                   "example": "Invalid username or password"
                 }
               }
             }
-          }
-        },
-        "security": [
-          {
-            "basicAuth": []
-          }
-        ]
-      }
-    },
-    "/api/auth/refresh": {
-      "post": {
-        "tags": [
-          "Authentication Service"
-        ],
-        "summary": "Refresh-Token",
-        "description": "This endpoint supports bearer authentication",
-        "operationId": "refreshToken",
-        "responses": {
+          },
           "500": {
             "description": "Internal server error",
             "content": {
-              "*/*": {
+              "text/plain": {
                 "schema": {
                   "type": "string",
                   "example": "Server Exception: ..."
                 }
               }
             }
-          },
+          }
+        }
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "tags": ["Authentication Service"],
+        "summary": "Refresh Token",
+        "description": "Refreshes an expired access token using the **refresh token**.\n\nAuthenticate using `Authorization: Bearer {refreshToken}` header.\n\nA new access token (and optionally a new refresh token) is returned.",
+        "operationId": "refreshToken",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
           "200": {
-            "description": "Token generated successfully",
+            "description": "Token refreshed successfully",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/OAuth2TokenResponse"
+                },
+                "example": {
+                  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  "tokenType": "Bearer",
+                  "expiresIn": 3600,
+                  "refreshToken": "6ba85f64-9999-4562-b3fc-2c963f66bbb7"
                 }
               }
             }
           },
           "401": {
-            "description": "Invalid Token",
+            "description": "Invalid or expired refresh token",
             "content": {
-              "*/*": {
+              "text/plain": {
                 "schema": {
                   "type": "string",
-                  "example": "Invalid username or password"
+                  "example": "Invalid or expired refresh token"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Server Exception: ..."
                 }
               }
             }
           }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
+        }
       }
     }
   },
@@ -126,17 +128,16 @@
     "schemas": {
       "OAuth2TokenResponse": {
         "type": "object",
-        "description": "Represents the response returned after a successful OAuth2 authentication, including access and refresh tokens.",
+        "description": "Represents the response returned after a successful authentication.",
         "properties": {
           "accessToken": {
             "type": "string",
-            "description": "The access token issued by the authorization server. Used to authenticate API requests.",
+            "description": "JWT access token used to authenticate API requests.",
             "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
           },
           "tokenType": {
             "type": "string",
-            "default": "Bearer",
-            "description": "The type of the token issued. Typically 'Bearer'.",
+            "description": "The type of token issued, typically 'Bearer'.",
             "example": "Bearer"
           },
           "expiresIn": {
@@ -147,7 +148,7 @@
           },
           "refreshToken": {
             "type": "string",
-            "description": "The refresh token, represented as a GUID, used to obtain a new access token.",
+            "description": "Refresh token used to obtain a new access token.",
             "example": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
           }
         }
@@ -156,14 +157,14 @@
     "securitySchemes": {
       "basicAuth": {
         "type": "http",
-        "description": "For login information, please contact support.",
-        "scheme": "basic"
+        "scheme": "basic",
+        "description": "Basic Authentication using username and password."
       },
       "bearerAuth": {
         "type": "http",
-        "description": "JWT Bearer token for API access.",
         "scheme": "bearer",
-        "bearerFormat": "JWT"
+        "bearerFormat": "JWT",
+        "description": "Bearer authentication using a refresh token."
       }
     }
   }
