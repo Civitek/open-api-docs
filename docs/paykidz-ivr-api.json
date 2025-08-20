@@ -107,6 +107,7 @@
           },
           "identities": {
             "type": "array",
+            "description": "For payments greater than or equal to $3000.00 additional information is required. Submit two types with pertinent details.",
             "items": {
               "$ref": "#/components/schemas/CustomerIdentity"
             }
@@ -127,7 +128,7 @@
         "properties": {
           "stateCode": {
             "type": "string",
-            "description": "State code is requried."
+            "description": "State code is required (e.g., FL)."
           },
           "ssn": {
             "type": "string",
@@ -135,14 +136,15 @@
           },
           "caseNumber": {
             "type": "string",
-            "description": "Case Number is required."
+            "description": "Case or Account Number is required."
           },
           "firstName": {
             "type": "string",
-            "description": "Case Number is required."
+            "description": "First name of the non-custodial parent is required."
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "description": "Last name of the non-custodial parent is required."
           },
           "amount": {
             "minimum": 1,
