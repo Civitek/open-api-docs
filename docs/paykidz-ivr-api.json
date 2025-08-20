@@ -1,48 +1,121 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.1.0",
   "info": {
-    "title": "PayKidz (Child Support) API Specifications",
-    "version": "1.0.0",
-    "description": "This API is used to create orders for child support IVR payment processing."
+    "title": "TPE User Authorization",
+    "description": "This service provides endpoints for obtaining and refreshing OAuth2-style tokens.\n\n### Usage Flow\n1. Call **`/api/auth/token`** with Basic Authentication to generate an access token and a refresh token.\n2. Use the **access token** (JWT) in the `Authorization` header (`Bearer {access_token}`) to access secured APIs.\n3. When the access token expires, call **`/api/auth/refresh`** with the refresh token (in the `Authorization` header) to obtain a new access token without re-sending Basic Auth credentials.",
+    "version": "1.0"
   },
   "servers": [
     {
-      "url": "https:testapi.civikestpayment.com",
-      "description": "Generated server url"
+      "url": "https://testauthgateway.civikestpayment.com"
     }
   ],
-  "security": [
+  "tags": [
     {
-      "bearerAuth": []
+      "name": "Authentication Service",
+      "description": "Provides endpoints for generating and refreshing access tokens."
     }
   ],
-  
   "paths": {
-    "/payment/ivr": {
+    "/api/auth/token": {
       "post": {
-        "tags": [
-          "Payment Service"
+        "tags": ["Authentication Service"],
+        "summary": "Generate Token",
+        "description": "Authenticate using **Basic Authentication** (username and password or client credentials).\n\nReturns both an **access_token** (short-lived) and a **refresh_token** (longer-lived).\n\nExample:\n```\nAuthorization: Basic base64(username:password)\n```",
+        "operationId": "createToken",
+        "security": [
+          {
+            "basicAuth": []
+          }
         ],
-        "summary": "Initiate IVR Payment Transaction",
-        "description": "This method is used to initiate child support payments via our payment processing service. It will accept a payment request that contains the type of payment, payment amount and any other identifying data. A new payment transaction will be initiated in the system with a unique Order Id. The method will return the Order Id.",
-        "operationId": "ivrPayment",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/IVRRequest"
+        "responses": {
+          "200": {
+            "description": "Token generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuth2TokenResponse"
+                },
+                "example": {
+                  "access_token": "eyJhbGciOiJFUzI1NiJ9...",
+                  "token_type": "Bearer",
+                  "expires_in": 300,
+                  "refresh_token": "95CCF8D8-C4D1-4471-8DE5-4B695C065163"
+                }
               }
             }
           },
-          "required": true
-        },
+          "401": {
+            "description": "Invalid username or password",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Invalid username or password"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Server Exception: ..."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "tags": ["Authentication Service"],
+        "summary": "Refresh Token",
+        "description": "Refreshes an expired access token using the **refresh_token**.\n\nAuthenticate using `Authorization: Bearer {refresh_token}` header.\n\nA new access token (and optionally a new refresh token) is returned.",
+        "operationId": "refreshToken",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Token refreshed successfully",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/IvrResponse"
+                  "$ref": "#/components/schemas/OAuth2TokenResponse"
+                },
+                "example": {
+                  "access_token": "eyJhbGciOiJFUzI1NiJ9...",
+                  "token_type": "Bearer",
+                  "expires_in": 300,
+                  "refresh_token": "AA11BB22-CC33-DD44-EE55-FF6677889900"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired refresh token",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Invalid or expired refresh token"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Server Exception: ..."
                 }
               }
             }
@@ -53,156 +126,45 @@
   },
   "components": {
     "schemas": {
-      "CustomerIdentity": {
+      "OAuth2TokenResponse": {
         "type": "object",
+        "description": "Represents the response returned after a successful authentication.",
         "properties": {
-          "identityTypeId": {
+          "access_token": {
+            "type": "string",
+            "description": "JWT access token used to authenticate API requests.",
+            "example": "eyJhbGciOiJFUzI1NiJ9..."
+          },
+          "token_type": {
+            "type": "string",
+            "description": "The type of token issued, typically 'Bearer'.",
+            "example": "Bearer"
+          },
+          "expires_in": {
             "type": "integer",
-            "description": "Valid values: 1=SSN, 2=Passport, 4=Alien Registration Number for Identity One; 0=Other, 3=Driver’s License for Identity Two",
-            "format": "int32",
-            "example": 1
+            "format": "int64",
+            "description": "The number of seconds until the access token expires.",
+            "example": 300
           },
-          "value": {
-            "type": "string"
-          },
-          "countryCode": {
+          "refresh_token": {
             "type": "string",
-            "description": "Country code",
-            "example": "US"
-          },
-          "region": {
-            "type": "string",
-            "description": "Region/state code",
-            "example": "CA"
-          }
-        }
-      },
-      "IVRCustomer": {
-        "required": [
-          "firstName",
-          "lastName",
-          "phone"
-        ],
-        "type": "object",
-        "properties": {
-          "firstName": {
-            "type": "string",
-            "description": "First Name of the customer making the payment. Optional."
-          },
-          "lastName": {
-            "type": "string",
-            "description": "Last Name of the customer making the payment. Optional."
-          },
-          "middleName": {
-            "type": "string",
-            "description": "Middle Name of the customer making the payment. Optional."
-          },
-          "phone": {
-            "type": "string",
-            "description": "Phone number of the customer making the payment. Optional."
-          },
-          "email": {
-            "type": "string",
-            "description": "Email of the customer making the payment. Optional."
-          },
-          "identities": {
-            "type": "array",
-            "description": "For payments greater than or equal to $3000.00 additional information is required. Submit two types with pertinent details.",
-            "items": {
-              "$ref": "#/components/schemas/CustomerIdentity"
-            }
-          }
-        }
-      },
-      "IVRRequest": {
-        "required": [
-          "amount",
-          "caseNumber",
-          "customer",
-          "firstName",
-          "lastName",
-          "ssn",
-          "stateCode"
-        ],
-        "type": "object",
-        "properties": {
-          "stateCode": {
-            "type": "string",
-            "description": "State code is required (e.g., FL)."
-          },
-          "ssn": {
-            "type": "string",
-            "description": "SSN is requried."
-          },
-          "caseNumber": {
-            "type": "string",
-            "description": "Case or Account Number is required."
-          },
-          "firstName": {
-            "type": "string",
-            "description": "First name of the non-custodial parent is required."
-          },
-          "lastName": {
-            "type": "string",
-            "description": "Last name of the non-custodial parent is required."
-          },
-          "amount": {
-            "minimum": 1,
-            "exclusiveMinimum": false,
-            "type": "number",
-            "description": "Child Support Payment Amount. Rquired."
-          },
-          "customer": {
-            "$ref": "#/components/schemas/IVRCustomer"
-          }
-        }
-      },
-      "IVRResponse": {
-        "type": "object",
-        "properties": {
-          "orderId": {
-            "type": "integer",
-            "description": "A unique identifier for the payment transaction. It is generated by Civitek and returned to the partner who initiated the payment.",
-            "format": "int64"
-          },
-          "status": {
-            "type": "string",
-            "description": "Indicates the success or failure in initiating a payment transaction and creating the OrderId.",
-            "example": "success",
-            "enum": [
-              "success",
-              "failed"
-            ]
-          },
-          "errorMessage": {
-            "type": "string",
-            "description": "Text describing the error returned if payment transaction could not be initiated. This will be null if the status is success."
-          },
-          "amount": {
-            "type": "number",
-            "description": "Child support payment amount received in the IVR Request."
-          },
-          "feeAmount": {
-            "type": "number",
-            "description": "Amount charged as a fee for processing the payment."
-          },
-          "totalAmount": {
-            "type": "number",
-            "description": "Total amount charged for the payment, including the child support payment amount and fee amount."
-          },
-          "caseNumber": {
-            "type": "string",
-            "description": "Case number (Identifier) for the case for which the child support payment is being made. It is passed in the IVR Request."
+            "description": "Refresh token used to obtain a new access token.",
+            "example": "95CCF8D8-C4D1-4471-8DE5-4B695C065163"
           }
         }
       }
     },
     "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Basic Authentication using username and password."
+      },
       "bearerAuth": {
         "type": "http",
-        "description": "Please provide the JWT token. For login information, please contact support.",
         "scheme": "bearer",
-        "bearerFormat": "JWT"
+        "bearerFormat": "JWT",
+        "description": "Bearer authentication using a refresh token."
       }
     }
   }
