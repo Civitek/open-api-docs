@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https:testapi.civikestpayment.com"
+      "url": "https://testauthgateway.civikestpayment.com/api/auth/token"
     }
   ],
   "security": [
@@ -29,9 +29,20 @@
           "Authentication Service"
         ],
         "summary": "Token",
-        "description": "This endpoint supports Basic authentication:\n- Refresh Request (Optional)",
+        "description": "This endpoint supports Basic authentication",
         "operationId": "createToken",
         "responses": {
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "example": "Server Exception: ..."
+                }
+              }
+            }
+          },
           "200": {
             "description": "Token generated successfully",
             "content": {
@@ -52,19 +63,13 @@
                 }
               }
             }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string",
-                  "example": "Server Exception: ..."
-                }
-              }
-            }
           }
-        }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
       }
     },
     "/api/auth/refresh": {
@@ -73,9 +78,20 @@
           "Authentication Service"
         ],
         "summary": "Refresh-Token",
-        "description": "This endpoint supports bearer authentication:\n- Refresh Token (Guid - In header)- Refresh Request (Optional)",
+        "description": "This endpoint supports bearer authentication",
         "operationId": "refreshToken",
         "responses": {
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "example": "Server Exception: ..."
+                }
+              }
+            }
+          },
           "200": {
             "description": "Token generated successfully",
             "content": {
@@ -87,7 +103,7 @@
             }
           },
           "401": {
-            "description": "Invalid username or password",
+            "description": "Invalid Token",
             "content": {
               "*/*": {
                 "schema": {
@@ -96,19 +112,13 @@
                 }
               }
             }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string",
-                  "example": "Server Exception: ..."
-                }
-              }
-            }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     }
   },
