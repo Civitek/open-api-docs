@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "TPE User Authorization",
-    "description": "This service provides endpoints for obtaining and refreshing OAuth2-style tokens.\n\n### Usage Flow\n1. Call **`/api/auth/token`** with Basic Authentication to generate an access token and a refresh token.\n2. Use the **access token** (JWT) in the `Authorization` header (`Bearer {accessToken}`) to access secured APIs.\n3. When the access token expires, call **`/api/auth/refresh`** with the refresh token (in the `Authorization` header) to obtain a new access token without re-sending Basic Auth credentials.",
+    "title": "TPE Authentication API Specifications",
+    "description": "This service provides endpoints for obtaining and refreshing OAuth2-style tokens.\n\n### Usage Flow\n1. Call **`/api/auth/token`** with Basic Authentication to generate an access token and a refresh token.\n2. Use the **access token** (JWT) in the `Authorization` header (`Bearer {access_token}`) to access secured APIs.\n3. When the access token expires, call **`/api/auth/refresh`** with the refresh token (in the `Authorization` header) to obtain a new access token without re-sending Basic Auth credentials.",
     "version": "1.0"
   },
   "servers": [
@@ -21,7 +21,7 @@
       "post": {
         "tags": ["Authentication Service"],
         "summary": "Generate Token",
-        "description": "Authenticate using **Basic Authentication** (username and password or client credentials).\n\nReturns both an **access token** (short-lived) and a **refresh token** (longer-lived).\n\nExample:\n```\nAuthorization: Basic base64(username:password)\n```",
+        "description": "Authenticate using **Basic Authentication** (username and password or client credentials).\n\nReturns both an **access_token** (short-lived) and a **refresh_token** (longer-lived).\n\nExample:\n```\nAuthorization: Basic base64(username:password)\n```",
         "operationId": "createToken",
         "security": [
           {
@@ -37,10 +37,10 @@
                   "$ref": "#/components/schemas/OAuth2TokenResponse"
                 },
                 "example": {
-                  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                  "tokenType": "Bearer",
-                  "expiresIn": 3600,
-                  "refreshToken": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                  "access_token": "eyJhbGciOiJFUzI1NiJ9...",
+                  "token_type": "Bearer",
+                  "expires_in": 300,
+                  "refresh_token": "95CCF8D8-C4D1-4471-8DE5-4B695C065163"
                 }
               }
             }
@@ -74,7 +74,7 @@
       "post": {
         "tags": ["Authentication Service"],
         "summary": "Refresh Token",
-        "description": "Refreshes an expired access token using the **refresh token**.\n\nAuthenticate using `Authorization: Bearer {refreshToken}` header.\n\nA new access token (and optionally a new refresh token) is returned.",
+        "description": "Refreshes an expired access token using the **refresh_token**.\n\nAuthenticate using `Authorization: Bearer {refresh_token}` header.\n\nA new access token (and optionally a new refresh token) is returned.",
         "operationId": "refreshToken",
         "security": [
           {
@@ -90,10 +90,10 @@
                   "$ref": "#/components/schemas/OAuth2TokenResponse"
                 },
                 "example": {
-                  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                  "tokenType": "Bearer",
-                  "expiresIn": 3600,
-                  "refreshToken": "6ba85f64-9999-4562-b3fc-2c963f66bbb7"
+                  "access_token": "eyJhbGciOiJFUzI1NiJ9...",
+                  "token_type": "Bearer",
+                  "expires_in": 300,
+                  "refresh_token": "AA11BB22-CC33-DD44-EE55-FF6677889900"
                 }
               }
             }
@@ -130,26 +130,26 @@
         "type": "object",
         "description": "Represents the response returned after a successful authentication.",
         "properties": {
-          "accessToken": {
+          "access_token": {
             "type": "string",
             "description": "JWT access token used to authenticate API requests.",
-            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            "example": "eyJhbGciOiJFUzI1NiJ9..."
           },
-          "tokenType": {
+          "token_type": {
             "type": "string",
             "description": "The type of token issued, typically 'Bearer'.",
             "example": "Bearer"
           },
-          "expiresIn": {
+          "expires_in": {
             "type": "integer",
             "format": "int64",
             "description": "The number of seconds until the access token expires.",
-            "example": 3600
+            "example": 300
           },
-          "refreshToken": {
+          "refresh_token": {
             "type": "string",
             "description": "Refresh token used to obtain a new access token.",
-            "example": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+            "example": "95CCF8D8-C4D1-4471-8DE5-4B695C065163"
           }
         }
       }
