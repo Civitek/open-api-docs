@@ -12,7 +12,8 @@
   ],
   "security": [
     {
-      "basicAuth": []
+      "basicAuth": [],
+      "bearerAuth": []
     }
   ],
   "tags": [
@@ -147,6 +148,12 @@
         "type": "http",
         "description": "For login information, please contact support.",
         "scheme": "basic"
+      },
+      "bearerAuth": {
+        "type": "http",
+        "description": "JWT Bearer token for API access.",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }
