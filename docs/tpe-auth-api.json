@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "TPE Authentication API Specifications",
-    "description": "This service provides endpoints for obtaining and refreshing OAuth2-style tokens.\n\n### Usage Flow\n1. Call **`/api/auth/token`** with Basic Authentication to generate an access token and a refresh token.\n2. Use the **access token** (JWT) in the `Authorization` header (`Bearer {access_token}`) to access secured APIs.\n3. When the access token expires, call **`/api/auth/refresh`** with the refresh token (in the `Authorization` header) to obtain a new access token without re-sending Basic Auth credentials.",
+    "title": "TPE User Authorization",
+    "description": "This service provides endpoints for obtaining and refreshing OAuth2-style tokens.\n\n### Usage Flow\n1. Call **`/api/auth/token`** with Basic Authentication to generate an access token and a refresh token.\n2. Use the **access token** (JWT) in the `Authorization` header (`Bearer {access_token}`) to access secured APIs.\n3. When the access token expires, call **`/api/auth/refresh`** with the refresh token (in the `Authorization` header) to obtain a new access token and refresh token. The previous refresh_token will expire.",
     "version": "1.0"
   },
   "servers": [
@@ -74,7 +74,7 @@
       "post": {
         "tags": ["Authentication Service"],
         "summary": "Refresh Token",
-        "description": "Refreshes an expired access token using the **refresh_token**.\n\nAuthenticate using `Authorization: Bearer {refresh_token}` header.\n\nA new access token (and optionally a new refresh token) is returned.",
+        "description": "Refreshes an expired access token using the **refresh_token**.\n\nAuthenticate using `Authorization: Bearer {refresh_token}` header.\n\nA new access token is generated. New access token and new refresh token is returned. The previous refresh_token expires.",
         "operationId": "refreshToken",
         "security": [
           {
@@ -148,7 +148,7 @@
           },
           "refresh_token": {
             "type": "string",
-            "description": "Refresh token used to obtain a new access token.",
+            "description": "Refresh token used to obtain a new access token. Previous refresh_token expires once a new one is issued.",
             "example": "95CCF8D8-C4D1-4471-8DE5-4B695C065163"
           }
         }
