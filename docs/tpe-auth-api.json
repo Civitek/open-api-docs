@@ -30,25 +30,6 @@
         "summary": "Token",
         "description": "This endpoint supports Basic authentication:\n- Refresh Request (Optional)",
         "operationId": "createToken",
-        "parameters": [
-          {
-            "name": "Authorization",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RefreshRequest"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Token generated successfully",
@@ -93,25 +74,6 @@
         "summary": "Refresh-Token",
         "description": "This endpoint supports bearer authentication:\n- Refresh Token (Guid - In header)- Refresh Request (Optional)",
         "operationId": "refreshToken",
-        "parameters": [
-          {
-            "name": "Authorization",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RefreshRequest"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Token generated successfully",
@@ -151,25 +113,6 @@
   },
   "components": {
     "schemas": {
-      "RefreshRequest": {
-        "type": "object",
-        "description": "Request body for refreshing an access token. Includes optional custom claims and token expiration override.",
-        "properties": {
-          "claims": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Optional custom claims to be included in the new access token. These will be merged with the default claims."
-          },
-          "expireMinutes": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Optional override for the access token's expiration time in minutes. If not provided, the default expiry will be used.",
-            "example": 60
-          }
-        }
-      },
       "OAuth2TokenResponse": {
         "type": "object",
         "description": "Represents the response returned after a successful OAuth2 authentication, including access and refresh tokens.",
