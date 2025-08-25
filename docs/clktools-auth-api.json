@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "TPE User Authorization (FL ClerkTools)",
+    "title": "CLerk Tools Authorization (FL ClerkTools)",
     "version": "v0",
     "description": "This service provides endpoints for obtaining and refreshing OAuth2-style tokens.\n\n### Usage Flow\n1. Call **`/api/auth/token`** with **Basic Authentication** to generate an **access_token** and a **refresh_token**.\n2. Use the **access_token** (JWT) in requests: `Authorization: Bearer {access_token}`.\n3. When the access token expires, call **`/api/auth/refresh`** with the **refresh_token** in the `Authorization` header.\n4. **Refresh behavior:** A new access token is generated. New access token and new refresh token is returned. The previous **refresh_token** expires."
   },
