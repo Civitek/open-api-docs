@@ -1,0 +1,202 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "TPE User Authorization (FL ClerkTools)",
+    "version": "v0",
+    "description": "This service provides endpoints for obtaining and refreshing OAuth2-style tokens.\n\n### Usage Flow\n1. Call **`/api/auth/token`** with **Basic Authentication** to generate an **access_token** and a **refresh_token**.\n2. Use the **access_token** (JWT) in requests: `Authorization: Bearer {access_token}`.\n3. When the access token expires, call **`/api/auth/refresh`** with the **refresh_token** in the `Authorization` header.\n4. **Refresh behavior:** A new access token is generated. New access token and new refresh token is returned. The previous **refresh_token** expires."
+  },
+  "servers": [
+    {
+      "url": "https://testauthgateway.flclerktools.com",
+      "description": "Test Authenticate server URL"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication Service",
+      "description": "Endpoints for generating and refreshing access tokens."
+    }
+  ],
+  "paths": {
+    "/api/auth/token": {
+      "post": {
+        "tags": ["Authentication Service"],
+        "summary": "Generate Token",
+        "operationId": "createToken",
+        "description": "Authenticate using **Basic Authentication** (username/password or client credentials).\n\nReturns both an **access_token** (short‑lived) and a **refresh_token** (longer‑lived).\n\n**Header example**:\n```\nAuthorization: Basic base64(username:password)\n```",
+        "security": [
+          { "basicAuth": [] }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Optional claims and expiry override. If omitted, defaults are applied.",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/TokenRequest" },
+              "example": {
+                "claims": { "role": "cashier", "permissions": ["payments:read"] },
+                "expireMinutes": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token generated successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/OAuth2TokenResponse" },
+                "example": {
+                  "access_token": "eyJhbGciOiJFUzI1NiJ9...",
+                  "token_type": "Bearer",
+                  "expires_in": 300,
+                  "refresh_token": "95CCF8D8-C4D1-4471-8DE5-4B695C065163"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid username or password",
+            "content": {
+              "text/plain": {
+                "schema": { "type": "string" },
+                "example": "Invalid username or password"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "text/plain": {
+                "schema": { "type": "string" },
+                "example": "Server Exception: ..."
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "tags": ["Authentication Service"],
+        "summary": "Refresh Token",
+        "operationId": "refreshToken",
+        "description": "Refreshes an expired access token using the **refresh_token**.\n\nAuthenticate using:\n```\nAuthorization: Bearer {refresh_token}\n```\n\n**Refresh behavior:** A new access token is generated. New access token and new refresh token is returned. The previous **refresh_token** expires.",
+        "security": [
+          { "bearerAuth": [] }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Optional claims and expiry override. If provided, server may apply them to the new tokens subject to policy.",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/TokenRequest" },
+              "example": {
+                "claims": { "session_hint": "kiosk-12" },
+                "expireMinutes": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token refreshed successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/OAuth2TokenResponse" },
+                "example": {
+                  "access_token": "eyJhbGciOiJFUzI1NiJ9...",
+                  "token_type": "Bearer",
+                  "expires_in": 300,
+                  "refresh_token": "AA11BB22-CC33-DD44-EE55-FF6677889900"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired refresh token",
+            "content": {
+              "text/plain": {
+                "schema": { "type": "string" },
+                "example": "Invalid or expired refresh token"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "text/plain": {
+                "schema": { "type": "string" },
+                "example": "Server Exception: ..."
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TokenRequest": {
+        "type": "object",
+        "description": "Optional request to supply custom claims and/or an expiry override for issued tokens.",
+        "properties": {
+          "claims": {
+            "type": "object",
+            "additionalProperties": {
+              "type": ["string", "number", "boolean", "array", "object", "null"]
+            },
+            "description": "Arbitrary claims to embed or consider when minting tokens (server may restrict/ignore)."
+          },
+          "expireMinutes": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Optional override for access token lifetime in minutes (subject to server policy).",
+            "example": 5
+          }
+        }
+      },
+      "OAuth2TokenResponse": {
+        "type": "object",
+        "description": "Response returned after successful authentication/refresh.",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "JWT access token used to authenticate API requests.",
+            "example": "eyJhbGciOiJFUzI1NiJ9..."
+          },
+          "token_type": {
+            "type": "string",
+            "description": "Token type; typically 'Bearer'.",
+            "example": "Bearer"
+          },
+          "expires_in": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Number of seconds until the access token expires.",
+            "example": 300
+          },
+          "refresh_token": {
+            "type": "string",
+            "description": "Refresh token used to obtain a new access token. Previous refresh_token expires when a new one is issued.",
+            "example": "95CCF8D8-C4D1-4471-8DE5-4B695C065163"
+          }
+        },
+        "required": ["access_token", "token_type", "expires_in", "refresh_token"]
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Basic Authentication using username and password."
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Use the **refresh_token** as the Bearer credential on `/api/auth/refresh`."
+      }
+    }
+  }
+}
