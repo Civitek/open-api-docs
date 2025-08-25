@@ -3,7 +3,7 @@
   "info": {
     "title": "Clerk Tools User Authorization",
     "version": "v0",
-    "description": "This service provides endpoints for obtaining and refreshing OAuth2-style tokens.\n\n### Typical Usage Flow (Web or Mobile Application)\n1. Call **`/api/auth/token`** with **Basic Authentication** (username/password or client credentials) to generate an **access_token** and a **refresh_token**.\n2. Use the **access_token** (JWT) in requests to access secure APIs:\n   ```\n   Authorization: Bearer {access_token}\n   ```\n3. When the access token expires, you can either:\n   - Generate a new token again with **username/password** using `/api/auth/token`, OR\n   - Continue the session without username/password by using the **refresh_token** at `/api/auth/refresh`.\n\n### Refresh Behavior\n- A new access token is generated.\n- Both a new access token and a new refresh token are returned.\n- The previous **refresh_token** expires."
+    "description": "This service provides endpoints for obtaining and refreshing OAuth2-style tokens.\n\n### Typical Usage Flow (Web or Mobile Application)\n1. Call **`/api/auth/token`** with **Basic Authentication** (username/password or client credentials) to generate an **access_token** and a **refresh_token**.\n2. Use the **access_token** (JWT) in requests to access secure APIs:\n   ```\n   Authorization: Bearer {access_token}\n   ```\n3. When the access token expires, you can either:\n   - Generate a new token again with **username/password** using `/api/auth/token`, OR\n   - Continue the session without username/password by using the **refresh_token** at `/api/auth/refresh`.\n\n### Refresh Behavior\n- A new access token is generated.\n- Both a new access token and a new refresh token are returned.\n- The previous **refresh_token** expires.\n\n⚠️ **Important:** Store the `refresh_token` securely on the client (e.g., secure storage in mobile apps). Do not expose or transmit the `refresh_token` outside the application."
   },
   "servers": [
     {
@@ -23,7 +23,7 @@
         "tags": ["Authentication Service"],
         "summary": "Generate Token",
         "operationId": "createToken",
-        "description": "Authenticate using **Basic Authentication** with username/password or client credentials.\n\nThis endpoint is typically used by a web or mobile application at login when the user first enters their credentials. Returns both an **access_token** and a **refresh_token**.\n\n**Header example**:\n```\nAuthorization: Basic base64(username:password)\n```",
+        "description": "Authenticate using **Basic Authentication** with username/password or client credentials.\n\nThis endpoint is typically used by a web or mobile application at login when the user first enters their credentials.\n\nReturns both an **access_token** and a **refresh_token**.\n\n**Header example**:\n```\nAuthorization: Basic base64(username:password)\n```",
         "security": [
           { "basicAuth": [] }
         ],
@@ -68,7 +68,7 @@
         "tags": ["Authentication Service"],
         "summary": "Refresh Token",
         "operationId": "refreshToken",
-        "description": "Obtain a new access token using a **refresh_token** instead of username/password.\n\nThis endpoint is typically used by web or mobile applications to continue the user session after login, without prompting for credentials again.\n\n**Header example**:\n```\nAuthorization: Bearer {refresh_token}\n```\n\n**Refresh behavior:**\n- A new access token is generated.\n- Both a new access token and a new refresh token are returned.\n- The previous **refresh_token** expires.",
+        "description": "Use the **refresh_token** to continue a user session without requiring the user to re-enter authentication details.\n\nThis endpoint is typically used by web or mobile applications after login to keep the user signed in.\n\n**Header example**:\n```\nAuthorization: Bearer {refresh_token}\n```\n\n**Refresh behavior:**\n- A new access token is generated.\n- Both a new access token and a new refresh token are returned.\n- The previous **refresh_token** expires.\n\n⚠️ **Important:** Never expose the `refresh_token` outside of the application. It must be stored securely and treated as highly sensitive.",
         "security": [
           { "bearerAuth": [] }
         ],
@@ -133,7 +133,7 @@
           },
           "refresh_token": {
             "type": "string",
-            "description": "Refresh token used to obtain a new access token. Previous refresh_token expires when a new one is issued.",
+            "description": "Refresh token used to obtain a new access token. Previous refresh_token expires when a new one is issued. Must be stored securely and never exposed outside the application.",
             "example": "95CCF8D8-C4D1-4471-8DE5-4B695C065163"
           }
         },
@@ -150,7 +150,7 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT",
-        "description": "Use the **refresh_token** as the Bearer credential on `/api/auth/refresh`."
+        "description": "Use the **refresh_token** as the Bearer credential on `/api/auth/refresh`. Must be kept secure and not exposed outside the application."
       }
     }
   }
