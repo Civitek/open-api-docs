@@ -17,7 +17,7 @@
     }
   ],
   "paths": {
-    "/flhsmv-api/customerSanctions/{driverLicenseNumber}": {
+    "/hb1077-api/customerSanctions/{driverLicenseNumber}": {
       "get": {
         "description": "This method accepts a parameter of driver license number and returns the sanctions (DSU, SUS, or PTS) that can be cleared or reopened by a county for a FLHSMV customer. The response includes driver's name, driver license number and demographic information and an array of sanction details.",
         "operationId": "customerSanctions",
@@ -166,7 +166,7 @@
         "summary": "CustomerSanctions"
       }
     },
-    "/flhsmv-api/clearance": {
+    "/hb1077-api/clearance": {
       "post": {
         "tags": [
           "HB-1077 Sanctions Clearance"
@@ -261,7 +261,7 @@
         "summary": "Clearance"
       }
     },
-    "/flhsmv-api/notOnRecordClear": {
+    "/hb1077-api/notOnRecordClear": {
       "post": {
         "description": "This method is used to clear DSU FTC (Failure to Comply) suspensions before they have been added to the customer driver record. The client must provide the Citation Number of the DSU sanction to be cleared.\nEach request can clear only one DSU/FTC suspension. SUS (Criminal Financial Obligation and Child Support) and PTS suspensions cannot be cleared using this method.",
         "operationId": "notOnRecordClear",
@@ -356,7 +356,7 @@
         "summary": "NotOnRecordClear"
       }
     },
-    "/flhsmv-api/reopen": {
+    "/hb1077-api/reopen": {
       "post": {
         "tags": [
           "HB-1077 Sanctions Clearance"
