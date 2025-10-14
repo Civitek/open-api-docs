@@ -24,7 +24,7 @@
         "tags": ["Authentication Service"],
         "summary": "Generate Token",
         "operationId": "createToken",
-        "description": "Authenticate using **Basic Authentication** with username/password or client credentials.\n\nThis endpoint is typically used by a web or mobile application at login when the user first enters their credentials.\n\nReturns an **access_token** and, optionally, a **refresh_token** depending on the type of authentication.\n\n**Note:** The **refresh_token** is only issued for web or mobile authentication users; it is **not** returned for machine-to-machine (M2M) authentication.\n\n**Header example**:\n```\nAuthorization: Basic base64(username:password)\n```",
+        "description": "**Authenticate using Basic Authentication with username/password or client credentials. This endpoint is typically used by a web or mobile application at login when the user first enters their credentials. Returns an access_token and, optionally, a refresh_token depending on the type of authentication. Note: The refresh_token is only issued for web or mobile authentication users; it is not returned for machine-to-machine (M2M) authentication. Header example: Authorization: Basic base64(username:password)**",
         "security": [
           { "basicAuth": [] }
         ],
