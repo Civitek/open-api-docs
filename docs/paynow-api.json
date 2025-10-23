@@ -3,13 +3,20 @@
 	"info": {
 		"title": "PayNow API Specifications",
 		"version": "1.0.0",
-		"description": "API to manage and track miscellaneous payment transactions."
+		"description": "API to manage and track miscellaneous payment transactions.\n\nAuthentication:\n1. Obtain a JWT access token from the TPE Auth server using the TPE Auth API documented at https://civitek.github.io/open-api-docs/tpe-auth.html.\n2. Call the appropriate token endpoint, supplying your client credentials.\n3. Use the returned access token in the Authorization header for all secured PayNow API calls as: Authorization: Bearer <token>.\n\nNotes:\n- Tokens are time-limited; refresh or re-authenticate when you receive 401 responses.\n- Keep your token secret and never expose it in client-side code."
+	},
+	"externalDocs": {
+		"description": "TPE Auth Server API Documentation",
+		"url": "https://civitek.github.io/open-api-docs/tpe-auth.html"
 	},
 	"servers": [
 		{
 			"url": "https:testapi.civikestpayment.com",
 			"description": "Generated server url"
 		}
+	],
+	"security": [
+		{ "BearerAuth": [] }
 	],
 	"paths": {
 		"/payment/createOrder": {
@@ -41,11 +48,7 @@
 						}
 					}
 				},
-				"security": [
-					{
-						"basicAuth": []
-					}
-				]
+				"security": [ { "BearerAuth": [] } ]
 			}
 		}
 	},
@@ -192,9 +195,11 @@
 			}
 		},
 		"securitySchemes": {
-			"basicAuth": {
+			"BearerAuth": {
 				"type": "http",
-				"scheme": "basic"
+				"scheme": "bearer",
+				"bearerFormat": "JWT",
+				"description": "Use the JWT access token issued by the TPE Auth server. Obtain a token via the TPE Auth API (see https://civitek.github.io/open-api-docs/tpe-auth.html) then include it as: Authorization: Bearer <token>"
 			}
 		}
 	}
