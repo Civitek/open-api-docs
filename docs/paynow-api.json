@@ -22,9 +22,10 @@
 		"/payment/createOrder": {
 			"post": {
 				"tags": [
-					"Payment Service"
+					"PayNow Service"
 				],
-				"description": "This method is used to initiate miscellaneous payments via our payment processing service. It will accept an Item Key to identify the type of payment, payment amount and any other identifying data. It will initiate the payment in the system and return an Order Id that uniquely identifies this payment transaction.",
+				"summary": "Initiate IVR Payment Transaction",
+				"description": "Use this method to initiate a new payment order for downstream processing with our payment processor.\nCreates an order (payment transaction) with the provided itemKey, transactionAmount, itemSku, and any additional identifying data. Returns an orderId that uniquely identifies the initiated payment.",
 				"operationId": "createOrder",
 				"requestBody": {
 					"content": {
