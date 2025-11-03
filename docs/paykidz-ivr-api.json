@@ -3,8 +3,12 @@
   "info": {
     "title": "PayKidz (Child Support) API Specifications",
     "version": "1.0.0",
-    "description": "This API is used to create orders for child support IVR payment processing."
+    "description": "API to manage and track miscellaneous payment transactions.\n\nAuthentication:\n1. Obtain a JWT access token from the TPE Auth server using the TPE Auth API documented at https://civitek.github.io/open-api-docs/tpe-auth.html.\n2. Call the appropriate token endpoint, supplying your client credentials.\n3. Use the returned access token in the Authorization header for all secured PayNow API calls as: Authorization: Bearer <token>.\n\n"
   },
+  "externalDocs": {
+		"description": "TPE Auth Server API Documentation",
+		"url": "https://civitek.github.io/open-api-docs/tpe-auth.html"
+	},
   "servers": [
     {
       "url": "https:testapi.civikestpayment.com",
@@ -197,13 +201,13 @@
         }
       }
     },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "description": "Please provide the JWT token. For login information, please contact support.",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
-      }
-    }
+		"securitySchemes": {
+			"BearerAuth": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT",
+				"description": "Use the JWT access token issued by the TPE Auth server. Obtain a token via the TPE Auth API (see https://civitek.github.io/open-api-docs/tpe-auth.html) then include it as: Authorization: Bearer <token>"
+			}
+		}
   }
 }
