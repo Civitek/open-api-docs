@@ -46,7 +46,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/IvrResponse"
+                  "$ref": "#/components/schemas/IVRResponse"
                 }
               }
             }
