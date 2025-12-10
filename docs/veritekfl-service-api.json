@@ -1,0 +1,239 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Veritek FL Search API",
+    "description": "Endpoints for searching parties and related background check data.\n\nThis specification is derived from the service runtime contract and enhanced with common response types, examples, and clarifying descriptions. Verify security, rate limits, and field semantics with the implementation team before publishing to consumers.\n\nAuthentication: obtain an access token from the VeritekFL Auth server using the OAuth2 client credentials flow (token endpoint documented in externalDocs below). Use the returned access token as: Authorization: Bearer <token>.",
+    "version": "v1"
+  },
+  "externalDocs": {
+    "description": "Auth token endpoint (client credentials)",
+    "url": "https://veritekfl-auth-server-dev.veritekfl.com/oauth2/token"
+  },
+  "servers": [
+    {
+      "url": "https://veritekfl-service-dev.veritekfl.com",
+      "description": "Development environment (canonical)"
+    }
+  ],
+  "security": [
+    {
+      "bearer-jwt": []
+    },
+    {
+      "OAuth2ClientCredentials": []
+    }
+  ],
+  "tags": [
+    { "name": "Search", "description": "Search endpoints for parties, cases, and related records" }
+  ],
+  "paths": {
+    "/search": {
+      "post": {
+        "tags": ["Search"],
+        "summary": "Search for a party",
+        "description": "Search for parties and related records using identifying information and optional filters. The service performs best-effort matching and may return multiple candidate parties; clients should use UCN or PIN where available to disambiguate.",
+        "operationId": "search",
+        "requestBody": {
+          "description": "Search criteria (see schema for optional filters). Provide either name + dob or other identifiers where available.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SearchRequest" },
+              "examples": {
+                "basic": {
+                  "summary": "Basic name + dob search",
+                  "value": { "first_name": "John", "last_name": "Smith", "dob": "1980-01-01", "request_id": "req-123", "request_timestamp": "2025-11-20T12:34:56Z" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Search successful",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SearchResponse" },
+                "examples": {
+                  "ok": {
+                    "summary": "Single match example",
+                    "value": { "parties": [ { "first_name": "John", "last_name": "Smith", "date_of_birth": "1980-01-01", "ucn": "UCN12345" } ] }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Bad request - validation failed", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "401": { "description": "Unauthorized - invalid or missing token", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "429": { "description": "Too Many Requests - rate limit exceeded", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        },
+        "security": [ { "bearer-jwt": [] } ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SearchRequest": {
+        "type": "object",
+        "required": ["dob","first_name","last_name","request_id","request_timestamp"],
+        "properties": {
+          "last_name": { "type": "string", "maxLength": 30, "minLength": 1, "description": "Last name of the Party", "example": "Smith" },
+          "first_name": { "type": "string", "maxLength": 20, "minLength": 0, "description": "First name of the Party", "example": "John" },
+          "dob": { "type": "string", "pattern": "\\d{4}-\\d{2}-\\d{2}", "description": "Date of birth in format YYYY-MM-DD", "example": "1980-01-01" },
+          "ssn_last_4": { "type": "string", "maxLength": 4, "minLength": 4, "pattern": "\\d{4}", "description": "Last 4 digits of SSN (optional)", "example": "1234" },
+          "filed_date_from": { "type": "string", "pattern": "\\d{4}-\\d{2}-\\d{2}", "description": "Start date for case filing date range (YYYY-MM-DD)", "example": "2020-01-01" },
+          "filed_date_to": { "type": "string", "pattern": "\\d{4}-\\d{2}-\\d{2}", "description": "End date for case filing date range (YYYY-MM-DD)", "example": "2025-12-31" },
+          "case_type": { "type": "string", "description": "Case type to filter search results", "example": "FELONY" },
+          "county_codes": { "type": "array", "items": { "type": "integer", "format": "int32" }, "description": "List of county codes to search in", "example": [12,45,67] },
+          "include_dockets": { "type": "boolean", "description": "Include docket information in the response", "default": false },
+          "include_charges": { "type": "boolean", "description": "Include charge information in the response", "default": true },
+          "include_events": { "type": "boolean", "description": "Include event information in the response", "default": false },
+          "request_id": { "type": "string", "description": "Unique request ID for tracking. Server-generated trace ID, echoed back in response.", "example": "abc123xyz" },
+          "request_timestamp": { "type": "string", "description": "Request timestamp in ISO 8601 format (UTC)", "example": "2025-11-20T12:34:56Z" }
+        },
+        "description": "Search criteria for background check queries against data"
+      },
+      "SearchResponse": {
+        "type": "object",
+        "properties": {
+          "parties": { "type": "array", "items": { "$ref": "#/components/schemas/party" } },
+          "meta": { "$ref": "#/components/schemas/ResponseMeta" }
+        },
+        "description": "Search response containing array of Party objects"
+      },
+      "ResponseMeta": {
+        "type": "object",
+        "properties": {
+          "request_id": { "type": "string" },
+          "processing_time_ms": { "type": "integer", "format": "int32" },
+          "result_count": { "type": "integer", "format": "int32" }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": { "type": "string" },
+          "message": { "type": "string" },
+          "request_id": { "type": "string" }
+        }
+      },
+      "case": {
+        "type": "object",
+        "required": ["case_status_code","case_type","clerk_case_number","clerk_file_date","county_id","ucn"],
+        "properties": {
+          "clerk_case_number": { "type": "string", "maxLength": 50, "description": "Display case number" },
+          "ucn": { "type": "string", "maxLength": 20, "description": "Included when available in the source" },
+          "county_id": { "type": "string", "description": "FL county code" },
+          "case_type": { "type": "string", "description": "Case type" },
+          "court_type": { "type": "string", "description": "Court type", "example": "CRIMINAL" },
+          "clerk_file_date": { "type": "string", "description": "Filed date" },
+          "case_status_code": { "type": "string", "description": "Current status" },
+          "charges": { "type": "array", "items": { "$ref": "#/components/schemas/charge" } },
+          "dockets": { "type": "array", "items": { "$ref": "#/components/schemas/docket" } },
+          "events": { "type": "array", "items": { "$ref": "#/components/schemas/event" } }
+        },
+        "description": "Criminal case details"
+      },
+      "charge": {
+        "type": "object",
+        "properties": {
+          "charge_sequence_number": { "type": "string" },
+          "initial_status_date": { "type": "string" },
+          "initial_fl_statute_description": { "type": "string" },
+          "offense_date": { "type": "string" },
+          "initial_fl_statute_number": { "type": "string" },
+          "prosecutor_action_code": { "type": "string" },
+          "prosecutor_fl_statute_number": { "type": "string" },
+          "prosecutor_fl_statute_description": { "type": "string" },
+          "prosecutor_decision_date": { "type": "string" },
+          "court_fl_statute_number": { "type": "string" },
+          "court_fl_statute_description": { "type": "string" },
+          "court_decision_date": { "type": "string" },
+          "traffic_disposition_code": { "type": "string" },
+          "citation_number": { "type": "string" },
+          "citation_issued_date": { "type": "string" },
+          "initial_charge_level_code": { "type": "string" },
+          "initial_charge_degree_code": { "type": "string" },
+          "prosecutor_charge_level_code": { "type": "string" },
+          "prosecutor_charge_degree_code": { "type": "string" },
+          "court_charge_level_code": { "type": "string" },
+          "court_charge_degree_code": { "type": "string" },
+          "sentences": { "type": "array", "items": { "$ref": "#/components/schemas/sentence" } }
+        },
+        "description": "Represents a charge within a case"
+      },
+      "docket": {
+        "type": "object",
+        "properties": {
+          "docket_identifier": { "type": "string", "maxLength": 14, "description": "Unique identifier for the docket entry" },
+          "docket_action_date": { "type": "string", "format": "date", "description": "Date when the docket action occurred" },
+          "docket_code": { "type": "string", "maxLength": 20, "description": "Code representing the type of docket action" },
+          "docket_text": { "type": "string", "maxLength": 8000, "description": "Full text description of the docket entry" }
+        },
+        "description": "Represents a docket entry in a case"
+      },
+      "event": {
+        "type": "object",
+        "properties": {
+          "event_id": { "type": "string", "description": "Opaque unique event identifier composed of UCN, court appearance date (yyyyMMdd) and standard event code" },
+          "court_appearance_date": { "type": "string", "format": "date", "description": "Court appearance date" },
+          "court_event_description": { "type": "string", "maxLength": 8000, "description": "Description of the court event" },
+          "standard_court_event_code": { "type": "string", "description": "Standard court event code" },
+          "court_appeance_time": { "type": "string", "description": "Court appearance time" },
+          "court_location": { "type": "string", "description": "Court location" },
+          "division": { "type": "string", "description": "Court division" }
+        },
+        "description": "Represents a court event"
+      },
+      "party": {
+        "type": "object",
+        "properties": {
+          "ssn_last_4": { "type": "string", "description": "Last 4 digits of Social Security Number", "example": "1234" },
+          "ucn": { "type": "string", "description": "UCN" },
+          "pin": { "type": "string", "description": "Party PIN" },
+          "last_name": { "type": "string", "description": "Last name of the person", "example": "Smith" },
+          "first_name": { "type": "string", "description": "First name of the person", "example": "John" },
+          "middle_name": { "type": "string", "description": "Middle name of the person", "example": "Robert" },
+          "suffix_code": { "type": "string", "description": "Suffix code" },
+          "date_of_birth": { "type": "string", "description": "Date of birth in format YYYY-MM-DD", "example": "1980-01-01" },
+          "sex_code": { "type": "string", "description": "Sex code" },
+          "race_code": { "type": "string", "description": "Race code" },
+          "driver_license_number": { "type": "string", "description": "Driver license number" },
+          "case": { "$ref": "#/components/schemas/case" }
+        },
+        "description": "Person information returned from search"
+      },
+      "sentence": {
+        "type": "object",
+        "properties": {
+          "sentence_sequence_number": { "type": "string" },
+          "sentence_status_code": { "type": "string" },
+          "sentence_imposed_date": { "type": "string" },
+          "sentence_effective_date": { "type": "string" },
+          "sentence_code": { "type": "string" },
+          "length_of_sentence_confinement": { "type": "string" }
+        },
+        "description": "Represents a sentence within a charge"
+      }
+    },
+    "securitySchemes": {
+      "bearer-jwt": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Paste a valid access token from auth server or use the TPE Auth flow to obtain a token. Include as: Authorization: Bearer <token>"
+      },
+      "OAuth2ClientCredentials": {
+        "type": "oauth2",
+        "description": "OAuth2 client credentials flow. Exchange client_id/client_secret at the token endpoint to obtain a JWT access token.",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://veritekfl-auth-server-dev.veritekfl.com/oauth2/token",
+            "scopes": {}
+          }
+        }
+      }
+    }
+  }
+}
