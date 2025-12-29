@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Veritek FL Search API",
-    "description": "Endpoints for searching parties and related background check data.\n\nThis specification is derived from the service runtime contract and enhanced with common response types, examples, and clarifying descriptions. Verify security, rate limits, and field semantics with the implementation team before publishing to consumers.\n\nAuthentication: obtain an access token from the VeritekFL Auth server using the OAuth2 client credentials flow (token endpoint documented in externalDocs below). Use the returned access token as: Authorization: Bearer <token>.",
+    "description": "VeritekFL provides background-check search APIs to query parties, cases, and court records across Florida counties. Use this API to submit search criteria and receive normalized case, charge, event, and docket details with tracking metadata.\n\nSecurity: OAuth2 client credentials with bearer JWT tokens. Confirm the token endpoint and scopes with the implementation team; the OAuth link in externalDocs is under review.\n\nAuthentication: include the access token as: Authorization: Bearer <token>.",
     "version": "v1"
   },
   "externalDocs": {
@@ -31,10 +31,10 @@
       "post": {
         "tags": ["Search"],
         "summary": "Search for a party",
-        "description": "Search for parties and related records using identifying information and optional filters. The service performs best-effort matching and may return multiple candidate parties; clients should use UCN or PIN where available to disambiguate.",
+        "description": "Search for parties and related records using identifying information and optional filters. The service performs best-effort matching and may return multiple candidate parties; clients should use UCN or PIN where available to disambiguate. UCN and PIN together make a unique party record on the case.",
         "operationId": "search",
         "requestBody": {
-          "description": "Search criteria (see schema for optional filters). Provide either name + dob or other identifiers where available.",
+          "description": "Provide the name and date of birth of the person being searched, and optionally the last four digits of their SSN, to initiate a search.",
           "required": true,
           "content": {
             "application/json": {
@@ -42,7 +42,7 @@
               "examples": {
                 "basic": {
                   "summary": "Basic name + dob search",
-                  "value": { "first_name": "John", "last_name": "Smith", "dob": "1980-01-01", "request_id": "req-123", "request_timestamp": "2025-11-20T12:34:56Z" }
+                  "value": { "firstName": "John", "lastName": "Smith", "dateOfBirth": "1980-01-01", "requestId": "req-123", "requestTimestamp": "2025-11-20T12:34:56Z" }
                 }
               }
             }
@@ -50,23 +50,23 @@
         },
         "responses": {
           "200": {
-            "description": "Search successful",
+            "description": "A successful search.",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/SearchResponse" },
                 "examples": {
                   "ok": {
                     "summary": "Single match example",
-                    "value": { "parties": [ { "first_name": "John", "last_name": "Smith", "date_of_birth": "1980-01-01", "ucn": "UCN12345" } ] }
+                    "value": { "parties": [ { "firstName": "John", "lastName": "Smith", "dateOfBirth": "1980-01-01", "case": { "ucn": "UCN12345" } } ] }
                   }
                 }
               }
             }
           },
-          "400": { "description": "Bad request - validation failed", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
-          "401": { "description": "Unauthorized - invalid or missing token", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
-          "429": { "description": "Too Many Requests - rate limit exceeded", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
-          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+          "400": { "description": "Bad request – the request failed validation.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "401": { "description": "Unauthorized – the token is either invalid or missing.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "429": { "description": "Too Many Requests – the rate limit was exceeded.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "500": { "description": "Internal server error.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
         },
         "security": [ { "bearer-jwt": [] } ]
       }
@@ -76,155 +76,162 @@
     "schemas": {
       "SearchRequest": {
         "type": "object",
-        "required": ["dob","first_name","last_name","request_id","request_timestamp"],
+        "required": ["dateOfBirth","firstName","lastName","requestId","requestTimestamp"],
         "properties": {
-          "last_name": { "type": "string", "maxLength": 30, "minLength": 1, "description": "Last name of the Party", "example": "Smith" },
-          "first_name": { "type": "string", "maxLength": 20, "minLength": 0, "description": "First name of the Party", "example": "John" },
-          "dob": { "type": "string", "pattern": "\\d{4}-\\d{2}-\\d{2}", "format": "date", "description": "Date of birth in format YYYY-MM-DD", "example": "1980-01-01" },
-          "ssn_last_4": { "type": "string", "maxLength": 4, "minLength": 4, "pattern": "\\d{4}", "description": "Last 4 digits of SSN (optional)", "example": "1234" },
-          "filed_date_from": { "type": "string", "pattern": "\\d{4}-\\d{2}-\\d{2}", "format": "date", "description": "Start date for case filing date range (YYYY-MM-DD)", "example": "2020-01-01" },
-          "filed_date_to": { "type": "string", "pattern": "\\d{4}-\\d{2}-\\d{2}", "format": "date", "description": "End date for case filing date range (YYYY-MM-DD)", "example": "2025-12-31" },
-          "case_type": { "type": "string", "description": "Case type to filter search results", "example": "FELONY" },
-          "county_codes": { "type": "array", "items": { "type": "integer", "format": "int32" }, "description": "List of county codes to search in", "example": [12,45,67] },
-          "include_dockets": { "type": "boolean", "description": "Include docket information in the response", "default": false },
-          "include_charges": { "type": "boolean", "description": "Include charge information in the response", "default": true },
-          "include_events": { "type": "boolean", "description": "Include event information in the response", "default": false },
-          "request_id": { "type": "string", "description": "Unique request ID for tracking. Server-generated trace ID, echoed back in response.", "example": "abc123xyz" },
-          "request_timestamp": { "type": "string", "description": "Request timestamp in ISO 8601 format (UTC)", "format": "date-time", "example": "2025-11-20T12:34:56Z" }
+          "lastName": { "type": "string", "maxLength": 30, "minLength": 1, "description": "Last name of the person being searched.", "example": "Smith" },
+          "firstName": { "type": "string", "maxLength": 20, "minLength": 0, "description": "First name of the person being searched.", "example": "John" },
+          "dateOfBirth": { "type": "string", "pattern": "\\d{4}-\\d{2}-\\d{2}", "format": "date", "description": "The date of birth of the person being searched. Use the format YYYY-MM-DD.", "example": "1980-01-01" },
+          "ssnLast4": { "type": "string", "maxLength": 4, "minLength": 4, "pattern": "\\d{4}", "description": "(optional) The last four digits of the SSN for the person being searched.", "example": "1234" },
+          "filedDateFrom": { "type": "string", "pattern": "\\d{4}-\\d{2}-\\d{2}", "format": "date", "description": "(optional) Use this field to set a lower limit of the search range based on the ‘case file date’ value. Use the format YYYY-MM-DD.", "example": "2020-01-01" },
+          "filedDateTo": { "type": "string", "pattern": "\\d{4}-\\d{2}-\\d{2}", "format": "date", "description": "(optional) Use this field to set an upper limit of the search range based on the ‘case file date’ value. Use the format YYYY-MM-DD.", "example": "2025-12-31" },
+          "caseType": { "type": "string", "description": "(optional) Use this field to limit searches to specific case types. The options are ‘CF’ for Felony; ‘MM’ for Misdemeanor; and ‘CT’ for Criminal Traffic. If none are provided, the system will default to all options included in the search.", "example": "CF" },
+          "countyCodes": { "type": "array", "items": { "type": "integer", "format": "int32" }, "description": "(optional) Use this field to limit searches to specific counties. The options are: [1 - 67]. If none are provided, the system will default to all options included in the search.", "example": [12,45,67] },
+          "includeDockets": { "type": "boolean", "description": "(optional) Use this field to affirm the inclusion of progress docket records in the response. The default is to exclude [false] these records.", "default": false },
+          "includeCharges": { "type": "boolean", "description": "(optional) Use this field to exclude charge records from the response. The default is to include [true] these records.", "default": true },
+          "includeEvents": { "type": "boolean", "description": "(optional) Use this field to affirm the inclusion of court event records in the response. The default is to exclude [false] these records.", "default": false },
+          "requestId": { "type": "string", "description": "This is a unique value generated by your system for end-to-end tracking. The value provided will be echoed in the response.", "example": "abc123xyz" },
+          "requestTimestamp": { "type": "string", "description": "This timestamp value is generated by your system at the time of the request. The value will be used to support response time metrics. Use the ISO 8601 format (UTC).", "format": "date-time", "example": "2025-11-20T12:34:56Z" }
         },
-        "description": "Search criteria for background check queries against data"
+        "description": "The search request includes the search criteria available to query the VeritekFL data."
       },
       "SearchResponse": {
         "type": "object",
         "properties": {
-          "parties": { "type": "array", "items": { "$ref": "#/components/schemas/party" } },
-          "api_version": { "type": "string", "description": "API version used for the response (e.g. v1)" },
-          "request_id": { "type": "string", "description": "Echoed request id from caller, if provided" },
-          "receipt_id": { "type": "string", "description": "Unique identifier generated by VeritekFL to track internal processing" },
-          "response_timestamp": { "type": "string", "format": "date-time", "description": "UTC response timestamp in ISO-8601 format" },
-          "warnings": { "type": "array", "items": { "type": "string" }, "description": "Non-fatal warnings or notes" }
+          "parties": { "type": "array", "items": { "$ref": "#/components/schemas/Party" }, "description": "An array of ‘Party’ objects that met the search criteria provided." },
+          "apiVersion": { "type": "string", "description": "The version of the API used for this response (e.g. v1)." },
+          "requestId": { "type": "string", "description": "The echoed ‘request id’ value provided in the request by the caller." },
+          "receiptId": { "type": "string", "description": "A unique identifier generated by VeritekFL to support internal logging activities." },
+          "responseTimestamp": { "type": "string", "format": "date-time", "description": "This timestamp value is generated by VeritekFL at the time the response is returned. The value will be used to support response time metrics and will be in the ISO 8601 format (UTC)." },
+          "warnings": { "type": "array", "items": { "type": "string" }, "description": "Any non-fatal warnings or notes will be included in this field." }
         },
-        "description": "Search response containing array of Party objects and response metadata",
+        "description": "The search response contains an array of ‘Party’ objects and response metadata.",
         "examples": {
           "singleMatch": {
             "summary": "Example response with one party",
-            "value": { "api_version": "v1", "request_id": "abc123xyz", "receipt_id": "rcpt-001", "response_timestamp": "2025-12-11T12:00:00Z", "parties": [ { "first_name": "John", "last_name": "Smith", "date_of_birth": "1980-01-01", "ucn": "UCN12345" } ] }
+            "value": { "apiVersion": "v1", "requestId": "abc123xyz", "receiptId": "rcpt-001", "responseTimestamp": "2025-12-11T12:00:00Z", "parties": [ { "firstName": "John", "lastName": "Smith", "dateOfBirth": "1980-01-01", "case": { "ucn": "UCN12345" } } ] }
           }
         }
       },
       "ResponseMeta": {
         "type": "object",
         "properties": {
-          "request_id": { "type": "string" },
-          "processing_time_ms": { "type": "integer", "format": "int32" },
-          "result_count": { "type": "integer", "format": "int32" }
-        }
+          "requestId": { "type": "string" },
+          "processingTimeMs": { "type": "integer", "format": "int32" },
+          "resultCount": { "type": "integer", "format": "int32" }
+        },
+        "description": "The response metadata supports message tracking and system metrics."
       },
       "ErrorResponse": {
         "type": "object",
         "properties": {
           "error": { "type": "string" },
           "message": { "type": "string" },
-          "request_id": { "type": "string" }
+          "requestId": { "type": "string" }
+        },
+        "description": "In the event of an error, this message format will be returned."
+      },
+      "Case": {
+        "type": "object",
+        "required": ["caseStatusCode","caseType","clerkCaseNumber","clerkFileDate","countyName","ucn"],
+        "properties": {
+          "ucn": { "type": "string", "maxLength": 20, "description": "The uniform case number is the definitive unique identifier for a given case. This value has a standard format used by all Clerks’ offices." },
+          "clerkCaseNumber": { "type": "string", "maxLength": 50, "description": "The local identification number assigned by a Clerk of Court’s office. The format of this value is not standardized across all 67 Clerks’ offices." },
+          "countyName": { "type": "string", "description": "The name of the county this case was filed in." },
+          "caseType": { "type": "string", "description": "The case type as defined by the Clerk’s office responsible for this case’s data." },
+          "courtType": { "type": "string", "description": "The standard category (Felony, Misdemeanor, Criminal Traffic) that this case falls under for court assignment purposes.", "example": "CRIMINAL" },
+          "clerkFileDate": { "type": "string", "format": "date", "description": "The date the case was filed in the Clerk’s office. This value is used for any date range searching specified in the request." },
+          "caseStatusCode": { "type": "string", "description": "The current status of the case." },
+          "charges": { "type": "array", "items": { "$ref": "#/components/schemas/Charge" } },
+          "dockets": { "type": "array", "items": { "$ref": "#/components/schemas/Docket" } },
+          "events": { "type": "array", "items": { "$ref": "#/components/schemas/Event" } }
+        },
+        "description": "The ‘case’ object includes details of a case associated with a party that matched the search criteria in the request."
+      },
+      "Charge": {
+        "type": "object",
+        "description": "The ‘charge’ object includes details for a specific charge on this case. The charge object is built based on a phase precedence: Court > Prosecutor > Initial. If a charge has Court-phase data, only Court-phase fields will be populated. If not, it will fall back to Prosecutor-phase data, and finally to Initial-phase data.",
+        "properties": {
+          "chargePhase": {
+            "type": "string",
+            "enum": ["COURT", "PROSECUTOR", "INITIAL"],
+            "description": "Indicates the highest phase of the charge, which determines which set of fields are populated."
+          },
+          "chargeSequenceNumber": { "type": "string", "description": "The unique ID for this charge record." },
+          "initialStatusDate": { "type": "string", "format": "date", "description": "Populated when chargePhase is 'INITIAL'." },
+          "initialFlStatuteDescription": { "type": "string", "description": "Populated when chargePhase is 'INITIAL'." },
+          "offenseDate": { "type": "string", "format": "date", "description": "The date the offense occurred." },
+          "initialFlStatuteNumber": { "type": "string", "description": "Populated when chargePhase is 'INITIAL'." },
+          "prosecutorActionCode": { "type": "string", "description": "Populated when chargePhase is 'PROSECUTOR'." },
+          "prosecutorFlStatuteNumber": { "type": "string", "description": "Populated when chargePhase is 'PROSECUTOR'." },
+          "prosecutorFlStatuteDescription": { "type": "string", "description": "Populated when chargePhase is 'PROSECUTOR'." },
+          "prosecutorDecisionDate": { "type": "string", "format": "date", "description": "Populated when chargePhase is 'PROSECUTOR'." },
+          "courtFlStatuteNumber": { "type": "string", "description": "Populated when chargePhase is 'COURT'." },
+          "courtFlStatuteDescription": { "type": "string", "description": "Populated when chargePhase is 'COURT'." },
+          "courtDecisionDate": { "type": "string", "format": "date", "description": "Populated when chargePhase is 'COURT'." },
+          "trafficDispositionCode": { "type": "string", "description": "For traffic-related cases, this value indicates the disposition of the traffic citation." },
+          "citationNumber": { "type": "string", "description": "For traffic-related cases, this is the value assigned to the citation by law enforcement." },
+          "citationIssuedDate": { "type": "string", "format": "date", "description": "For traffic-related cases, this is the date the citation was issued by law enforcement." },
+          "initialChargeLevelCode": { "type": "string", "description": "Populated when chargePhase is 'INITIAL'." },
+          "initialChargeDegreeCode": { "type": "string", "description": "Populated when chargePhase is 'INITIAL'." },
+          "prosecutorChargeLevelCode": { "type": "string", "description": "Populated when chargePhase is 'PROSECUTOR'." },
+          "prosecutorChargeDegreeCode": { "type": "string", "description": "Populated when chargePhase is 'PROSECUTOR'." },
+          "courtChargeLevelCode": { "type": "string", "description": "Populated when chargePhase is 'COURT'." },
+          "courtChargeDegreeCode": { "type": "string", "description": "Populated when chargePhase is 'COURT'." },
+          "sentences": { "type": "array", "items": { "$ref": "#/components/schemas/Sentence" } }
         }
       },
-      "case": {
+      "Docket": {
         "type": "object",
-        "required": ["case_status_code","case_type","clerk_case_number","clerk_file_date","county_id","ucn"],
         "properties": {
-          "clerk_case_number": { "type": "string", "maxLength": 50, "description": "Display case number" },
-          "ucn": { "type": "string", "maxLength": 20, "description": "Included when available in the source" },
-          "county_id": { "type": "string", "description": "FL county code" },
-          "case_type": { "type": "string", "description": "Case type" },
-          "court_type": { "type": "string", "description": "Court type", "example": "CRIMINAL" },
-          "clerk_file_date": { "type": "string", "format": "date", "description": "Filed date" },
-          "case_status_code": { "type": "string", "description": "Current status" },
-          "charges": { "type": "array", "items": { "$ref": "#/components/schemas/charge" } },
-          "dockets": { "type": "array", "items": { "$ref": "#/components/schemas/docket" } },
-          "events": { "type": "array", "items": { "$ref": "#/components/schemas/event" } }
+          "docketIdentifier": { "type": "string", "maxLength": 14, "description": "The unique identifier for this docket record." },
+          "docketActionDate": { "type": "string", "format": "date", "description": "This is the date the docket was entered into the Clerk’s system." },
+          "docketCode": { "type": "string", "maxLength": 20, "description": "This is the standard type of docket this object represents." },
+          "docketText": { "type": "string", "maxLength": 8000, "description": "This is the freeform text entered by the Clerk’s office for this docket record." }
         },
-        "description": "Criminal case details"
+        "description": "The ‘docket’ object represents a progress docket entry for this case."
       },
-      "charge": {
+      "Event": {
         "type": "object",
         "properties": {
-          "charge_sequence_number": { "type": "string" },
-          "initial_status_date": { "type": "string", "format": "date" },
-          "initial_fl_statute_description": { "type": "string" },
-          "offense_date": { "type": "string", "format": "date" },
-          "initial_fl_statute_number": { "type": "string" },
-          "prosecutor_action_code": { "type": "string" },
-          "prosecutor_fl_statute_number": { "type": "string" },
-          "prosecutor_fl_statute_description": { "type": "string" },
-          "prosecutor_decision_date": { "type": "string", "format": "date" },
-          "court_fl_statute_number": { "type": "string" },
-          "court_fl_statute_description": { "type": "string" },
-          "court_decision_date": { "type": "string", "format": "date" },
-          "traffic_disposition_code": { "type": "string" },
-          "citation_number": { "type": "string" },
-          "citation_issued_date": { "type": "string", "format": "date" },
-          "initial_charge_level_code": { "type": "string" },
-          "initial_charge_degree_code": { "type": "string" },
-          "prosecutor_charge_level_code": { "type": "string" },
-          "prosecutor_charge_degree_code": { "type": "string" },
-          "court_charge_level_code": { "type": "string" },
-          "court_charge_degree_code": { "type": "string" },
-          "sentences": { "type": "array", "items": { "$ref": "#/components/schemas/sentence" } }
+          "eventId": { "type": "string", "description": "A unique value that is a combination of the UCN, court appearance date (yyyyMMdd), and standard event code values." },
+          "courtAppearanceDate": { "type": "string", "format": "date", "description": "The date the court event is/was scheduled to occur." },
+          "courtEventDescription": { "type": "string", "maxLength": 8000, "description": "The standard court event type." },
+          "standardCourtEventCode": { "type": "string", "description": "Standard court event code" },
+          "courtAppearanceTime": { "type": "string", "description": "The time of day the court event is/was scheduled to occur." },
+          "courtLocation": { "type": "string", "description": "The address where the court event is/was scheduled to occur. Virtual events may not include a physical address." },
+          "courtDivision": { "type": "string", "description": "The administrative section of the court assigned this case." }
         },
-        "description": "Represents a charge within a case"
+        "description": "The ‘event’ object represents a court event associated with this case."
       },
-      "docket": {
+      "Party": {
         "type": "object",
         "properties": {
-          "docket_identifier": { "type": "string", "maxLength": 14, "description": "Unique identifier for the docket entry" },
-          "docket_action_date": { "type": "string", "format": "date", "description": "Date when the docket action occurred" },
-          "docket_code": { "type": "string", "maxLength": 20, "description": "Code representing the type of docket action" },
-          "docket_text": { "type": "string", "maxLength": 8000, "description": "Full text description of the docket entry" }
-        },
-        "description": "Represents a docket entry in a case"
-      },
-      "event": {
-        "type": "object",
-        "properties": {
-          "event_id": { "type": "string", "description": "Opaque unique event identifier composed of UCN, court appearance date (yyyyMMdd) and standard event code" },
-          "court_appearance_date": { "type": "string", "format": "date", "description": "Court appearance date" },
-          "court_event_description": { "type": "string", "maxLength": 8000, "description": "Description of the court event" },
-          "standard_court_event_code": { "type": "string", "description": "Standard court event code" },
-          "court_appeance_time": { "type": "string", "description": "Court appearance time" },
-          "court_location": { "type": "string", "description": "Court location" },
-          "division": { "type": "string", "description": "Court division" }
-        },
-        "description": "Represents a court event"
-      },
-      "party": {
-        "type": "object",
-        "properties": {
-          "ssn_last_4": { "type": "string", "description": "Last 4 digits of Social Security Number", "example": "1234" },
-          "ucn": { "type": "string", "description": "UCN" },
-          "pin": { "type": "string", "description": "Party PIN" },
-          "last_name": { "type": "string", "description": "Last name of the person", "example": "Smith" },
-          "first_name": { "type": "string", "description": "First name of the person", "example": "John" },
-          "middle_name": { "type": "string", "description": "Middle name of the person", "example": "Robert" },
-          "suffix_code": { "type": "string", "description": "Suffix code" },
-          "date_of_birth": { "type": "string", "format": "date", "description": "Date of birth in format YYYY-MM-DD", "example": "1980-01-01" },
-          "sex_code": { "type": "string", "description": "Sex code" },
-          "race_code": { "type": "string", "description": "Race code" },
-          "driver_license_number": { "type": "string", "description": "Driver license number" },
-          "case": { "$ref": "#/components/schemas/case" }
+          "ssnLast4": { "type": "string", "description": "(nullable) The last four digits of the SSN for this party.", "example": "1234" },
+          "pin": { "type": "string", "description": "The unique party identification number for this record on this case." },
+          "lastName": { "type": "string", "description": "Last name of the person on this record.", "example": "Smith" },
+          "firstName": { "type": "string", "description": "First name of the person on this record.", "example": "John" },
+          "middleName": { "type": "string", "description": "Middle name of the person on this record.", "example": "Robert" },
+          "suffix": { "type": "string", "description": "The name suffix, if available, for the person on this record." },
+          "dateOfBirth": { "type": "string", "format": "date", "description": "The date of birth of the person on this record, formatted as YYYY-MM-DD.", "example": "1980-01-01" },
+          "sex": { "type": "string", "description": "The sex documented for the person on this record." },
+          "race": { "type": "string", "description": "The race documented for the person on this record." },
+          "driverLicenseNumber": { "type": "string", "description": "The government issued driver’s license number documented for the person on this record." },
+          "aliases": { "type": "array", "items": { "type": "string" }, "description": "Alias records associated to this party record." },
+          "case": { "$ref": "#/components/schemas/Case" }
         },
         "description": "Person information returned from search"
       },
-      "sentence": {
+      "Sentence": {
         "type": "object",
         "properties": {
-          "sentence_sequence_number": { "type": "string" },
-          "sentence_status_code": { "type": "string" },
-          "sentence_imposed_date": { "type": "string", "format": "date" },
-          "sentence_effective_date": { "type": "string", "format": "date" },
-          "sentence_code": { "type": "string" },
-          "length_of_sentence_confinement": { "type": "string" }
+          "sentenceSequenceNumber": { "type": "string", "description": "The unique ID for this sentence record." },
+          "sentenceStatusCode": { "type": "string", "description": "The status of this sentence entry." },
+          "sentenceImposedDate": { "type": "string", "format": "date", "description": "The date the sentence was issued by the Court." },
+          "sentenceEffectiveDate": { "type": "string", "format": "date", "description": "The date the sentence effectively began based on the Court’s sentencing order." },
+          "sentenceCode": { "type": "string", "description": "The type of sentence imposed. For example, probation, confinement, etc." },
+          "lengthOfSentenceConfinement": { "type": "string", "description": "The amount of time a sentence or confinement action is assigned by the Court at the time of sentencing." }
         },
-        "description": "Represents a sentence within a charge"
+        "description": "An array of ‘sentence’ objects for this charge record."
       }
     },
     "securitySchemes": {
@@ -232,7 +239,7 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT",
-        "description": "Paste a valid access token from auth server or use the TPE Auth flow to obtain a token. Include as: Authorization: Bearer <token>"
+        "description": "Provide a valid access token issued by the VeritekFL auth server. Include as: Authorization: Bearer <token>."
       },
       "OAuth2ClientCredentials": {
         "type": "oauth2",
