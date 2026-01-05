@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Veritek FL Search API",
-    "description": "VeritekFL provides background-check search APIs to query parties, cases, and court records across Florida counties. Use this API to submit search criteria and receive normalized case, charge, event, and docket details with tracking metadata.\n\nSecurity: OAuth2 client credentials with bearer JWT tokens. Confirm the token endpoint and scopes with the implementation team; the OAuth link in externalDocs is under review.\n\nAuthentication: include the access token as: Authorization: Bearer <token>.",
+    "description": "VeritekFL provides background-check search APIs to query parties, cases, and court records across Florida counties. Use this API to submit search criteria and receive normalized case, charge, event, and docket details with tracking metadata.\n\nSecurity overview:\n- Authentication uses OAuth2 client credentials for machine-to-machine (M2M) access and issues short-lived JWT access tokens.\n- Token endpoint: https://veritekfl-auth-server-dev.veritekfl.com/oauth2/token (see externalDocs).\n- To obtain a token, call the token endpoint using HTTP Basic authentication with your `client_id` and `client_secret` and a form-encoded body: `grant_type=client_credentials&scope=...`.\n- Only an `access_token` (JWT) is returned for M2M client credentials flows; refresh tokens are not issued for M2M. When the access token expires the client should request a new token using its credentials.\n- Include the access token on API requests using the Authorization header: Authorization: Bearer <access_token>.\n\nScopes and token lifetime: confirm required scopes (e.g. `search.read`) and token expiry with your VeritekFL implementation contact.",
     "version": "v1"
   },
   "externalDocs": {
@@ -14,17 +14,23 @@
       "url": "https://veritekfl-service-dev.veritekfl.com",
       "description": "Development environment (canonical)"
     }
+    ,
+    {
+      "url": "http://localhost:8080",
+      "description": "Local auth server (for token endpoint)"
+    }
   ],
   "security": [
     {
       "bearer-jwt": []
-    },
-    {
-      "OAuth2ClientCredentials": []
     }
   ],
   "tags": [
-    { "name": "Search", "description": "Search endpoints for parties, cases, and related records" }
+    { "name": "Search", "description": "Search endpoints for parties, cases, and related records" },
+    {
+      "name": "Authorization Server",
+      "description": "This service provides endpoints for obtaining OAuth2-style access tokens for both interactive (web/mobile) and machine-to-machine (M2M) use cases.\n\nMachine-to-Machine (M2M) Authentication:\n- Call /oauth2/token with HTTP Basic Authentication using your client credentials (`client_id`/`client_secret`).\n- For M2M, only an `access_token` is returned; no `refresh_token` is issued.\n- When the access token expires the client must request a new token using its credentials.\n\nTypical Usage Flow (Web or Mobile Application):\n1. Call `/oauth2/token` with Basic Authentication (username/password) to generate an `access_token` and, when applicable, a `refresh_token`.\n2. Use the `access_token` (JWT) in requests to access secure APIs: `Authorization: Bearer {access_token}`.\n3. When the access token expires, you can either:\n   - Generate a new token with username/password using `/oauth2/token`, OR\n   - If the authorization server issues a `refresh_token`, use the server's refresh endpoint (if supported) to obtain a new access token without re-entering credentials.\n\nTypical Usage Flow (Machine-to-Machine - M2M):\n- Call `/oauth2/token` with Basic Authentication using client credentials (client_id/client_secret).\n- Only an `access_token` is returned for M2M; no `refresh_token` will be issued.\n- When the access token expires, the client must request a new token using its credentials."
+    }
   ],
   "paths": {
     "/search": {
@@ -71,6 +77,59 @@
         "security": [ { "bearer-jwt": [] } ]
       }
     }
+    ,
+    "/oauth2/token": {
+      "post": {
+        "tags": ["Authorization Server"],
+        "summary": "Token endpoint",
+        "description": "Issue an access token using the OAuth2 `client_credentials` grant. Clients authenticate using HTTP Basic (client_id:client_secret) and present `grant_type=client_credentials` with optional `scope` in the form-encoded body. Use the token endpoint URL: https://veritekfl-auth-server-dev.veritekfl.com/oauth2/token",
+        "operationId": "token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "grant_type": { "type": "string", "description": "Grant type: client_credentials" },
+                  "scope": { "type": "string", "description": "Optional scope(s) requested (space-delimited)" }
+                },
+                "required": ["grant_type"]
+              },
+              "examples": {
+                "client_credentials": {
+                  "summary": "Client credentials request",
+                  "value": "grant_type=client_credentials&scope=search.read"
+                }
+              }
+            }
+          }
+        },
+        "security": [ { "basicAuth": [] } ],
+        "responses": {
+          "200": {
+            "description": "Token response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/OAuth2TokenResponse" },
+                "examples": {
+                  "client_credentials": {
+                    "summary": "Client credentials response",
+                    "value": { "access_token": "eyJhbGciOi...", "token_type": "Bearer", "expires_in": 300 }
+                  },
+                  
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid request", "content": { "application/json": { "schema": { "type": "object" } } } },
+          "401": { "description": "Invalid client credentials", "content": { "application/json": { "schema": { "type": "object" } } } },
+          "500": { "description": "Server error", "content": { "text/plain": { "schema": { "type": "string" } } } }
+        }
+      }
+    }
+    ,
+    
   },
   "components": {
     "schemas": {
@@ -81,7 +140,7 @@
           "lastName": { "type": "string", "maxLength": 30, "minLength": 1, "description": "Last name of the person being searched.", "example": "Smith" },
           "firstName": { "type": "string", "maxLength": 20, "minLength": 0, "description": "First name of the person being searched.", "example": "John" },
           "dateOfBirth": { "type": "string", "pattern": "\\d{4}-\\d{2}-\\d{2}", "format": "date", "description": "The date of birth of the person being searched. Use the format YYYY-MM-DD.", "example": "1980-01-01" },
-          "ssnLast4": { "type": "string", "maxLength": 4, "minLength": 4, "pattern": "\\d{4}", "description": "(optional) The last four digits of the SSN for the person being searched.", "example": "1234" },
+          "ssnLast4": { "type": "string", "maxLength": 4, "minLength": 4, "pattern": "\\d{4}", "description": "(optional) The last four digits of the SSN for the person being searched. Providing this value narrows results to records that match the same last-four digits; however, some records may have a null or missing SSN and can still be returned if other criteria match. Do not rely on `ssnLast4` alone to uniquely identify a person—use UCN or `pin` where available to disambiguate.", "example": "1234" },
           "filedDateFrom": { "type": "string", "pattern": "\\d{4}-\\d{2}-\\d{2}", "format": "date", "description": "(optional) Use this field to set a lower limit of the search range based on the ‘case file date’ value. Use the format YYYY-MM-DD.", "example": "2020-01-01" },
           "filedDateTo": { "type": "string", "pattern": "\\d{4}-\\d{2}-\\d{2}", "format": "date", "description": "(optional) Use this field to set an upper limit of the search range based on the ‘case file date’ value. Use the format YYYY-MM-DD.", "example": "2025-12-31" },
           "caseType": { "type": "string", "description": "(optional) Use this field to limit searches to specific case types. The options are ‘CF’ for Felony; ‘MM’ for Misdemeanor; and ‘CT’ for Criminal Traffic. If none are provided, the system will default to all options included in the search.", "example": "CF" },
@@ -93,6 +152,14 @@
           "requestTimestamp": { "type": "string", "description": "This timestamp value is generated by your system at the time of the request. The value will be used to support response time metrics. Use the ISO 8601 format (UTC).", "format": "date-time", "example": "2025-11-20T12:34:56Z" }
         },
         "description": "The search request includes the search criteria available to query the VeritekFL data."
+      },
+      "OAuth2TokenResponse": {
+        "type": "object",
+        "properties": {
+          "access_token": { "type": "string" },
+          "token_type": { "type": "string", "example": "Bearer" },
+          "expires_in": { "type": "integer", "format": "int64" }
+        }
       },
       "SearchResponse": {
         "type": "object",
@@ -132,15 +199,15 @@
       },
       "Case": {
         "type": "object",
-        "required": ["caseStatusCode","caseType","clerkCaseNumber","clerkFileDate","countyName","ucn"],
+        "required": ["caseStatus","caseType","clerkCaseNumber","clerkFileDate","countyName","ucn"],
         "properties": {
-          "ucn": { "type": "string", "maxLength": 20, "description": "The uniform case number is the definitive unique identifier for a given case. This value has a standard format used by all Clerks’ offices." },
+          "ucn": { "type": "string", "minLength": 20, "maxLength": 20, "description": "The uniform case number is the definitive unique identifier for a given case. This value has a standard 20-character format used by all Clerks’ offices." },
           "clerkCaseNumber": { "type": "string", "maxLength": 50, "description": "The local identification number assigned by a Clerk of Court’s office. The format of this value is not standardized across all 67 Clerks’ offices." },
           "countyName": { "type": "string", "description": "The name of the county this case was filed in." },
           "caseType": { "type": "string", "description": "The case type as defined by the Clerk’s office responsible for this case’s data." },
-          "courtType": { "type": "string", "description": "The standard category (Felony, Misdemeanor, Criminal Traffic) that this case falls under for court assignment purposes.", "example": "CRIMINAL" },
+          "courtType": { "type": "string", "description": "The standard category that this case falls under for court assignment purposes. One of: Felony, Misdemeanor, Criminal Traffic.", "example": "Felony" },
           "clerkFileDate": { "type": "string", "format": "date", "description": "The date the case was filed in the Clerk’s office. This value is used for any date range searching specified in the request." },
-          "caseStatusCode": { "type": "string", "description": "The current status of the case." },
+          "caseStatus": { "type": "string", "description": "The current status of the case (human-readable value). If a machine-readable code is required, include that mapping in implementation notes or an additional field.", "example": "Open" },
           "charges": { "type": "array", "items": { "$ref": "#/components/schemas/Charge" } },
           "dockets": { "type": "array", "items": { "$ref": "#/components/schemas/Docket" } },
           "events": { "type": "array", "items": { "$ref": "#/components/schemas/Event" } }
@@ -149,35 +216,40 @@
       },
       "Charge": {
         "type": "object",
-        "description": "The ‘charge’ object includes details for a specific charge on this case. The charge object is built based on a phase precedence: Court > Prosecutor > Initial. If a charge has Court-phase data, only Court-phase fields will be populated. If not, it will fall back to Prosecutor-phase data, and finally to Initial-phase data.",
+        "description": "The ‘charge’ object includes details for a specific charge on this case. Related sentencing activity for the charge is captured in the `sentences` array nested under the charge. The charge object is built based on a phase precedence: Court > Prosecutor > Initial. If a charge has Court-phase data, only Court-phase fields will be populated. If not, it will fall back to Prosecutor-phase data, and finally to Initial-phase data.",
         "properties": {
-          "chargePhase": {
-            "type": "string",
-            "enum": ["COURT", "PROSECUTOR", "INITIAL"],
-            "description": "Indicates the highest phase of the charge, which determines which set of fields are populated."
-          },
           "chargeSequenceNumber": { "type": "string", "description": "The unique ID for this charge record." },
-          "initialStatusDate": { "type": "string", "format": "date", "description": "Populated when chargePhase is 'INITIAL'." },
-          "initialFlStatuteDescription": { "type": "string", "description": "Populated when chargePhase is 'INITIAL'." },
+          "initialStatusDate": { "type": "string", "format": "date", "description": "Populated when Initial-phase data is available." },
+          "initialFlStatuteDescription": { "type": "string", "description": "Populated when Initial-phase data is available." },
           "offenseDate": { "type": "string", "format": "date", "description": "The date the offense occurred." },
-          "initialFlStatuteNumber": { "type": "string", "description": "Populated when chargePhase is 'INITIAL'." },
-          "prosecutorActionCode": { "type": "string", "description": "Populated when chargePhase is 'PROSECUTOR'." },
-          "prosecutorFlStatuteNumber": { "type": "string", "description": "Populated when chargePhase is 'PROSECUTOR'." },
-          "prosecutorFlStatuteDescription": { "type": "string", "description": "Populated when chargePhase is 'PROSECUTOR'." },
-          "prosecutorDecisionDate": { "type": "string", "format": "date", "description": "Populated when chargePhase is 'PROSECUTOR'." },
-          "courtFlStatuteNumber": { "type": "string", "description": "Populated when chargePhase is 'COURT'." },
-          "courtFlStatuteDescription": { "type": "string", "description": "Populated when chargePhase is 'COURT'." },
-          "courtDecisionDate": { "type": "string", "format": "date", "description": "Populated when chargePhase is 'COURT'." },
+          "initialFlStatuteNumber": { "type": "string", "description": "Populated when Initial-phase data is available." },
+          "prosecutorActionCode": { "type": "string", "description": "Populated when Prosecutor-phase data is available." },
+          "prosecutorFlStatuteNumber": { "type": "string", "description": "Populated when Prosecutor-phase data is available." },
+          "prosecutorFlStatuteDescription": { "type": "string", "description": "Populated when Prosecutor-phase data is available." },
+          "prosecutorDecisionDate": { "type": "string", "format": "date", "description": "Populated when Prosecutor-phase data is available." },
+          "courtFlStatuteNumber": { "type": "string", "description": "Populated when Court-phase data is available." },
+          "courtFlStatuteDescription": { "type": "string", "description": "Populated when Court-phase data is available." },
+          "courtDecisionDate": { "type": "string", "format": "date", "description": "Populated when Court-phase data is available." },
           "trafficDispositionCode": { "type": "string", "description": "For traffic-related cases, this value indicates the disposition of the traffic citation." },
           "citationNumber": { "type": "string", "description": "For traffic-related cases, this is the value assigned to the citation by law enforcement." },
           "citationIssuedDate": { "type": "string", "format": "date", "description": "For traffic-related cases, this is the date the citation was issued by law enforcement." },
-          "initialChargeLevelCode": { "type": "string", "description": "Populated when chargePhase is 'INITIAL'." },
-          "initialChargeDegreeCode": { "type": "string", "description": "Populated when chargePhase is 'INITIAL'." },
-          "prosecutorChargeLevelCode": { "type": "string", "description": "Populated when chargePhase is 'PROSECUTOR'." },
-          "prosecutorChargeDegreeCode": { "type": "string", "description": "Populated when chargePhase is 'PROSECUTOR'." },
-          "courtChargeLevelCode": { "type": "string", "description": "Populated when chargePhase is 'COURT'." },
-          "courtChargeDegreeCode": { "type": "string", "description": "Populated when chargePhase is 'COURT'." },
-          "sentences": { "type": "array", "items": { "$ref": "#/components/schemas/Sentence" } }
+          "initialChargeLevelCode": { "type": "string", "description": "Populated when Initial-phase data is available." },
+          "initialChargeDegreeCode": { "type": "string", "description": "Populated when Initial-phase data is available." },
+          "prosecutorChargeLevelCode": { "type": "string", "description": "Populated when Prosecutor-phase data is available." },
+          "prosecutorChargeDegreeCode": { "type": "string", "description": "Populated when Prosecutor-phase data is available." },
+          "courtChargeLevelCode": { "type": "string", "description": "Populated when Court-phase data is available." },
+          "courtChargeDegreeCode": { "type": "string", "description": "Populated when Court-phase data is available." },
+          "sentences": { "type": "array", "items": { "$ref": "#/components/schemas/Sentence" }, "description": "Related sentencing activity is captured in an array of `sentence` objects nested under the charge." }
+        }
+      ,
+        "x-field-mapping": {
+          "note": "For client use, the effective disposition and codes are provided in the phase-appropriate fields. Example mapping:",
+          "mapping": {
+            "disposition": "initial -> initialStatusDate; prosecutor -> prosecutorDecisionDate; court -> courtDecisionDate",
+            "disposition_date": "initial_status_date | prosecutor_decision_date | court_decision_date",
+            "level_code": "initialChargeLevelCode | prosecutorChargeLevelCode | courtChargeLevelCode",
+            "degree_code": "initialChargeDegreeCode | prosecutorChargeDegreeCode | courtChargeDegreeCode"
+          }
         }
       },
       "Docket": {
@@ -185,7 +257,7 @@
         "properties": {
           "docketIdentifier": { "type": "string", "maxLength": 14, "description": "The unique identifier for this docket record." },
           "docketActionDate": { "type": "string", "format": "date", "description": "This is the date the docket was entered into the Clerk’s system." },
-          "docketCode": { "type": "string", "maxLength": 20, "description": "This is the standard type of docket this object represents." },
+          "docketCode": { "type": "string", "description": "The standard type of docket this object represents. Values may be longer than 20 characters depending on the source system (e.g., CCIS ICD). Confirm maximum length with your VeritekFL implementation contact." },
           "docketText": { "type": "string", "maxLength": 8000, "description": "This is the freeform text entered by the Clerk’s office for this docket record." }
         },
         "description": "The ‘docket’ object represents a progress docket entry for this case."
@@ -196,7 +268,7 @@
           "eventId": { "type": "string", "description": "A unique value that is a combination of the UCN, court appearance date (yyyyMMdd), and standard event code values." },
           "courtAppearanceDate": { "type": "string", "format": "date", "description": "The date the court event is/was scheduled to occur." },
           "courtEventDescription": { "type": "string", "maxLength": 8000, "description": "The standard court event type." },
-          "standardCourtEventCode": { "type": "string", "description": "Standard court event code" },
+          "standardCourtEventCode": { "type": "string", "nullable": true, "description": "Optional code for the court event. The human-readable description is provided in `courtEventDescription`; clients may ignore `standardCourtEventCode` if they only use the description." },
           "courtAppearanceTime": { "type": "string", "description": "The time of day the court event is/was scheduled to occur." },
           "courtLocation": { "type": "string", "description": "The address where the court event is/was scheduled to occur. Virtual events may not include a physical address." },
           "courtDivision": { "type": "string", "description": "The administrative section of the court assigned this case." }
@@ -228,7 +300,7 @@
           "sentenceStatusCode": { "type": "string", "description": "The status of this sentence entry." },
           "sentenceImposedDate": { "type": "string", "format": "date", "description": "The date the sentence was issued by the Court." },
           "sentenceEffectiveDate": { "type": "string", "format": "date", "description": "The date the sentence effectively began based on the Court’s sentencing order." },
-          "sentenceCode": { "type": "string", "description": "The type of sentence imposed. For example, probation, confinement, etc." },
+          "sentenceType": { "type": "string", "description": "The type of sentence imposed (formerly `sentenceCode`). For example, probation, confinement, etc." },
           "lengthOfSentenceConfinement": { "type": "string", "description": "The amount of time a sentence or confinement action is assigned by the Court at the time of sentencing." }
         },
         "description": "An array of ‘sentence’ objects for this charge record."
@@ -239,17 +311,19 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT",
-        "description": "Provide a valid access token issued by the VeritekFL auth server. Include as: Authorization: Bearer <token>."
+        "description": "VeritekFL uses OAuth 2.0 Client Credentials to issue short-lived JWT access tokens. Obtain a token from the token endpoint (see the externalDocs URL) by exchanging your `client_id` and `client_secret`. Include the returned access token on requests using the HTTP Authorization header: Authorization: Bearer <token>. Confirm required scopes and token lifetime with your VeritekFL implementation contact.\n\nProvide your bearer token in the Authorization header when making requests to protected resources.\n\nExample: Authorization: Bearer 123"
       },
-      "OAuth2ClientCredentials": {
-        "type": "oauth2",
-        "description": "OAuth2 client credentials flow. Exchange client_id/client_secret at the token endpoint to obtain a JWT access token.",
-        "flows": {
-          "clientCredentials": {
-            "tokenUrl": "https://veritekfl-auth-server-dev.veritekfl.com/oauth2/token",
-            "scopes": {}
-          }
-        }
+      
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Client authentication using HTTP Basic"
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "VeritekFL uses OAuth 2.0 Client Credentials to issue short-lived JWT access tokens. Obtain a token from the token endpoint (see the externalDocs URL) by exchanging your `client_id` and `client_secret`. Include the returned access token on requests using the HTTP Authorization header: Authorization: Bearer <token>. Confirm required scopes and token lifetime with your VeritekFL implementation contact."
       }
     }
   }
