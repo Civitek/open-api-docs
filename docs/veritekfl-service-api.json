@@ -216,39 +216,33 @@
       },
       "Charge": {
         "type": "object",
-        "description": "The ‘charge’ object includes details for a specific charge on this case. Related sentencing activity for the charge is captured in the `sentences` array nested under the charge. The charge object is built based on a phase precedence: Court > Prosecutor > Initial. If a charge has Court-phase data, only Court-phase fields will be populated. If not, it will fall back to Prosecutor-phase data, and finally to Initial-phase data.",
+        "description": "The ‘charge’ object includes details for a specific charge on this case. Values reflect the determined phase precedence (Court > Prosecutor > Initial). Related sentencing activity is captured in an array of `Sentence` objects nested under its charge.",
         "properties": {
+          "chargeId": { "type": "string", "description": "Charge identifier (UCN)" },
           "chargeSequenceNumber": { "type": "string", "description": "The unique ID for this charge record." },
-          "initialStatusDate": { "type": "string", "format": "date", "description": "Populated when Initial-phase data is available." },
-          "initialFlStatuteDescription": { "type": "string", "description": "Populated when Initial-phase data is available." },
+          "statute": { "type": "string", "description": "Statute number for the determined phase" },
+          "description": { "type": "string", "description": "Description for the determined phase" },
+          "levelCode": { "type": "string", "description": "Charge level code for the determined phase" },
+          "degreeCode": { "type": "string", "description": "Charge degree code for the determined phase" },
+          "disposition": { "type": "string", "description": "Disposition value for the determined phase" },
+          "dispositionDate": { "type": "string", "format": "date", "description": "Disposition date for the determined phase" },
           "offenseDate": { "type": "string", "format": "date", "description": "The date the offense occurred." },
-          "initialFlStatuteNumber": { "type": "string", "description": "Populated when Initial-phase data is available." },
-          "prosecutorActionCode": { "type": "string", "description": "Populated when Prosecutor-phase data is available." },
-          "prosecutorFlStatuteNumber": { "type": "string", "description": "Populated when Prosecutor-phase data is available." },
-          "prosecutorFlStatuteDescription": { "type": "string", "description": "Populated when Prosecutor-phase data is available." },
-          "prosecutorDecisionDate": { "type": "string", "format": "date", "description": "Populated when Prosecutor-phase data is available." },
-          "courtFlStatuteNumber": { "type": "string", "description": "Populated when Court-phase data is available." },
-          "courtFlStatuteDescription": { "type": "string", "description": "Populated when Court-phase data is available." },
-          "courtDecisionDate": { "type": "string", "format": "date", "description": "Populated when Court-phase data is available." },
           "trafficDispositionCode": { "type": "string", "description": "For traffic-related cases, this value indicates the disposition of the traffic citation." },
           "citationNumber": { "type": "string", "description": "For traffic-related cases, this is the value assigned to the citation by law enforcement." },
           "citationIssuedDate": { "type": "string", "format": "date", "description": "For traffic-related cases, this is the date the citation was issued by law enforcement." },
-          "initialChargeLevelCode": { "type": "string", "description": "Populated when Initial-phase data is available." },
-          "initialChargeDegreeCode": { "type": "string", "description": "Populated when Initial-phase data is available." },
-          "prosecutorChargeLevelCode": { "type": "string", "description": "Populated when Prosecutor-phase data is available." },
-          "prosecutorChargeDegreeCode": { "type": "string", "description": "Populated when Prosecutor-phase data is available." },
-          "courtChargeLevelCode": { "type": "string", "description": "Populated when Court-phase data is available." },
-          "courtChargeDegreeCode": { "type": "string", "description": "Populated when Court-phase data is available." },
-          "sentences": { "type": "array", "items": { "$ref": "#/components/schemas/Sentence" }, "description": "Related sentencing activity is captured in an array of `sentence` objects nested under the charge." }
+          "pleaCode": { "type": "string", "description": "Defendant final plea code" },
+          "sentences": { "type": "array", "description": "Array of sentences for the charge", "items": { "$ref": "#/components/schemas/Sentence" } }
         }
       ,
         "x-field-mapping": {
-          "note": "For client use, the effective disposition and codes are provided in the phase-appropriate fields. Example mapping:",
+          "note": "Normalized charge fields reflect phase precedence (Court > Prosecutor > Initial). Fields contain values appropriate to the determined phase rather than all phase-specific source fields.",
           "mapping": {
-            "disposition": "initial -> initialStatusDate; prosecutor -> prosecutorDecisionDate; court -> courtDecisionDate",
-            "disposition_date": "initial_status_date | prosecutor_decision_date | court_decision_date",
-            "level_code": "initialChargeLevelCode | prosecutorChargeLevelCode | courtChargeLevelCode",
-            "degree_code": "initialChargeDegreeCode | prosecutorChargeDegreeCode | courtChargeDegreeCode"
+            "statute": "initialFlStatuteNumber | prosecutorFlStatuteNumber | courtFlStatuteNumber",
+            "description": "initialFlStatuteDescription | prosecutorFlStatuteDescription | courtFlStatuteDescription",
+            "levelCode": "initialChargeLevelCode | prosecutorChargeLevelCode | courtChargeLevelCode",
+            "degreeCode": "initialChargeDegreeCode | prosecutorChargeDegreeCode | courtChargeDegreeCode",
+            "disposition": "initial status value | prosecutorActionCode | court-phase decision value (if available)",
+            "dispositionDate": "initialStatusDate | prosecutorDecisionDate | courtDecisionDate"
           }
         }
       },
@@ -311,19 +305,13 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT",
-        "description": "VeritekFL uses OAuth 2.0 Client Credentials to issue short-lived JWT access tokens. Obtain a token from the token endpoint (see the externalDocs URL) by exchanging your `client_id` and `client_secret`. Include the returned access token on requests using the HTTP Authorization header: Authorization: Bearer <token>. Confirm required scopes and token lifetime with your VeritekFL implementation contact.\n\nProvide your bearer token in the Authorization header when making requests to protected resources.\n\nExample: Authorization: Bearer 123"
+        "description": "VeritekFL uses OAuth 2.0 Client Credentials to issue short-lived JWT access tokens. Obtain a token from the token endpoint (see the externalDocs URL) by exchanging your `client_id` and `client_secret`. Include the returned access token on requests using the HTTP Authorization header: Authorization: Bearer <token>. Confirm required scopes and token lifetime with your VeritekFL implementation contact."
       },
       
       "basicAuth": {
         "type": "http",
         "scheme": "basic",
         "description": "Client authentication using HTTP Basic"
-      },
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT",
-        "description": "VeritekFL uses OAuth 2.0 Client Credentials to issue short-lived JWT access tokens. Obtain a token from the token endpoint (see the externalDocs URL) by exchanging your `client_id` and `client_secret`. Include the returned access token on requests using the HTTP Authorization header: Authorization: Bearer <token>. Confirm required scopes and token lifetime with your VeritekFL implementation contact."
       }
     }
   }
