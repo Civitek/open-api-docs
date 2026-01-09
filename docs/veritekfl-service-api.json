@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Veritek FL Search API",
-    "description": "VeritekFL provides background-check search APIs to query parties, cases, and court records across Florida counties. Use this API to submit search criteria and receive normalized case, charge, event, and docket details with tracking metadata.\n\nSecurity overview:\n- Authentication uses OAuth2 client credentials for machine-to-machine (M2M) access and issues short-lived JWT access tokens.\n- Token endpoint: https://veritekfl-auth-server-dev.veritekfl.com/oauth2/token (see externalDocs).\n- To obtain a token, call the token endpoint using HTTP Basic authentication with your `client_id` and `client_secret` and a form-encoded body: `grant_type=client_credentials&scope=...`.\n- Only an `access_token` (JWT) is returned for M2M client credentials flows; refresh tokens are not issued for M2M. When the access token expires the client should request a new token using its credentials.\n- Include the access token on API requests using the Authorization header: Authorization: Bearer <access_token>.\n\nScopes and token lifetime: confirm required scopes (e.g. `search.read`) and token expiry with your VeritekFL implementation contact.",
+    "description": "VeritekFL provides a background-check search API to query parties to receive matching court case records across Florida’s 67 counties. Use this API to submit search criteria and receive normalized case, charge, event, and docket details with tracking metadata.\n\nSecurity overview:\n- Authentication uses OAuth2 client credentials for machine-to-machine (M2M) access and issues short-lived JWT access tokens.\n- Token endpoint: https://veritekfl-auth-server-dev.veritekfl.com/oauth2/token.\n- To obtain a token, call the token endpoint using HTTP Basic authentication with your `client_id` and `client_secret` and a form-encoded body: `grant_type=client_credentials&scope=...`.\n- Only an `access_token` (JWT) is returned for M2M client credentials flows; refresh tokens are not issued for M2M. When the access token expires the client should request a new token using its credentials.\n- Include the access token on API requests using the Authorization header: Authorization: Bearer <access_token>.\n\nIntended consumers and onboarding:\n- Intended for authorized partners and integrators with a signed agreement.\n- Client credentials are issued by VeritekFL; onboarding and approval are required before access.\n- Contact your VeritekFL implementation representative to begin onboarding and receive `client_id`/`client_secret`.\n\nScopes and usage:\n- Supported scope for this API: `search.read` (read-only access to search endpoints and data returned).\n- Additional scopes may be introduced in future; partners should request only the minimal scope needed.\n\nToken lifecycle and resilience:\n- Typical access token lifetime is approximately 300 seconds (5 minutes) in development; production values may differ and will be communicated during onboarding.\n- M2M flows do not issue `refresh_token`. When the token expires, request a new `access_token` using client credentials.\n- Rotate client secrets per your security policy (recommended at least annually) or sooner if compromise is suspected.\n\nEnvironment clarity (service vs auth server):\n- API base (protected resources): https://veritekfl-service-dev.veritekfl.com\n- Authorization server (token minting): https://veritekfl-auth-server-dev.veritekfl.com\n- Tokens are minted by the authorization server and presented to the service; both hosts are part of the same environment.\n- The `/oauth2/token` endpoint is documented in this specification for integrator convenience but is operated by the authorization server domain noted above.\n\nAudit and compliance:\n- Token issuance and usage are logged for operational monitoring and accountability.\n- Requests include `requestId` and timestamps to support traceability.\n- Log retention and audit access follow VeritekFL policy; consult your implementation contact for compliance needs.",
     "version": "v1"
   },
   "externalDocs": {
@@ -37,10 +37,10 @@
       "post": {
         "tags": ["Search"],
         "summary": "Search for a party",
-        "description": "Search for parties and related records using identifying information and optional filters. The service performs best-effort matching and may return multiple candidate parties; clients should use UCN or PIN where available to disambiguate. UCN and PIN together make a unique party record on the case.",
+        "description": "Search for parties and their related court case records using identifying information and optional filters. The service performs best-effort matching and may return multiple candidate parties. Clients should use UCN or PIN where available to disambiguate results. UCN and PIN together make a unique party record on the case.",
         "operationId": "search",
         "requestBody": {
-          "description": "Provide the name and date of birth of the person being searched, and optionally the last four digits of their SSN, to initiate a search.",
+          "description": "Provide the name and date of birth of the person being searched, and optionally the last four digits of their SSN, to initiate a search. Optional fields should be omitted from the request unless explicitly providing values to override the default behavior.",
           "required": true,
           "content": {
             "application/json": {
@@ -201,13 +201,14 @@
         "type": "object",
         "required": ["caseStatus","caseType","clerkCaseNumber","clerkFileDate","countyName","ucn"],
         "properties": {
-          "ucn": { "type": "string", "minLength": 20, "maxLength": 20, "description": "The uniform case number is the definitive unique identifier for a given case. This value has a standard 20-character format used by all Clerks’ offices." },
+          "ucn": { "type": "string", "minLength": 20, "maxLength": 20, "description": "The uniform case number is the definitive unique identifier for a given case. This value has a standard 20-character format used by all Clerks’ offices. Must be exactly 20 characters." },
           "clerkCaseNumber": { "type": "string", "maxLength": 50, "description": "The local identification number assigned by a Clerk of Court’s office. The format of this value is not standardized across all 67 Clerks’ offices." },
           "countyName": { "type": "string", "description": "The name of the county this case was filed in." },
           "caseType": { "type": "string", "description": "The case type as defined by the Clerk’s office responsible for this case’s data." },
           "courtType": { "type": "string", "description": "The standard category that this case falls under for court assignment purposes. One of: Felony, Misdemeanor, Criminal Traffic.", "example": "Felony" },
           "clerkFileDate": { "type": "string", "format": "date", "description": "The date the case was filed in the Clerk’s office. This value is used for any date range searching specified in the request." },
-          "caseStatus": { "type": "string", "description": "The current status of the case (human-readable value). If a machine-readable code is required, include that mapping in implementation notes or an additional field.", "example": "Open" },
+          "caseStatus": { "type": "string", "description": "The current status of the case (human-readable value).", "example": "Open" },
+          "caseStatusCode": { "type": "string", "nullable": true, "description": "Optional machine-readable status code corresponding to `caseStatus`. If present, clients may use this code for programmatic handling." },
           "charges": { "type": "array", "items": { "$ref": "#/components/schemas/Charge" } },
           "dockets": { "type": "array", "items": { "$ref": "#/components/schemas/Docket" } },
           "events": { "type": "array", "items": { "$ref": "#/components/schemas/Event" } }
@@ -218,20 +219,20 @@
         "type": "object",
         "description": "The ‘charge’ object includes details for a specific charge on this case. Values reflect the determined phase precedence (Court > Prosecutor > Initial). Related sentencing activity is captured in an array of `Sentence` objects nested under its charge.",
         "properties": {
-          "chargeId": { "type": "string", "description": "Charge identifier (UCN)" },
+          "chargeId": { "type": "string", "description": "Charge identifier (UCN)." },
           "chargeSequenceNumber": { "type": "string", "description": "The unique ID for this charge record." },
-          "statute": { "type": "string", "description": "Statute number for the determined phase" },
-          "description": { "type": "string", "description": "Description for the determined phase" },
-          "levelCode": { "type": "string", "description": "Charge level code for the determined phase" },
-          "degreeCode": { "type": "string", "description": "Charge degree code for the determined phase" },
-          "disposition": { "type": "string", "description": "Disposition value for the determined phase" },
-          "dispositionDate": { "type": "string", "format": "date", "description": "Disposition date for the determined phase" },
+          "statute": { "type": "string", "description": "Statute number for the determined phase." },
+          "description": { "type": "string", "description": "Description for the determined phase." },
+          "levelCode": { "type": "string", "description": "Charge level code for the determined phase." },
+          "degreeCode": { "type": "string", "description": "Charge degree code for the determined phase." },
+          "disposition": { "type": "string", "description": "Disposition value for the determined phase." },
+          "dispositionDate": { "type": "string", "format": "date", "description": "Disposition date for the determined phase." },
           "offenseDate": { "type": "string", "format": "date", "description": "The date the offense occurred." },
           "trafficDispositionCode": { "type": "string", "description": "For traffic-related cases, this value indicates the disposition of the traffic citation." },
           "citationNumber": { "type": "string", "description": "For traffic-related cases, this is the value assigned to the citation by law enforcement." },
           "citationIssuedDate": { "type": "string", "format": "date", "description": "For traffic-related cases, this is the date the citation was issued by law enforcement." },
-          "pleaCode": { "type": "string", "description": "Defendant final plea code" },
-          "sentences": { "type": "array", "description": "Array of sentences for the charge", "items": { "$ref": "#/components/schemas/Sentence" } }
+          "pleaCode": { "type": "string", "description": "Defendant final plea code." },
+          "sentences": { "type": "array", "description": "Array of sentences for the charge.", "items": { "$ref": "#/components/schemas/Sentence" } }
         }
       ,
         "x-field-mapping": {
@@ -305,7 +306,7 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT",
-        "description": "VeritekFL uses OAuth 2.0 Client Credentials to issue short-lived JWT access tokens. Obtain a token from the token endpoint (see the externalDocs URL) by exchanging your `client_id` and `client_secret`. Include the returned access token on requests using the HTTP Authorization header: Authorization: Bearer <token>. Confirm required scopes and token lifetime with your VeritekFL implementation contact."
+        "description": "VeritekFL uses OAuth 2.0 Client Credentials to issue short-lived JWT access tokens. Obtain a token from the token endpoint by exchanging your `client_id` and `client_secret`. Include the returned access token on requests using the HTTP Authorization header: Authorization: Bearer <token>. Confirm required scopes and token lifetime with your VeritekFL implementation contact."
       },
       
       "basicAuth": {
