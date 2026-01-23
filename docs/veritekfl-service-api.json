@@ -2,22 +2,32 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Veritek FL Search API",
-    "description": "VeritekFL provides a background-check search API to query parties to receive matching court case records across Florida’s 67 counties. Use this API to submit search criteria and receive normalized case, charge, event, and docket details with tracking metadata.\n\nSecurity overview:\n- Authentication uses OAuth2 client credentials for machine-to-machine (M2M) access and issues short-lived JWT access tokens.\n- Token endpoint: https://veritekfl-auth-server-dev.veritekfl.com/oauth2/token.\n- To obtain a token, call the token endpoint using HTTP Basic authentication with your `client_id` and `client_secret` and a form-encoded body: `grant_type=client_credentials&scope=...`.\n- Only an `access_token` (JWT) is returned for M2M client credentials flows; refresh tokens are not issued for M2M. When the access token expires the client should request a new token using its credentials.\n- Include the access token on API requests using the Authorization header: Authorization: Bearer <access_token>.\n\nIntended consumers and onboarding:\n- Intended for authorized partners and integrators with a signed agreement.\n- Client credentials are issued by VeritekFL; onboarding and approval are required before access.\n- Contact your VeritekFL implementation representative to begin onboarding and receive `client_id`/`client_secret`.\n\nScopes and usage:\n- Supported scope for this API: `search.read` (read-only access to search endpoints and data returned).\n- Additional scopes may be introduced in future; partners should request only the minimal scope needed.\n\nToken lifecycle and resilience:\n- Typical access token lifetime is approximately 300 seconds (5 minutes) in development; production values may differ and will be communicated during onboarding.\n- M2M flows do not issue `refresh_token`. When the token expires, request a new `access_token` using client credentials.\n- Rotate client secrets per your security policy (recommended at least annually) or sooner if compromise is suspected.\n\nEnvironment clarity (service vs auth server):\n- API base (protected resources): https://veritekfl-service-dev.veritekfl.com\n- Authorization server (token minting): https://veritekfl-auth-server-dev.veritekfl.com\n- Tokens are minted by the authorization server and presented to the service; both hosts are part of the same environment.\n- The `/oauth2/token` endpoint is documented in this specification for integrator convenience but is operated by the authorization server domain noted above.\n\nAudit and compliance:\n- Token issuance and usage are logged for operational monitoring and accountability.\n- Requests include `requestId` and timestamps to support traceability.\n- Log retention and audit access follow VeritekFL policy; consult your implementation contact for compliance needs.",
+    "description": "VeritekFL provides a background-check search API to query parties to receive matching court case records across Florida’s 67 counties. Use this API to submit search criteria and receive normalized case, charge, event, and docket details with tracking metadata.\n\nSecurity overview:\n- Authentication uses OAuth2 client credentials for machine-to-machine (M2M) access and issues short-lived JWT access tokens.\n- Token endpoint: https://www.veritekfl.com/auth/oauth2/token.\n- To obtain a token, call the token endpoint using HTTP Basic authentication with your `client_id` and `client_secret` and a form-encoded body: `grant_type=client_credentials&scope=...`.\n- Only an `access_token` (JWT) is returned for M2M client credentials flows; refresh tokens are not issued for M2M. When the access token expires the client should request a new token using its credentials.\n- Include the access token on API requests using the Authorization header: Authorization: Bearer <access_token>.\n\nIntended consumers and onboarding:\n- Intended for authorized partners and integrators with a signed agreement.\n- Client credentials are issued by VeritekFL; onboarding and approval are required before access.\n- Contact your VeritekFL implementation representative to begin onboarding and receive `client_id`/`client_secret`.\n\nScopes and usage:\n- Supported scope for this API: `search.read` (read-only access to search endpoints and data returned).\n- Additional scopes may be introduced in future; partners should request only the minimal scope needed.\n\nToken lifecycle and resilience:\n- Typical access token lifetime is approximately 300 seconds (5 minutes) in development; production values may differ and will be communicated during onboarding.\n- M2M flows do not issue `refresh_token`. When the token expires, request a new `access_token` using client credentials.\n- Rotate client secrets per your security policy (recommended at least annually) or sooner if compromise is suspected.\n\nEnvironment clarity (service vs auth server):\n- API base (protected resources): https://veritekfl.com/api\n- Authorization server (token minting): https://www.veritekfl.com/auth\n- Tokens are minted by the authorization server and presented to the service; both hosts are part of the same environment.\n- The `/oauth2/token` endpoint is documented in this specification for integrator convenience but is operated by the authorization server domain noted above (https://www.veritekfl.com/auth/oauth2/token).\n\nAudit and compliance:\n- Token issuance and usage are logged for operational monitoring and accountability.\n- Requests include `requestId` and timestamps to support traceability.\n- Log retention and audit access follow VeritekFL policy; consult your implementation contact for compliance needs.",
     "version": "v1"
   },
   "externalDocs": {
     "description": "Auth token endpoint (client credentials)",
-    "url": "https://veritekfl-auth-server-dev.veritekfl.com/oauth2/token"
+    "url": "https://www.veritekfl.com/auth/oauth2/token"
   },
   "servers": [
     {
+      "url": "https://veritekfl.com/api",
+      "description": "Production"
+    }
+    ,
+    {
+      "url": "https://test.veritekfl.com/api",
+      "description": "Test"
+    }
+    ,
+    {
       "url": "https://veritekfl-service-dev.veritekfl.com",
-      "description": "Development environment (canonical)"
+      "description": "Development"
     }
     ,
     {
       "url": "http://localhost:8080",
-      "description": "Local auth server (for token endpoint)"
+      "description": "Local"
     }
   ],
   "security": [
@@ -56,7 +66,7 @@
         },
         "responses": {
           "200": {
-            "description": "A successful search.",
+            "description": "Search successful",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/SearchResponse" },
@@ -68,6 +78,10 @@
                 }
               }
             }
+          },
+          "204": {
+            "description": "No Content",
+            "content": {}
           },
           "400": { "description": "Bad request – the request failed validation.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" }, "examples": { "validation": { "summary": "Validation error example", "value": { "timestamp": "2026-01-20T12:00:00Z", "status": "Bad Request", "status_code": 400, "error_message": "'dob' must be a valid date (YYYY-MM-DD)", "error_details": { "field": "dob", "reason": "invalid_format" } } } } } } },
           "401": { "description": "Unauthorized – the token is either invalid or missing.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" }, "examples": { "unauthorized": { "summary": "Unauthorized error example", "value": { "timestamp": "2026-01-20T12:00:00Z", "status": "Unauthorized", "status_code": 401, "error_message": "Invalid or missing bearer token" } } } } } },
@@ -82,8 +96,24 @@
       "post": {
         "tags": ["Authorization Server"],
         "summary": "Token endpoint",
-        "description": "Issue an access token using the OAuth2 `client_credentials` grant. Clients authenticate using HTTP Basic (client_id:client_secret) and present `grant_type=client_credentials` with optional `scope` in the form-encoded body. Use the token endpoint URL: https://veritekfl-auth-server-dev.veritekfl.com/oauth2/token",
+        "description": "Issue an access token using the OAuth2 `client_credentials` grant. Clients authenticate using HTTP Basic (client_id:client_secret) and present `grant_type=client_credentials` with optional `scope` in the form-encoded body. Use the token endpoint URL: https://www.veritekfl.com/auth/oauth2/token",
         "operationId": "token",
+        "servers": [
+          {
+            "url": "https://www.veritekfl.com/auth",
+            "description": "Production"
+          }
+          ,
+          {
+            "url": "https://test.veritekfl.com/auth",
+            "description": "Test"
+          }
+          ,
+          {
+            "url": "https://veritekfl-auth-server-dev.veritekfl.com",
+            "description": "Development"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -166,8 +196,7 @@
           "apiVersion": { "type": "string", "description": "The version of the API used for this response (e.g. v1)." },
           "requestId": { "type": "string", "description": "The echoed ‘request id’ value provided in the request by the caller." },
           "receiptId": { "type": "string", "description": "A unique identifier generated by VeritekFL to support internal logging activities." },
-          "responseTimestamp": { "type": "string", "format": "date-time", "description": "This timestamp value is generated by VeritekFL at the time the response is returned. The value will be used to support response time metrics and will be in the ISO 8601 format (UTC)." },
-          "warnings": { "type": "array", "items": { "type": "string" }, "description": "Any non-fatal warnings or notes will be included in this field." }
+          "responseTimestamp": { "type": "string", "format": "date-time", "description": "This timestamp value is generated by VeritekFL at the time the response is returned. The value will be used to support response time metrics and will be in the ISO 8601 format (UTC)." }
         },
         "description": "The search response contains an array of ‘Party’ objects and response metadata.",
         "examples": {
@@ -233,7 +262,6 @@
         "type": "object",
         "description": "The ‘charge’ object includes details for a specific charge on this case. Values reflect the determined phase precedence (Court > Prosecutor > Initial). Related sentencing activity is captured in an array of `Sentence` objects nested under its charge.",
         "properties": {
-          "chargeId": { "type": "string", "description": "Charge identifier (UCN)." },
           "sequence": { "type": "string", "description": "The unique ID for this charge record." },
           "statute": { "type": "string", "description": "Statute number for the determined phase." },
           "description": { "type": "string", "description": "Description for the determined phase." },
@@ -298,7 +326,6 @@
         "properties": {
           "ssnLast4": { "type": "string", "description": "(nullable) The last four digits of the SSN for this party.", "example": "1234" },
           "pin": { "type": "string", "description": "The unique party identification number for this record on this case." },
-          "ucn": { "type": "string", "description": "Party-level UCN when available. If provided, this reflects the UCN associated with this party’s case context." },
           "lastName": { "type": "string", "description": "Last name of the person on this record.", "example": "Smith" },
           "firstName": { "type": "string", "description": "First name of the person on this record.", "example": "John" },
           "middleName": { "type": "string", "description": "Middle name of the person on this record.", "example": "Robert" },
