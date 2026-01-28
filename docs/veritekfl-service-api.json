@@ -47,7 +47,7 @@
       "post": {
         "tags": ["Search"],
         "summary": "Search for a party",
-        "description": "Search for parties and their related court case records using identifying information and optional filters. The service performs best-effort matching and may return multiple candidate parties. Clients should use UCN or PIN where available to disambiguate results. UCN and PIN together make a unique party record on the case.",
+        "description": "Search for parties and their related court case records using identifying information and optional filters. The service performs best-effort matching and may return multiple candidate parties. Clients should use UCN or PIN where available to disambiguate results. UCN and PIN together make a unique party record on the case.\n\nNote: Clients should not assume omitted fields indicate data errors; omission indicates the value is not available in the source system.",
         "operationId": "search",
         "requestBody": {
           "description": "Provide the name and date of birth of the person being searched, and optionally the last four digits of their SSN, to initiate a search. Optional fields should be omitted from the request unless explicitly providing values to override the default behavior.",
@@ -66,14 +66,14 @@
         },
         "responses": {
           "200": {
-            "description": "Search successful",
+            "description": "Search successful.",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/SearchResponse" },
                 "examples": {
                   "ok": {
                     "summary": "Single match example",
-                    "value": { "parties": [ { "firstName": "John", "lastName": "Smith", "dob": "1980-01-01", "caseModel": { "ucn": "UCN12345" } } ] }
+                    "value": { "parties": [ { "firstName": "John", "lastName": "Smith", "dob": "1980-01-01", "caseData": { "ucn": "UCN12345" } } ] }
                   }
                 }
               }
@@ -202,7 +202,7 @@
         "examples": {
           "singleMatch": {
             "summary": "Example response with one party",
-            "value": { "apiVersion": "v1", "requestId": "abc123xyz", "receiptId": "rcpt-001", "responseTimestamp": "2025-12-11T12:00:00Z", "parties": [ { "firstName": "John", "lastName": "Smith", "dob": "1980-01-01", "caseModel": { "ucn": "UCN12345" } } ] }
+            "value": { "apiVersion": "v1", "requestId": "abc123xyz", "receiptId": "rcpt-001", "responseTimestamp": "2025-12-11T12:00:00Z", "parties": [ { "firstName": "John", "lastName": "Smith", "dob": "1980-01-01", "caseData": { "ucn": "UCN12345" } } ] }
           }
         }
       },
@@ -225,7 +225,7 @@
               "status": { "type": "string", "description": "HTTP status reason phrase (e.g., 'Bad Request')." },
               "status_code": { "type": "integer", "format": "int32", "description": "HTTP status code (e.g., 400, 401, 429)." },
               "error_message": { "type": "string", "description": " error message." },
-              "error_details": { "type": "object", "nullable": true, "description": "Optional structured details about validation or processing errors." }
+              "error_details": { "type": "object", "description": "Optional structured details about validation or processing errors." }
             }
           },
           {
@@ -250,8 +250,8 @@
           "courtType": { "type": "string", "description": "The standard category that this case falls under for court assignment purposes. One of: Felony, Misdemeanor, Criminal Traffic.", "example": "Felony" },
           "courtTypeDescription": { "type": "string", "description": " description corresponding to `courtType`." },
           "filedDate": { "type": "string", "format": "date", "description": "The date the case was filed in the Clerk’s office. This value is used for any date range searching specified in the request." },
-          "caseStatusDescription": { "type": "string", "nullable": true, "description": "The current status of the case ( value).", "example": "Open" },
-          "caseStatusCode": { "type": "string", "nullable": true, "description": "Optional machine-readable status code corresponding to `caseStatusDescription`. If present, clients may use this code for programmatic handling." },
+          "caseStatusDescription": { "type": "string", "description": "The current status of the case ( value).", "example": "Open" },
+          "caseStatusCode": { "type": "string", "description": "Optional machine-readable status code corresponding to `caseStatusDescription`. If present, clients may use this code for programmatic handling." },
           "charges": { "type": "array", "items": { "$ref": "#/components/schemas/Charge" } },
           "dockets": { "type": "array", "items": { "$ref": "#/components/schemas/Docket" } },
           "events": { "type": "array", "items": { "$ref": "#/components/schemas/Event" } }
@@ -279,7 +279,7 @@
           "citationIssuedDate": { "type": "string", "format": "date", "description": "For traffic-related cases, this is the date the citation was issued by law enforcement." },
           "pleaCode": { "type": "string", "description": "Defendant final plea code." },
           "pleaDescription": { "type": "string", "description": " description corresponding to `pleaCode`." },
-          "caseStatusDescription": { "type": "string", "nullable": true, "description": " case status description when associated at the charge level (if applicable)." },
+          "caseStatusDescription": { "type": "string", "description": " case status description when associated at the charge level (if applicable)." },
           "sentences": { "type": "array", "description": "Array of sentences for the charge.", "items": { "$ref": "#/components/schemas/Sentence" } }
         }
       ,
@@ -313,8 +313,8 @@
           "eventId": { "type": "string", "description": "A unique value that is a combination of the UCN, court appearance date (yyyyMMdd), and standard event code values." },
           "courtAppearanceDate": { "type": "string", "format": "date", "description": "The date the court event is/was scheduled to occur." },
           "courtEventDescription": { "type": "string", "maxLength": 8000, "description": "The standard court event type." },
-          "standardCourtEventCode": { "type": "string", "nullable": true, "description": "Optional code for the court event. The  description is provided in `courtEventDescription`; clients may ignore `standardCourtEventCode` if they only use the description." },
-          "standardCourtEventDescription": { "type": "string", "nullable": true, "description": "Optional derived  description corresponding to `standardCourtEventCode`." },
+          "standardCourtEventCode": { "type": "string", "description": "Optional code for the court event. The  description is provided in `courtEventDescription`; clients may ignore `standardCourtEventCode` if they only use the description." },
+          "standardCourtEventDescription": { "type": "string", "description": "Optional derived  description corresponding to `standardCourtEventCode`." },
           "courtAppearanceTime": { "type": "string", "description": "The time of day the court event is/was scheduled to occur." },
           "courtLocation": { "type": "string", "description": "The address where the court event is/was scheduled to occur. Virtual events may not include a physical address." },
           "division": { "type": "string", "description": "The administrative section of the court assigned this case." }
@@ -330,18 +330,18 @@
           "firstName": { "type": "string", "description": "First name of the person on this record.", "example": "John" },
           "middleName": { "type": "string", "description": "Middle name of the person on this record.", "example": "Robert" },
           "suffix": { "type": "string", "description": "The name suffix, if available, for the person on this record ." },
-          "suffixCode": { "type": "string", "nullable": true, "description": "Optional machine-readable suffix code." },
-          "suffixDescription": { "type": "string", "nullable": true, "description": "Optional  suffix description when a code is provided." },
+          "suffixCode": { "type": "string", "description": "Optional machine-readable suffix code." },
+          "suffixDescription": { "type": "string", "description": "Optional  suffix description when a code is provided." },
           "dob": { "type": "string", "format": "date", "description": "The date of birth of the person on this record, formatted as YYYY-MM-DD.", "example": "1980-01-01" },
           "sex": { "type": "string", "description": "The sex documented for the person on this record ." },
-          "sexCode": { "type": "string", "nullable": true, "description": "Optional machine-readable sex code." },
-          "sexDescription": { "type": "string", "nullable": true, "description": "Optional  sex description when a code is provided." },
+          "sexCode": { "type": "string", "description": "Optional machine-readable sex code." },
+          "sexDescription": { "type": "string", "description": "Optional  sex description when a code is provided." },
           "race": { "type": "string", "description": "The race documented for the person on this record ." },
-          "raceCode": { "type": "string", "nullable": true, "description": "Optional machine-readable race code." },
-          "raceDescription": { "type": "string", "nullable": true, "description": "Optional  race description when a code is provided." },
+          "raceCode": { "type": "string", "description": "Optional machine-readable race code." },
+          "raceDescription": { "type": "string", "description": "Optional  race description when a code is provided." },
           "driverLicenseNumber": { "type": "string", "description": "The government issued driver’s license number documented for the person on this record." },
           "aliases": { "type": "array", "items": { "$ref": "#/components/schemas/PartyAlias" }, "description": "Alias records associated to this party record as structured name objects." },
-          "caseModel": { "$ref": "#/components/schemas/Case" }
+          "caseData": { "$ref": "#/components/schemas/Case" }
         },
         "description": "Person information returned from search"
       },
@@ -352,8 +352,8 @@
           "firstName": { "type": "string", "description": "Alias first name." },
           "middleName": { "type": "string", "description": "Alias middle name." },
           "suffix": { "type": "string", "description": "Alias name suffix ." },
-          "suffixCode": { "type": "string", "nullable": true, "description": "Optional alias suffix code." },
-          "suffixDescription": { "type": "string", "nullable": true, "description": "Optional alias suffix description when a code is provided." }
+          "suffixCode": { "type": "string", "description": "Optional alias suffix code." },
+          "suffixDescription": { "type": "string", "description": "Optional alias suffix description when a code is provided." }
         },
         "description": "Alias name record for a party, represented as structured name fields."
       },
@@ -362,14 +362,14 @@
         "properties": {
           "sentenceSequenceNumber": { "type": "string", "description": "The unique ID for this sentence record." },
           "sentenceStatusCode": { "type": "string", "description": "The status of this sentence entry." },
-          "sentenceStatusDescription": { "type": "string", "nullable": true, "description": " description corresponding to `sentenceStatusCode`." },
+          "sentenceStatusDescription": { "type": "string", "description": " description corresponding to `sentenceStatusCode`." },
           "sentenceImposedDate": { "type": "string", "format": "date", "description": "The date the sentence was issued by the Court." },
           "sentenceEffectiveDate": { "type": "string", "format": "date", "description": "The date the sentence effectively began based on the Court’s sentencing order." },
           "sentenceCode": { "type": "string", "description": "The code for the sentence type imposed." },
           "sentenceDescription": { "type": "string", "description": " description of the sentence type imposed." },
           "lengthOfSentenceConfinement": { "type": "string", "description": "The amount of time a sentence or confinement action is assigned by the Court at the time of sentencing." },
-          "confinementTypeCode": { "type": "string", "nullable": true, "description": "If applicable, the code for the confinement type." },
-          "confinementTypeDescription": { "type": "string", "nullable": true, "description": "If applicable,  description for the confinement type." }
+          "confinementTypeCode": { "type": "string", "description": "If applicable, the code for the confinement type." },
+          "confinementTypeDescription": { "type": "string", "description": "If applicable,  description for the confinement type." }
         },
         "description": "An array of ‘sentence’ objects for this charge record."
       }
