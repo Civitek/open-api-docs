@@ -73,14 +73,14 @@
                 "examples": {
                   "ok": {
                     "summary": "Single match example",
-                    "value": { "parties": [ { "firstName": "John", "lastName": "Smith", "dob": "1980-01-01", "caseData": { "ucn": "UCN12345" } } ] }
+                    "value": { "parties": [ { "firstName": "John", "lastName": "Smith", "dob": "1980-01-01", "aliases": [ { "firstName": "J.", "lastName": "Smith" }, { "firstName": "Johnny", "lastName": "Smith", "middleName": "A." } ], "caseData": { "ucn": "UCN12345" } } ] }
                   }
                 }
               }
             }
           },
           "204": {
-            "description": "No Content",
+            "description": "No matches were found for the criteria submitted",
             "content": {}
           },
           "400": { "description": "Bad request – the request failed validation.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" }, "examples": { "validation": { "summary": "Validation error example", "value": { "timestamp": "2026-01-20T12:00:00Z", "status": "Bad Request", "status_code": 400, "error_message": "'dob' must be a valid date (YYYY-MM-DD)", "error_details": { "field": "dob", "reason": "invalid_format" } } } } } } },
@@ -202,7 +202,7 @@
         "examples": {
           "singleMatch": {
             "summary": "Example response with one party",
-            "value": { "apiVersion": "v1", "requestId": "abc123xyz", "receiptId": "rcpt-001", "responseTimestamp": "2025-12-11T12:00:00Z", "parties": [ { "firstName": "John", "lastName": "Smith", "dob": "1980-01-01", "caseData": { "ucn": "UCN12345" } } ] }
+            "value": { "apiVersion": "v1", "requestId": "abc123xyz", "receiptId": "rcpt-001", "responseTimestamp": "2025-12-11T12:00:00Z", "parties": [ { "firstName": "John", "lastName": "Smith", "dob": "1980-01-01", "aliases": [ { "firstName": "J.", "lastName": "Smith" }, { "firstName": "Johnny", "lastName": "Smith", "middleName": "A." } ], "caseData": { "ucn": "UCN12345" } } ] }
           }
         }
       },
@@ -262,14 +262,14 @@
         "type": "object",
         "description": "The ‘charge’ object includes details for a specific charge on this case. Values reflect the determined phase precedence (Court > Prosecutor > Initial). Related sentencing activity is captured in an array of `Sentence` objects nested under its charge.",
         "properties": {
-          "sequence": { "type": "string", "description": "The unique ID for this charge record." },
+          "sequence": { "type": "string", "description": "The unique ID for this charge record for this case." },
           "statute": { "type": "string", "description": "Statute number for the determined phase." },
           "description": { "type": "string", "description": "Description for the determined phase." },
           "levelCode": { "type": "string", "description": "Charge level code for the determined phase." },
           "levelDescription": { "type": "string", "description": " description corresponding to `levelCode`." },
           "degreeCode": { "type": "string", "description": "Charge degree code for the determined phase." },
           "degreeDescription": { "type": "string", "description": " description corresponding to `degreeCode`." },
-          "disposition": { "type": "string", "description": "Disposition value for the determined phase." },
+          "disposition": { "type": "string", "description": "Disposition code for the determined phase." },
           "dispositionDescription": { "type": "string", "description": " description corresponding to `disposition`." },
           "dispositionDate": { "type": "string", "format": "date", "description": "Disposition date for the determined phase." },
           "offenseDate": { "type": "string", "format": "date", "description": "The date the offense occurred." },
