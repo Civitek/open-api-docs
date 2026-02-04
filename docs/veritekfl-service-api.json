@@ -247,10 +247,9 @@
           "countyCode": { "type": "string", "description": "The code value of the county this case was filed in (corresponds to 1–67)." },
           "countyDescription": { "type": "string", "description": "The  name/description of the county this case was filed in." },
           "caseType": { "type": "string", "description": "The case type as defined by the Clerk’s office responsible for this case’s data." },
-          "courtType": { "type": "string", "description": "The standard category that this case falls under for court assignment purposes. One of: Felony, Misdemeanor, Criminal Traffic.", "example": "Felony" },
+          "courtType": { "type": "string", "description": "The standard category that this case falls under for court assignment purposes. One of: Felony(CF), Misdemeanor(MM), Criminal Traffic(CT).", "example": "CF for Felony" },
           "courtTypeDescription": { "type": "string", "description": " description corresponding to `courtType`." },
           "filedDate": { "type": "string", "format": "date", "description": "The date the case was filed in the Clerk’s office. This value is used for any date range searching specified in the request." },
-          "caseStatusDescription": { "type": "string", "description": "The current status of the case ( value).", "example": "Open" },
           "caseStatusCode": { "type": "string", "description": "Optional machine-readable status code corresponding to `caseStatusDescription`. If present, clients may use this code for programmatic handling." },
           "charges": { "type": "array", "items": { "$ref": "#/components/schemas/Charge" } },
           "dockets": { "type": "array", "items": { "$ref": "#/components/schemas/Docket" } },
@@ -279,7 +278,6 @@
           "citationIssuedDate": { "type": "string", "format": "date", "description": "For traffic-related cases, this is the date the citation was issued by law enforcement." },
           "pleaCode": { "type": "string", "description": "Defendant final plea code." },
           "pleaDescription": { "type": "string", "description": " description corresponding to `pleaCode`." },
-          "caseStatusDescription": { "type": "string", "description": " case status description when associated at the charge level (if applicable)." },
           "sentences": { "type": "array", "description": "Array of sentences for the charge.", "items": { "$ref": "#/components/schemas/Sentence" } }
         }
       ,
@@ -300,7 +298,6 @@
         "properties": {
           "docketIdentifier": { "type": "string", "maxLength": 14, "description": "The unique identifier for this docket record." },
           "docketActionDate": { "type": "string", "format": "date", "description": "This is the date the docket was entered into the Clerk’s system." },
-          "docketCode": { "type": "string", "maxLength": 20, "description": "The standard type of docket this object represents." },
           "standardDocketCode": { "type": "string", "maxLength": 50, "description": "Standard docket code." },
           "standardDocketDescription": { "type": "string", "maxLength": 4000, "description": "Standard docket description." },
           "docketText": { "type": "string", "maxLength": 8000, "description": "This is the freeform text entered by the Clerk’s office for this docket record." }
@@ -312,8 +309,7 @@
         "properties": {
           "eventId": { "type": "string", "description": "A unique value that is a combination of the UCN, court appearance date (yyyyMMdd), and standard event code values." },
           "courtAppearanceDate": { "type": "string", "format": "date", "description": "The date the court event is/was scheduled to occur." },
-          "courtEventDescription": { "type": "string", "maxLength": 8000, "description": "The standard court event type." },
-          "standardCourtEventCode": { "type": "string", "description": "Optional code for the court event. The  description is provided in `courtEventDescription`; clients may ignore `standardCourtEventCode` if they only use the description." },
+          "standardCourtEventCode": { "type": "string", "description": "Optional code for the court event. The description is provided in `standardCourtEventDescription`; clients may ignore `standardCourtEventCode` if they only use the description." },
           "standardCourtEventDescription": { "type": "string", "description": "Optional derived  description corresponding to `standardCourtEventCode`." },
           "courtAppearanceTime": { "type": "string", "description": "The time of day the court event is/was scheduled to occur." },
           "courtLocation": { "type": "string", "description": "The address where the court event is/was scheduled to occur. Virtual events may not include a physical address." },
