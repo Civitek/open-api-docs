@@ -251,6 +251,7 @@
           "courtTypeDescription": { "type": "string", "description": " description corresponding to `courtType`." },
           "filedDate": { "type": "string", "format": "date", "description": "The date the case was filed in the Clerk’s office. This value is used for any date range searching specified in the request." },
           "caseStatusCode": { "type": "string", "description": "Optional machine-readable status code corresponding to `caseStatusDescription`. If present, clients may use this code for programmatic handling." },
+          "caseStatusDescription": { "type": "string", "description": "The current status of the case (value).", "example": "Open" },
           "charges": { "type": "array", "items": { "$ref": "#/components/schemas/Charge" } },
           "dockets": { "type": "array", "items": { "$ref": "#/components/schemas/Docket" } },
           "events": { "type": "array", "items": { "$ref": "#/components/schemas/Event" } }
@@ -344,7 +345,6 @@
           "lastName": { "type": "string", "description": "Alias last name." },
           "firstName": { "type": "string", "description": "Alias first name." },
           "middleName": { "type": "string", "description": "Alias middle name." },
-          "suffix": { "type": "string", "description": "Alias name suffix ." },
           "suffixCode": { "type": "string", "description": "Optional alias suffix code." },
           "suffixDescription": { "type": "string", "description": "Optional alias suffix description when a code is provided." }
         },
