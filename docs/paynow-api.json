@@ -3,7 +3,11 @@
 	"info": {
 		"title": "PayNow API Specifications",
 		"version": "1.0.0",
-		"description": "API to manage and track miscellaneous payment transactions."
+		"description": "API to manage and track miscellaneous payment transactions.\n\nAuthentication:\n1. Obtain a JWT access token from the TPE Auth server using the TPE Auth API documented at https://civitek.github.io/open-api-docs/tpe-auth.html.\n2. Call the appropriate token endpoint, supplying your client credentials.\n3. Use the returned access token in the Authorization header for all secured PayNow API calls as: Authorization: Bearer <token>.\n\n"
+	},
+	"externalDocs": {
+		"description": "TPE Auth Server API Documentation",
+		"url": "https://civitek.github.io/open-api-docs/tpe-auth.html"
 	},
 	"servers": [
 		{
@@ -11,13 +15,17 @@
 			"description": "Generated server url"
 		}
 	],
+	"security": [
+		{ "BearerAuth": [] }
+	],
 	"paths": {
 		"/payment/createOrder": {
 			"post": {
 				"tags": [
-					"Payment Service"
+					"PayNow Service"
 				],
-				"description": "This method is used to initiate miscellaneous payments via our payment processing service. It will accept an Item Key to identify the type of payment, payment amount and any other identifying data. It will initiate the payment in the system and return an Order Id that uniquely identifies this payment transaction.",
+				"summary": "Initiate IVR Payment Transaction",
+				"description": "Use this method to initiate a new payment order for downstream processing with our payment processor.\nCreates an order (payment transaction) with the provided itemKey, transactionAmount, itemSku, and any additional identifying data. Returns an orderId that uniquely identifies the initiated payment.",
 				"operationId": "createOrder",
 				"requestBody": {
 					"content": {
@@ -41,11 +49,7 @@
 						}
 					}
 				},
-				"security": [
-					{
-						"basicAuth": []
-					}
-				]
+				"security": [ { "BearerAuth": [] } ]
 			}
 		}
 	},
@@ -192,9 +196,11 @@
 			}
 		},
 		"securitySchemes": {
-			"basicAuth": {
+			"BearerAuth": {
 				"type": "http",
-				"scheme": "basic"
+				"scheme": "bearer",
+				"bearerFormat": "JWT",
+				"description": "Use the JWT access token issued by the TPE Auth server. Obtain a token via the TPE Auth API (see https://civitek.github.io/open-api-docs/tpe-auth.html) then include it as: Authorization: Bearer <token>"
 			}
 		}
 	}

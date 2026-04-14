@@ -1,13 +1,14 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "TPE User Authorization",
-    "description": "This service provides endpoints for obtaining and refreshing OAuth2-style tokens.\n\n### Usage Flow\n1. Call **`/api/auth/token`** with Basic Authentication to generate an access token and a refresh token.\n2. Use the **access token** (JWT) in the `Authorization` header (`Bearer {access_token}`) to access secured APIs.\n3. When the access token expires, call **`/api/auth/refresh`** with the refresh token (in the `Authorization` header) to obtain a new access token and refresh token. The previous refresh_token will expire.",
+    "title": "TPE Authentication API",
+    "description": "This service provides endpoints for obtaining and refreshing OAuth2-style tokens.\n\n### Typical Usage Flow (Web or Mobile Application)\n1. Call **`/api/auth/token`** with **Basic Authentication** (username/password) to generate an **access_token** and a **refresh_token**.\n2. Use the **access_token** (JWT) in requests to access secure APIs:\n   ```\n   Authorization: Bearer {access_token}\n   ```\n3. When the access token expires, you can either:\n   - Generate a new token again with **username/password** using `/api/auth/token`, OR\n   - Continue the session without username/password by using the **refresh_token** at `/api/auth/refresh`.\n\n### Machine-to-Machine (M2M) Authentication\n- Call **`/api/auth/token`** with **Basic Authentication** using client credentials (client_id/client_secret).\n- Only an **access_token** is returned; no **refresh_token** is issued for M2M.\n- When the access token expires, the client must request a new token using its credentials.\n\n### Refresh Behavior (Web/Mobile Only)\n- A new access token is generated.\n- Both a new access token and a new refresh token are returned.\n- The previous **refresh_token** expires.\n\n⚠️ **Important:** Store the `refresh_token` securely on the client (e.g., secure storage in mobile apps). Do not expose or transmit the `refresh_token` outside the application.",
     "version": "1.0"
   },
   "servers": [
     {
-      "url": "https://testauthgateway.civikestpayment.com"
+      "url": "https://testauthgateway.civikestpayment.com",
+      "description": "Test Authentication Server"
     }
   ],
   "tags": [
@@ -21,7 +22,7 @@
       "post": {
         "tags": ["Authentication Service"],
         "summary": "Generate Token",
-        "description": "Authenticate using **Basic Authentication** (username and password or client credentials).\n\nReturns both an **access_token** (short-lived) and a **refresh_token** (longer-lived).\n\nExample:\n```\nAuthorization: Basic base64(username:password)\n```",
+        "description": "Authenticate using **Basic Authentication** with username/password or client credentials.\n\nThis endpoint is typically used by a web or mobile application at login when the user first enters their credentials.\n\nReturns an **access_token** and, optionally, a **refresh_token** depending on the type of authentication.\n\n**Note: The refresh_token is only issued for web or mobile authentication users; it is not returned for machine-to-machine (M2M) authentication**.\n\n**Header example**:\n```\nAuthorization: Basic base64(username:password)\n```",
         "operationId": "createToken",
         "security": [
           {
@@ -74,7 +75,7 @@
       "post": {
         "tags": ["Authentication Service"],
         "summary": "Refresh Token",
-        "description": "Refreshes an expired access token using the **refresh_token**.\n\nAuthenticate using `Authorization: Bearer {refresh_token}` header.\n\nA new access token is generated. New access token and new refresh token is returned. The previous refresh_token expires.",
+        "description": "Use the **refresh_token** to continue a user session without requiring the user to re-enter authentication details.\n\nThis endpoint is typically used by web or mobile applications after login to keep the user signed in.\n\n**Header example**:\n```\nAuthorization: Bearer {refresh_token}\n```\n\n**Refresh behavior:**\n- A new access token is generated.\n- Both a new access token and a new refresh token are returned.\n- The previous **refresh_token** expires.\n\n⚠️ **Important:** Never expose the `refresh_token` outside of the application. It must be stored securely and treated as highly sensitive.",
         "operationId": "refreshToken",
         "security": [
           {
