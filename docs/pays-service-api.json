@@ -1,896 +1,440 @@
 {
-  "openapi": "3.0.1",
-  "info": {
-    "title": "Pays Service API Specifications",
-	"version": "1.0.0",
-	"description": "API to manage payment transactions."
-  },
-  "servers": [
-    {
-      "url": "http://localhost:8098",
-      "description": "Generated server url"
-    }
-  ],
-  "paths": {
-    "/refreshToken": {
-      "post": {
-        "tags": [
-          "authentication-controller"
-        ],
-        "operationId": "refresh",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthToken"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/payment/receipt/{orderId}": {
-      "post": {
-        "tags": [
-          "Payment Service"
-        ],
-        "operationId": "receiptDetails",
-        "parameters": [
-          {
-            "name": "orderId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/payment/process": {
-      "post": {
-        "tags": [
-          "Payment Service"
-        ],
-        "description": "Makes a payment",
-        "operationId": "processPayment",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PaymentRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/TpePaymentResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/payment/paymentMethods": {
-      "post": {
-        "tags": [
-          "Payment Service"
-        ],
-        "operationId": "getpaymentMethods",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PaymentMethodsRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaymentMethodsResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/payment/order/{orderId}": {
-      "post": {
-        "tags": [
-          "Payment Service"
-        ],
-        "operationId": "orderDetails",
-        "parameters": [
-          {
-            "name": "orderId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Order"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/passcode/validate": {
-      "post": {
-        "tags": [
-          "authentication-controller"
-        ],
-        "operationId": "validatePasscode",
-        "parameters": [
-          {
-            "name": "X-Refresh-Token",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PasscodeValidationRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/passcode/new": {
-      "post": {
-        "tags": [
-          "authentication-controller"
-        ],
-        "operationId": "sendNewPasscode",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "string"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/login": {
-      "post": {
-        "tags": [
-          "authentication-controller"
-        ],
-        "operationId": "login",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    }    
-  },
-  "components": {
-    "schemas": {
-      "AuthToken": {
-        "type": "object",
-        "properties": {
-          "access_token": {
-            "type": "string"
-          },
-          "token_type": {
-            "type": "string"
-          },
-          "expires_in": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "refresh_token": {
-            "type": "string"
-          }
-        }
-      },
-      "AttributeValue": {
-        "type": "object",
-        "properties": {
-          "attribute": {
-            "type": "string"
-          },
-          "value": {
-            "type": "string"
-          }
-        }
-      },
-      "Address": {
-        "required": [
-          "city",
-          "countryCode",
-          "postalCode",
-          "state",
-          "street1"
-        ],
-        "type": "object",
-        "properties": {
-          "street1": {
-            "type": "string",
-            "description": "Address line 1"
-          },
-          "street2": {
-            "type": "string",
-            "description": "Address line 2"
-          },
-          "city": {
-            "type": "string",
-            "description": "City"
-          },
-          "postalCode": {
-            "type": "string",
-            "description": "Zip/Postal code"
-          },
-          "state": {
-            "type": "string",
-            "description": "State/Province"
-          },
-          "countryCode": {
-            "type": "string",
-            "description": "Country Code"
-          }
-        },
-        "description": "Payer's address"
-      },
-      "Customer": {
-        "type": "object",
-        "properties": {
-          "username": {
-            "type": "string",
-            "description": "Username"
-          },
-          "phone": {
-            "type": "string",
-            "description": "Primary phone number"
-          },
-          "phone2": {
-            "type": "string",
-            "description": "Secondary phone number"
-          },
-          "company": {
-            "type": "string",
-            "description": "Company name"
-          },
-          "email": {
-            "type": "string",
-            "description": "Email address"
-          },
-          "fax": {
-            "type": "string",
-            "description": "Fax number"
-          },
-          "firstName": {
-            "type": "string",
-            "description": "First name"
-          },
-          "lastName": {
-            "type": "string",
-            "description": "Last name"
-          },
-          "middleName": {
-            "type": "string",
-            "description": "Middle name"
-          },
-          "ip": {
-            "type": "string",
-            "description": "IP address"
-          },
-          "deviceFingerprint": {
-            "type": "string",
-            "description": "Device fingerprint"
-          },
-          "identities": {
-            "type": "array",
-            "description": "Extra identity information needed when grand total is $3000 or more",
-            "items": {
-              "$ref": "#/components/schemas/CustomerIdentity"
-            }
-          }
-        },
-        "description": "Payer"
-      },
-      "CustomerIdentity": {
-        "type": "object",
-        "properties": {
-          "identityTypeId": {
-            "type": "integer",
-            "description": "Valid values: 1=SSN, 2=Passport, 4=Alien Registration Number for Identity One; 0=Other, 3=Driver’s License for Identity Two",
-            "format": "int32",
-            "example": 1
-          },
-          "value": {
-            "type": "string"
-          },
-          "countryCode": {
-            "type": "string",
-            "description": "Country code",
-            "example": "US"
-          },
-          "region": {
-            "type": "string",
-            "description": "Region/state code",
-            "example": "CA"
-          }
-        },
-        "description": "Extra identity information needed when grand total is $3000 or more"
-      },
-      "Item": {
-        "type": "object",
-        "properties": {
-          "itemKey": {
-            "type": "string",
-            "description": "The item's key"
-          },
-          "amount": {
-            "type": "number",
-            "description": "The amount to pay for the item"
-          },
-          "instanceId": {
-            "type": "string",
-            "description": "SKU"
-          },
-          "attributes": {
-            "type": "array",
-            "description": "Additional attributes",
-            "items": {
-              "$ref": "#/components/schemas/ItemAttribute"
-            }
-          }
-        },
-        "description": "Items to pay"
-      },
-      "ItemAttribute": {
-        "type": "object",
-        "properties": {
-          "receiptDisplay": {
-            "type": "boolean",
-            "description": "Determines whether or not the attribute is displayed on the receipt"
-          },
-          "attribute": {
-            "type": "string",
-            "description": "Attribute name"
-          },
-          "value": {
-            "type": "string",
-            "description": "Attribute value"
-          }
-        },
-        "description": "Additional attributes"
-      },
-      "Payment": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "description": "Payment type: creditcard, googlepay, echeck"
-          },
-          "shopperPaymentInfo": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string",
-              "description": "Payment information"
-            },
-            "description": "Payment information"
-          },
-          "paymentProcess": {
-            "type": "string"
-          }
-        },
-        "description": "Payment method data"
-      },
-      "PaymentRequest": {
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "description": "Items to pay",
-            "items": {
-              "$ref": "#/components/schemas/Item"
-            }
-          },
-          "address": {
-            "$ref": "#/components/schemas/Address"
-          },
-          "customer": {
-            "$ref": "#/components/schemas/Customer"
-          },
-          "payment": {
-            "$ref": "#/components/schemas/Payment"
-          }
-        }
-      },
-      "TpePaymentResponse": {
-        "type": "object",
-        "properties": {
-          "orderId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "subscriptionId": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          },
-          "errorMessage": {
-            "type": "string"
-          },
-          "errorDetails": {
-            "type": "string"
-          },
-          "retry": {
-            "type": "boolean"
-          },
-          "review": {
-            "type": "boolean"
-          }
-        }
-      },
-      "PaymentMethodsRequest": {
-        "type": "object",
-        "properties": {
-          "subscriptionId": {
-            "type": "string"
-          },
-          "amount": {
-            "type": "number"
-          }
-        }
-      },
-      "PaymentMethod": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "totalAmount": {
-            "type": "number"
-          },
-          "config": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "fee": {
-            "$ref": "#/components/schemas/PaymentMethodFee"
-          }
-        }
-      },
-      "PaymentMethodFee": {
-        "type": "object",
-        "properties": {
-          "itemKey": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "amount": {
-            "type": "number"
-          }
-        }
-      },
-      "PaymentMethodsResponse": {
-        "type": "object",
-        "properties": {
-          "environment": {
-            "type": "string"
-          },
-          "paymentMethods": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PaymentMethod"
-            }
-          }
-        }
-      },
-      "Order": {
-        "type": "object",
-        "properties": {
-          "orderId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "orderDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "authorizeAmount": {
-            "type": "number"
-          },
-          "paymentAmount": {
-            "type": "number"
-          },
-          "refundAmount": {
-            "type": "number"
-          },
-          "refundBalance": {
-            "type": "number"
-          },
-          "status": {
-            "type": "string"
-          },
-          "paymentItems": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/OrderItem"
-            }
-          },
-          "feeItems": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/OrderItem"
-            }
-          },
-          "customer": {
-            "$ref": "#/components/schemas/Customer"
-          },
-          "paymentInfo": {
-            "$ref": "#/components/schemas/OrderPaymentInfo"
-          },
-          "subscriptionId": {
-            "type": "string"
-          }
-        }
-      },
-      "OrderItem": {
-        "type": "object",
-        "properties": {
-          "itemId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "itemKey": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "orderItemId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "sku": {
-            "type": "string"
-          },
-          "instanceId": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "INVALID",
-              "GENERAL",
-              "TAX",
-              "FEE",
-              "DISCOUNT",
-              "ENGINE"
-            ]
-          },
-          "authorizeAmount": {
-            "type": "number"
-          },
-          "paymentAmount": {
-            "type": "number"
-          },
-          "refundAmount": {
-            "type": "number"
-          },
-          "refundBalance": {
-            "type": "number"
-          },
-          "attributes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ItemAttribute"
-            }
-          }
-        }
-      },
-      "OrderPaymentInfo": {
-        "type": "object",
-        "properties": {
-          "paymentMethod": {
-            "type": "string",
-            "enum": [
-              "Unkown",
-              "CreditCard",
-              "BankAccount",
-              "BillingAccount",
-              "ApplePay",
-              "GooglePay",
-              "PayPal",
-              "WeChat",
-              "AliPay",
-              "PointOfSale",
-              "Venmo",
-              "Cash"
-            ]
-          },
-          "cardHolderName": {
-            "type": "string"
-          },
-          "cardSummary": {
-            "type": "string"
-          },
-          "cardType": {
-            "type": "string"
-          },
-          "expiryDate": {
-            "type": "string"
-          },
-          "bankAccountSummary": {
-            "type": "string"
-          },
-          "bankAccountName": {
-            "type": "string"
-          },
-          "paymentMethodId": {
-            "type": "string"
-          }
-        }
-      },
-      "OrderRequest": {
-        "required": [
-          "itemKey",
-          "itemSku",
-          "transactionAmount"
-        ],
-        "type": "object",
-        "properties": {
-          "itemKey": {
-            "type": "string"
-          },
-          "transactionAmount": {
-            "minimum": 1,
-            "exclusiveMinimum": false,
-            "type": "number"
-          },
-          "itemSku": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "phone": {
-            "type": "string"
-          },
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "middleName": {
-            "type": "string"
-          },
-          "company": {
-            "type": "string"
-          },
-          "attributes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AttributeValue"
-            }
-          },
-          "customerIdentities": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CustomerIdentity"
-            }
-          }
-        }
-      },
-      "OrderResponse": {
-        "type": "object",
-        "properties": {
-          "orderId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "status": {
-            "type": "string",
-            "description": "Status of the order",
-            "example": "success",
-            "enum": [
-              "success",
-              "failed"
-            ]
-          },
-          "errorMessage": {
-            "type": "string"
-          },
-          "amount": {
-            "type": "number"
-          },
-          "feeAmount": {
-            "type": "number"
-          },
-          "totalAmount": {
-            "type": "number"
-          },
-          "itemSku": {
-            "type": "string"
-          }
-        }
-      },
-      "PasscodeValidationRequest": {
-        "type": "object",
-        "properties": {
-          "username": {
-            "type": "string"
-          },
-          "passcode": {
-            "type": "string"
-          },
-          "rememberMe": {
-            "type": "boolean"
-          }
-        }
-      },
-      "LoginResponse": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string"
-          },
-          "authToken": {
-            "$ref": "#/components/schemas/AuthToken"
-          }
-        }
-      },
-      "LoginRequest": {
-        "type": "object",
-        "properties": {
-          "username": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          }
-        }
-      }     
-    },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
-      }
-    }
-  }
+	"openapi": "3.0.1",
+	"info": {
+		"title": "Pays Service API Specifications",
+		"version": "1.0.0",
+		"description": "API to manage payment transactions."
+	},
+	"externalDocs": {
+		"description": "TPE Auth Server API Documentation",
+		"url": "https://civitek.github.io/open-api-docs/tpe-auth.html"
+	},
+	"servers": [
+		{
+			"url": "https:testapi.civikestpayment.com",
+			"description": "Generated server url"
+		}
+	],
+	"security": [
+		{
+			"BearerAuth": []
+		}
+	],
+	"paths": {
+		"/payment/process": {
+			"post": {
+				"tags": [
+					"Payment Service"
+				],
+				"description": "Makes a payment",
+				"operationId": "processPayment",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PaymentRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/TpePaymentResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				]
+			}
+		},
+		"/payment/paymentMethods": {
+			"post": {
+				"tags": [
+					"Payment Service"
+				],
+				"operationId": "getpaymentMethods",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PaymentMethodsRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/PaymentMethodsResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				]
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"AttributeValue": {
+				"type": "object",
+				"properties": {
+					"attribute": {
+						"type": "string"
+					},
+					"value": {
+						"type": "string"
+					}
+				}
+			},
+			"Address": {
+				"required": [
+					"city",
+					"countryCode",
+					"postalCode",
+					"state",
+					"street1"
+				],
+				"type": "object",
+				"properties": {
+					"street1": {
+						"type": "string",
+						"description": "Address line 1"
+					},
+					"street2": {
+						"type": "string",
+						"description": "Address line 2"
+					},
+					"city": {
+						"type": "string",
+						"description": "City"
+					},
+					"postalCode": {
+						"type": "string",
+						"description": "Zip/Postal code"
+					},
+					"state": {
+						"type": "string",
+						"description": "State/Province"
+					},
+					"countryCode": {
+						"type": "string",
+						"description": "Country Code"
+					}
+				},
+				"description": "Payer's address"
+			},
+			"Customer": {
+				"type": "object",
+				"properties": {
+					"username": {
+						"type": "string",
+						"description": "Username"
+					},
+					"phone": {
+						"type": "string",
+						"description": "Primary phone number"
+					},
+					"phone2": {
+						"type": "string",
+						"description": "Secondary phone number"
+					},
+					"company": {
+						"type": "string",
+						"description": "Company name"
+					},
+					"email": {
+						"type": "string",
+						"description": "Email address"
+					},
+					"fax": {
+						"type": "string",
+						"description": "Fax number"
+					},
+					"firstName": {
+						"type": "string",
+						"description": "First name"
+					},
+					"lastName": {
+						"type": "string",
+						"description": "Last name"
+					},
+					"middleName": {
+						"type": "string",
+						"description": "Middle name"
+					},
+					"ip": {
+						"type": "string",
+						"description": "IP address"
+					},
+					"deviceFingerprint": {
+						"type": "string",
+						"description": "Device fingerprint"
+					},
+					"identities": {
+						"type": "array",
+						"description": "Extra identity information needed when grand total is $3000 or more",
+						"items": {
+							"$ref": "#/components/schemas/CustomerIdentity"
+						}
+					}
+				},
+				"description": "Payer"
+			},
+			"CustomerIdentity": {
+				"type": "object",
+				"properties": {
+					"identityTypeId": {
+						"type": "integer",
+						"description": "Valid values: 1=SSN, 2=Passport, 4=Alien Registration Number for Identity One; 0=Other, 3=Driver’s License for Identity Two",
+						"format": "int32",
+						"example": 1
+					},
+					"value": {
+						"type": "string"
+					},
+					"countryCode": {
+						"type": "string",
+						"description": "Country code",
+						"example": "US"
+					},
+					"region": {
+						"type": "string",
+						"description": "Region/state code",
+						"example": "CA"
+					}
+				},
+				"description": "Extra identity information needed when grand total is $3000 or more"
+			},
+			"Item": {
+				"type": "object",
+				"properties": {
+					"itemKey": {
+						"type": "string",
+						"description": "The item's key"
+					},
+					"amount": {
+						"type": "number",
+						"description": "The amount to pay for the item"
+					},
+					"instanceId": {
+						"type": "string",
+						"description": "SKU"
+					},
+					"attributes": {
+						"type": "array",
+						"description": "Additional attributes",
+						"items": {
+							"$ref": "#/components/schemas/ItemAttribute"
+						}
+					}
+				},
+				"description": "Items to pay"
+			},
+			"ItemAttribute": {
+				"type": "object",
+				"properties": {
+					"receiptDisplay": {
+						"type": "boolean",
+						"description": "Determines whether or not the attribute is displayed on the receipt"
+					},
+					"attribute": {
+						"type": "string",
+						"description": "Attribute name"
+					},
+					"value": {
+						"type": "string",
+						"description": "Attribute value"
+					}
+				},
+				"description": "Additional attributes"
+			},
+			"Payment": {
+				"type": "object",
+				"properties": {
+					"type": {
+						"type": "string",
+						"description": "Type of payment method.",
+						"enum": [
+							"creditcard",
+							"echeck"
+						]
+					},
+					"shopperPaymentInfo": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "string",
+							"description": "Payment details as key-value pairs, based on the selected payment type. If type is 'creditcard', required keys are: encryptedCardNumber, encryptedSecurityCode, encryptedExpiryMonth, encryptedExpiryYear, cardHolderName. If type is 'echeck', required keys are: accountNumber, routingNumber, and either (firstName, lastName) or businessName."
+						},
+						"description": "Payment details as key-value pairs, based on the selected payment type. If type is 'creditcard', required keys are: encryptedCardNumber, encryptedSecurityCode, encryptedExpiryMonth, encryptedExpiryYear, cardHolderName. If type is 'echeck', required keys are: accountNumber, routingNumber, and either (firstName, lastName) or businessName."
+					},
+					"paymentProcess": {
+						"type": "string",
+						"description": "Specifies the payment process. Must be 'subscription_tokenization' when performing payment method tokenization.",
+						"enum": [
+							"subscription_tokenization"
+						]
+					}
+				},
+				"description": "Payment method data"
+			},
+			"PaymentRequest": {
+				"type": "object",
+				"properties": {
+					"items": {
+						"type": "array",
+						"description": "List of items to be paid for. Do not include this field when the request is intended only for payment method tokenization.",
+						"items": {
+							"$ref": "#/components/schemas/Item"
+						}
+					},
+					"address": {
+						"$ref": "#/components/schemas/Address"
+					},
+					"customer": {
+						"$ref": "#/components/schemas/Customer"
+					},
+					"payment": {
+						"$ref": "#/components/schemas/Payment"
+					},
+					"paymentReference": {
+						"type": "string",
+						"description": "A secure, tokenized identifier for a stored payment method such as a credit card or bank account."
+					},
+					"subscriptionId": {
+						"type": "string",
+						"description": "The unique subscription ID linked to the customer for which the payment method is used."
+					}
+				}
+			},
+			"TpePaymentResponse": {
+				"type": "object",
+				"properties": {
+					"orderId": {
+						"type": "integer",
+						"description": "This is a unique identifier for the payment transaction.",
+						"format": "int64"
+					},
+					"subscriptionId": {
+						"type": "string",
+						"description": "The unique subscription ID linked to the customer."
+					},
+					"status": {
+						"type": "string",
+						"description": "Status of the order",
+						"example": "success",
+						"enum": [
+							"success",
+							"failed"
+						]
+					},
+					"errorMessage": {
+						"type": "string",
+						"description": "This is an error message returned in case the OrderId could not be created. This will be null if the OrderId was created successfully."
+					},
+					"errorDetails": {
+						"type": "string"
+					},
+					"retry": {
+						"type": "boolean"
+					},
+					"review": {
+						"type": "boolean"
+					}
+				}
+			},
+			"PaymentMethodsRequest": {
+				"type": "object",
+				"properties": {
+					"subscriptionId": {
+						"type": "string"
+					},
+					"amount": {
+						"type": "number"
+					}
+				}
+			},
+			"PaymentMethod": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"type": {
+						"type": "string"
+					},
+					"totalAmount": {
+						"type": "number"
+					},
+					"config": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "string"
+						}
+					},
+					"fee": {
+						"$ref": "#/components/schemas/PaymentMethodFee"
+					}
+				}
+			},
+			"PaymentMethodFee": {
+				"type": "object",
+				"properties": {
+					"itemKey": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"description": {
+						"type": "string"
+					},
+					"amount": {
+						"type": "number"
+					}
+				}
+			},
+			"PaymentMethodsResponse": {
+				"type": "object",
+				"properties": {
+					"environment": {
+						"type": "string"
+					},
+					"paymentMethods": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/PaymentMethod"
+						}
+					}
+				}
+			}
+		},
+		"securitySchemes": {
+			"BearerAuth": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT",
+				"description": "Use the JWT access token issued by the TPE Auth server. Obtain a token via the TPE Auth API (see https://civitek.github.io/open-api-docs/tpe-auth.html) then include it as: Authorization: Bearer <token>"
+			}
+		}
+	}
 }
