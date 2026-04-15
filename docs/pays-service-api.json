@@ -496,6 +496,9 @@
               "description": "Payment information"
             },
             "description": "Payment information"
+          },
+          "paymentProcess": {
+            "type": "string"
           }
         },
         "description": "Payment method data"
