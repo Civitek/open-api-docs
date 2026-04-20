@@ -91,7 +91,291 @@
 					}
 				]
 			}
-		}
+		},
+		"/subscription/saveIdentities": {
+      "post": {
+        "tags": [
+          "Subscription Service"
+        ],
+        "description": "Saves identities and associates them with a subscriptionId",
+        "operationId": "saveSubsricpritionIdentities",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionIdentitiesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/subscription/findSavedPaymentMethods": {
+      "post": {
+        "tags": [
+          "Subscription Service"
+        ],
+        "description": "Gets the saved payment methods associated with a subscriptionId",
+        "operationId": "getSavedPaymentMethods",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SavedPaymentMethodRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SavedPayment"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/subscription/deleteSavedPaymentMethod": {
+      "post": {
+        "tags": [
+          "Subscription Service"
+        ],
+        "description": "Deletes the saved payment associated with a referenceId",
+        "operationId": "deleteSavedPaymentMethod",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteSavedPaymentMethodRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/recurring/setup": {
+      "post": {
+        "tags": [
+          "Recurring Service"
+        ],
+        "summary": "Create recurring payment configuration",
+        "description": "Sets up a subscription-like recurring payment with defined amount, frequency, and payment method.",
+        "operationId": "setup",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecurringRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecurringResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Setup completed successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecurringResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecurringResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/recurring/cancel/{recurringId}": {
+      "post": {
+        "tags": [
+          "Recurring Service"
+        ],
+        "summary": "Cancel recurring payment",
+        "description": "Cancels an active recurring payment and stops future billing cycles for the specified recurring ID.",
+        "operationId": "cancel",
+        "parameters": [
+          {
+            "name": "recurringId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recurring payment cancelled successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurring payment not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+"/recurring/details/{recurringId}": {
+      "get": {
+        "tags": [
+          "Recurring Service"
+        ],
+        "summary": "Get recurring payment details",
+        "description": "Retrieves the configuration and status of a recurring payment using the provided recurring ID.",
+        "operationId": "details",
+        "parameters": [
+          {
+            "name": "recurringId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recurring payment details retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurring payment not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
 	},
 	"components": {
 		"schemas": {
@@ -426,7 +710,127 @@
 						}
 					}
 				}
-			}
+			},
+			"SubscriptionIdentitiesRequest": {
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string",
+            "description": "SubscriptionId associated with saved payment information."
+          },
+          "identities": {
+            "type": "array",
+            "description": "Identities that will be associated with SubscriptionId.",
+            "items": {
+              "$ref": "#/components/schemas/CustomerIdentity"
+            }
+          }
+        }
+      },
+      "SavedPaymentMethodRequest": {
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string",
+            "description": "SubscritionId associated with saved payments."
+          }
+        }
+      },
+      "SavedPayment": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Saved payment type: creditcard oe echeck."
+          },
+          "info": {
+            "$ref": "#/components/schemas/SavedPaymentInfo"
+          }
+        }
+      },
+      "SavedPaymentInfo": {
+        "type": "object",
+        "properties": {
+          "summary": {
+            "type": "string",
+            "description": "Summary that describes the specific payment."
+          },
+          "reference": {
+            "type": "string",
+            "description": "ReferenceId that identifies this specific saved payment method."
+          },
+          "expiresOn": {
+            "type": "string",
+            "description": "Expiration date for a credit card."
+          },
+          "expired": {
+            "type": "boolean",
+            "description": "Expiration flag to alert the user that a credit card has expired."
+          }
+        },
+        "description": "Saved payment information."
+      },
+      "DeleteSavedPaymentMethodRequest": {
+        "type": "object",
+        "properties": {
+          "referenceId": {
+            "type": "string",
+            "description": "ReferenceId associated with a specific saved payment."
+          }
+        }
+      },
+      "RecurringRequest": {
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string",
+            "description": "The unique subscription ID linked to the customer for which the payment method is used."
+          },
+          "paymentMethod": {
+            "type": "string",
+            "description": "Type of payment method.",
+            "enum": [
+              "creditcard",
+              "echeck"
+            ]
+          },
+          "paymentReference": {
+            "type": "string",
+            "description": "A secure, tokenized identifier for a stored payment method such as a credit card or bank account."
+          },
+          "itemId": {
+            "type": "string",
+            "description": "The unique item ID."
+          },
+          "recurringFrequency": {
+            "type": "string",
+            "description": "Defines how often the payment recurs.",
+            "enum": [
+              "Monthly",
+              "Annually"
+            ]
+          },
+          "recurringStartDate": {
+            "type": "string",
+            "description": "The start date of the recurring schedule.",
+            "format": "date-time"
+          },
+          "recurringEndDate": {
+            "type": "string",
+            "description": "The end date of the recurring schedule.",
+            "format": "date-time"
+          },
+          "recurringAmount": {
+            "minimum": 1,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "description": "The amount applied for each recurring payment."
+          }
+        }
+      },
+      "RecurringResponse": {
+        "type": "object"
+      }
 		},
 		"securitySchemes": {
 			"BearerAuth": {
