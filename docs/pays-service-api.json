@@ -406,7 +406,7 @@
           "Payment Service"
         ],
         "summary": "Retrieve payment methods",
-        "description": "Returns a list of stored payment methods for the given subscription ID, along with their corresponding fees.",
+        "description": "Returns a list of avialable payment methods, along with their corresponding fees.",
         "operationId": "getpaymentMethods",
         "requestBody": {
           "content": {
