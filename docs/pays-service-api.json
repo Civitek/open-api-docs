@@ -20,121 +20,15 @@
 			"BearerAuth": []
 		}
 	],
-	"paths": {
-		"/payment/process": {
-			"post": {
-				"tags": [
-					"Payment Service"
-				],
-				"description": "Makes a payment",
-				"operationId": "processPayment",
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/PaymentRequest"
-							}
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/TpePaymentResponse"
-								}
-							}
-						}
-					}
-				},
-				"security": [
-					{
-						"BearerAuth": []
-					}
-				]
-			}
-		},
-		"/payment/paymentMethods": {
-			"post": {
-				"tags": [
-					"Payment Service"
-				],
-				"operationId": "getpaymentMethods",
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/PaymentMethodsRequest"
-							}
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/PaymentMethodsResponse"
-								}
-							}
-						}
-					}
-				},
-				"security": [
-					{
-						"BearerAuth": []
-					}
-				]
-			}
-		},
-		"/subscription/saveIdentities": {
+"paths": {
+    "/subscription/getPaymentMethods": {
       "post": {
         "tags": [
           "Subscription Service"
         ],
-        "description": "Saves identities and associates them with a subscriptionId",
-        "operationId": "saveSubsricpritionIdentities",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SubscriptionIdentitiesRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/subscription/findSavedPaymentMethods": {
-      "post": {
-        "tags": [
-          "Subscription Service"
-        ],
+        "summary": "Retrieves saved payment methods",
         "description": "Gets the saved payment methods associated with a subscriptionId",
-        "operationId": "getSavedPaymentMethods",
+        "operationId": "findSavedPaymentMethods",
         "requestBody": {
           "content": {
             "application/json": {
@@ -147,14 +41,31 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Payment methods successfully retrieved",
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SavedPayment"
-                  }
+                  "$ref": "#/components/schemas/SavedPaymentsMethodsResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedPaymentsMethodsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedPaymentsMethodsResponse"
                 }
               }
             }
@@ -167,11 +78,12 @@
         ]
       }
     },
-    "/subscription/deleteSavedPaymentMethod": {
+    "/subscription/deletePaymentMethod": {
       "post": {
         "tags": [
           "Subscription Service"
         ],
+        "summary": "Deletes a saved payment method",
         "description": "Deletes the saved payment associated with a referenceId",
         "operationId": "deleteSavedPaymentMethod",
         "requestBody": {
@@ -186,11 +98,88 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Payment method deleted",
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/SubscriptionResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/subscription/addIdentity": {
+      "post": {
+        "tags": [
+          "Subscription Service"
+        ],
+        "summary": "Adds identities to the subscription",
+        "description": "Adds identities and associates them with a subscriptionId, while overwritting the previously added identities",
+        "operationId": "addIdentity",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionIdentitiesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Identities added",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponse"
                 }
               }
             }
@@ -222,20 +211,10 @@
           "required": true
         },
         "responses": {
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/RecurringResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Setup completed successfully",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RecurringResponse"
                 }
@@ -245,9 +224,19 @@
           "400": {
             "description": "Invalid input data",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RecurringResponse"
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -260,7 +249,64 @@
         ]
       }
     },
-    "/recurring/cancel/{recurringId}": {
+    "/recurring/details": {
+      "post": {
+        "tags": [
+          "Recurring Service"
+        ],
+        "summary": "Get recurring payment details",
+        "description": "Retrieves the configuration and status of a recurring payment using the provided recurring ID.",
+        "operationId": "details",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecurringDetailsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "404": {
+            "description": "Recurring payment not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Recurring payment details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecurringDetailsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/recurring/cancel": {
       "post": {
         "tags": [
           "Recurring Service"
@@ -268,34 +314,33 @@
         "summary": "Cancel recurring payment",
         "description": "Cancels an active recurring payment and stops future billing cycles for the specified recurring ID.",
         "operationId": "cancel",
-        "parameters": [
-          {
-            "name": "recurringId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecurringCancelRequest"
+              }
             }
-          }
-        ],
+          },
+          "required": true
+        },
         "responses": {
-          "200": {
-            "description": "Recurring payment cancelled successfully",
+          "404": {
+            "description": "Recurring payment not found",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
           },
-          "404": {
-            "description": "Recurring payment not found",
+          "200": {
+            "description": "Recurring payment cancelled successfully",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/RecurringCancelResponse"
                 }
               }
             }
@@ -303,9 +348,9 @@
           "500": {
             "description": "Internal server error",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -318,52 +363,68 @@
         ]
       }
     },
-"/recurring/details/{recurringId}": {
-      "get": {
+    "/payment/process": {
+      "post": {
         "tags": [
-          "Recurring Service"
+          "Payment Service"
         ],
-        "summary": "Get recurring payment details",
-        "description": "Retrieves the configuration and status of a recurring payment using the provided recurring ID.",
-        "operationId": "details",
-        "parameters": [
-          {
-            "name": "recurringId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
+        "summary": "Process a payment transaction",
+        "description": "Accepts payment details and processes the transaction. ",
+        "operationId": "processPayment",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentRequest"
+              }
             }
-          }
-        ],
+          },
+          "required": true
+        },
         "responses": {
           "200": {
-            "description": "Recurring payment details retrieved successfully",
+            "description": "OK",
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/TpePaymentResponse"
                 }
               }
             }
-          },
-          "404": {
-            "description": "Recurring payment not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "object"
-                }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/payment/paymentMethods": {
+      "post": {
+        "tags": [
+          "Payment Service"
+        ],
+        "summary": "Retrieve payment methods",
+        "description": "Returns a list of stored payment methods for the given subscription ID, along with their corresponding fees.",
+        "operationId": "getpaymentMethods",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentMethodsRequest"
               }
             }
           },
-          "500": {
-            "description": "Internal server error",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/PaymentMethodsResponse"
                 }
               }
             }
@@ -376,357 +437,9 @@
         ]
       }
     }
-	},
-	"components": {
-		"schemas": {
-			"AttributeValue": {
-				"type": "object",
-				"properties": {
-					"attribute": {
-						"type": "string"
-					},
-					"value": {
-						"type": "string"
-					}
-				}
-			},
-			"Address": {
-				"required": [
-					"city",
-					"countryCode",
-					"postalCode",
-					"state",
-					"street1"
-				],
-				"type": "object",
-				"properties": {
-					"street1": {
-						"type": "string",
-						"description": "Address line 1"
-					},
-					"street2": {
-						"type": "string",
-						"description": "Address line 2"
-					},
-					"city": {
-						"type": "string",
-						"description": "City"
-					},
-					"postalCode": {
-						"type": "string",
-						"description": "Zip/Postal code"
-					},
-					"state": {
-						"type": "string",
-						"description": "State/Province"
-					},
-					"countryCode": {
-						"type": "string",
-						"description": "Country Code"
-					}
-				},
-				"description": "Payer's address"
-			},
-			"Customer": {
-				"type": "object",
-				"properties": {
-					"username": {
-						"type": "string",
-						"description": "Username"
-					},
-					"phone": {
-						"type": "string",
-						"description": "Primary phone number"
-					},
-					"phone2": {
-						"type": "string",
-						"description": "Secondary phone number"
-					},
-					"company": {
-						"type": "string",
-						"description": "Company name"
-					},
-					"email": {
-						"type": "string",
-						"description": "Email address"
-					},
-					"fax": {
-						"type": "string",
-						"description": "Fax number"
-					},
-					"firstName": {
-						"type": "string",
-						"description": "First name"
-					},
-					"lastName": {
-						"type": "string",
-						"description": "Last name"
-					},
-					"middleName": {
-						"type": "string",
-						"description": "Middle name"
-					},
-					"ip": {
-						"type": "string",
-						"description": "IP address"
-					},
-					"deviceFingerprint": {
-						"type": "string",
-						"description": "Device fingerprint"
-					},
-					"identities": {
-						"type": "array",
-						"description": "Extra identity information needed when grand total is $3000 or more",
-						"items": {
-							"$ref": "#/components/schemas/CustomerIdentity"
-						}
-					}
-				},
-				"description": "Payer"
-			},
-			"CustomerIdentity": {
-				"type": "object",
-				"properties": {
-					"identityTypeId": {
-						"type": "integer",
-						"description": "Valid values: 1=SSN, 2=Passport, 4=Alien Registration Number for Identity One; 0=Other, 3=Driver’s License for Identity Two",
-						"format": "int32",
-						"example": 1
-					},
-					"value": {
-						"type": "string"
-					},
-					"countryCode": {
-						"type": "string",
-						"description": "Country code",
-						"example": "US"
-					},
-					"region": {
-						"type": "string",
-						"description": "Region/state code",
-						"example": "CA"
-					}
-				},
-				"description": "Extra identity information needed when grand total is $3000 or more"
-			},
-			"Item": {
-				"type": "object",
-				"properties": {
-					"itemKey": {
-						"type": "string",
-						"description": "The item's key"
-					},
-					"amount": {
-						"type": "number",
-						"description": "The amount to pay for the item"
-					},
-					"instanceId": {
-						"type": "string",
-						"description": "SKU"
-					},
-					"attributes": {
-						"type": "array",
-						"description": "Additional attributes",
-						"items": {
-							"$ref": "#/components/schemas/ItemAttribute"
-						}
-					}
-				},
-				"description": "Items to pay"
-			},
-			"ItemAttribute": {
-				"type": "object",
-				"properties": {
-					"receiptDisplay": {
-						"type": "boolean",
-						"description": "Determines whether or not the attribute is displayed on the receipt"
-					},
-					"attribute": {
-						"type": "string",
-						"description": "Attribute name"
-					},
-					"value": {
-						"type": "string",
-						"description": "Attribute value"
-					}
-				},
-				"description": "Additional attributes"
-			},
-			"Payment": {
-				"type": "object",
-				"properties": {
-					"type": {
-						"type": "string",
-						"description": "Type of payment method.",
-						"enum": [
-							"creditcard",
-							"echeck"
-						]
-					},
-					"shopperPaymentInfo": {
-						"type": "object",
-						"additionalProperties": {
-							"type": "string",
-							"description": "Payment details as key-value pairs, based on the selected payment type. If type is 'creditcard', required keys are: encryptedCardNumber, encryptedSecurityCode, encryptedExpiryMonth, encryptedExpiryYear, cardHolderName. If type is 'echeck', required keys are: accountNumber, routingNumber, and either (firstName, lastName) or businessName."
-						},
-						"description": "Payment details as key-value pairs, based on the selected payment type. If type is 'creditcard', required keys are: encryptedCardNumber, encryptedSecurityCode, encryptedExpiryMonth, encryptedExpiryYear, cardHolderName. If type is 'echeck', required keys are: accountNumber, routingNumber, and either (firstName, lastName) or businessName."
-					},
-					"paymentProcess": {
-						"type": "string",
-						"description": "Specifies the payment process. Must be 'subscription_tokenization' when performing payment method tokenization.",
-						"enum": [
-							"subscription_tokenization"
-						]
-					}
-				},
-				"description": "Payment method data"
-			},
-			"PaymentRequest": {
-				"type": "object",
-				"properties": {
-					"items": {
-						"type": "array",
-						"description": "List of items to be paid for. Do not include this field when the request is intended only for payment method tokenization.",
-						"items": {
-							"$ref": "#/components/schemas/Item"
-						}
-					},
-					"address": {
-						"$ref": "#/components/schemas/Address"
-					},
-					"customer": {
-						"$ref": "#/components/schemas/Customer"
-					},
-					"payment": {
-						"$ref": "#/components/schemas/Payment"
-					},
-					"paymentReference": {
-						"type": "string",
-						"description": "A secure, tokenized identifier for a stored payment method such as a credit card or bank account."
-					},
-					"subscriptionId": {
-						"type": "string",
-						"description": "The unique subscription ID linked to the customer for which the payment method is used."
-					}
-				}
-			},
-			"TpePaymentResponse": {
-				"type": "object",
-				"properties": {
-					"orderId": {
-						"type": "integer",
-						"description": "This is a unique identifier for the payment transaction.",
-						"format": "int64"
-					},
-					"subscriptionId": {
-						"type": "string",
-						"description": "The unique subscription ID linked to the customer."
-					},
-					"status": {
-						"type": "string",
-						"description": "Status of the order",
-						"example": "success",
-						"enum": [
-							"success",
-							"failed"
-						]
-					},
-					"errorMessage": {
-						"type": "string",
-						"description": "This is an error message returned in case the OrderId could not be created. This will be null if the OrderId was created successfully."
-					},
-					"errorDetails": {
-						"type": "string"
-					},
-					"retry": {
-						"type": "boolean"
-					},
-					"review": {
-						"type": "boolean"
-					}
-				}
-			},
-			"PaymentMethodsRequest": {
-				"type": "object",
-				"properties": {
-					"subscriptionId": {
-						"type": "string"
-					},
-					"amount": {
-						"type": "number"
-					}
-				}
-			},
-			"PaymentMethod": {
-				"type": "object",
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"type": {
-						"type": "string"
-					},
-					"totalAmount": {
-						"type": "number"
-					},
-					"config": {
-						"type": "object",
-						"additionalProperties": {
-							"type": "string"
-						}
-					},
-					"fee": {
-						"$ref": "#/components/schemas/PaymentMethodFee"
-					}
-				}
-			},
-			"PaymentMethodFee": {
-				"type": "object",
-				"properties": {
-					"itemKey": {
-						"type": "string"
-					},
-					"name": {
-						"type": "string"
-					},
-					"description": {
-						"type": "string"
-					},
-					"amount": {
-						"type": "number"
-					}
-				}
-			},
-			"PaymentMethodsResponse": {
-				"type": "object",
-				"properties": {
-					"environment": {
-						"type": "string"
-					},
-					"paymentMethods": {
-						"type": "array",
-						"items": {
-							"$ref": "#/components/schemas/PaymentMethod"
-						}
-					}
-				}
-			},
-			"SubscriptionIdentitiesRequest": {
-        "type": "object",
-        "properties": {
-          "subscriptionId": {
-            "type": "string",
-            "description": "SubscriptionId associated with saved payment information."
-          },
-          "identities": {
-            "type": "array",
-            "description": "Identities that will be associated with SubscriptionId.",
-            "items": {
-              "$ref": "#/components/schemas/CustomerIdentity"
-            }
-          }
-        }
-      },
+  },
+	 "components": {
+    "schemas": {
       "SavedPaymentMethodRequest": {
         "type": "object",
         "properties": {
@@ -746,7 +459,8 @@
           "info": {
             "$ref": "#/components/schemas/SavedPaymentInfo"
           }
-        }
+        },
+        "description": "Saved payment methods"
       },
       "SavedPaymentInfo": {
         "type": "object",
@@ -770,14 +484,191 @@
         },
         "description": "Saved payment information."
       },
+      "SavedPaymentsMethodsResponse": {
+        "type": "object",
+        "properties": {
+          "methods": {
+            "type": "array",
+            "description": "Saved payment methods",
+            "items": {
+              "$ref": "#/components/schemas/SavedPayment"
+            }
+          },
+          "subscriptionId": {
+            "type": "string",
+            "description": "Subscription Id"
+          },
+          "storedPaymentMethodId": {
+            "type": "string",
+            "description": "Identifies a specific stored payment"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status: success or failed"
+          },
+          "statusCode": {
+            "type": "string",
+            "description": "Http status code"
+          },
+          "message": {
+            "type": "string",
+            "description": "Success message"
+          },
+          "responseTimeStamp": {
+            "type": "string",
+            "description": "Date of response",
+            "format": "date-time"
+          },
+          "errorDetails": {
+            "type": "string",
+            "description": "Error response message"
+          }
+        }
+      },
       "DeleteSavedPaymentMethodRequest": {
         "type": "object",
         "properties": {
-          "referenceId": {
+          "storedPaymentMethodId": {
             "type": "string",
-            "description": "ReferenceId associated with a specific saved payment."
+            "description": "Id associated with a specific saved payment."
           }
         }
+      },
+      "SubscriptionResponse": {
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string",
+            "description": "Subscription Id"
+          },
+          "storedPaymentMethodId": {
+            "type": "string",
+            "description": "Identifies a specific stored payment"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status: success or failed"
+          },
+          "statusCode": {
+            "type": "string",
+            "description": "Http status code"
+          },
+          "message": {
+            "type": "string",
+            "description": "Success message"
+          },
+          "responseTimeStamp": {
+            "type": "string",
+            "description": "Date of response",
+            "format": "date-time"
+          },
+          "errorDetails": {
+            "type": "string",
+            "description": "Error details when status is failed"
+          }
+        }
+      },
+      "CustomerIdentity": {
+        "type": "object",
+        "properties": {
+          "identityTypeId": {
+            "type": "integer",
+            "description": "Valid values: 1=SSN, 2=Passport, 4=Alien Registration Number for Identity One; 0=Other, 3=Driver’s License for Identity Two",
+            "format": "int32",
+            "example": 1
+          },
+          "value": {
+            "type": "string"
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "Country code",
+            "example": "US"
+          },
+          "region": {
+            "type": "string",
+            "description": "Region/state code",
+            "example": "CA"
+          }
+        },
+        "description": "Identities that will be associated with SubscriptionId."
+      },
+      "SubscriptionIdentitiesRequest": {
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string",
+            "description": "SubscriptionId associated with saved payment information."
+          },
+          "identities": {
+            "type": "array",
+            "description": "Identities that will be associated with SubscriptionId.",
+            "items": {
+              "$ref": "#/components/schemas/CustomerIdentity"
+            }
+          }
+        }
+      },
+      "AuthToken": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string"
+          },
+          "token_type": {
+            "type": "string"
+          },
+          "expires_in": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "refresh_token": {
+            "type": "string"
+          }
+        }
+      },
+      "Item": {
+        "type": "object",
+        "properties": {
+          "itemKey": {
+            "type": "string",
+            "description": "The item's key"
+          },
+          "amount": {
+            "type": "number",
+            "description": "The amount to pay for the item"
+          },
+          "instanceId": {
+            "type": "string",
+            "description": "SKU"
+          },
+          "attributes": {
+            "type": "array",
+            "description": "Additional attributes",
+            "items": {
+              "$ref": "#/components/schemas/ItemAttribute"
+            }
+          }
+        },
+        "description": "The payment Item."
+      },
+      "ItemAttribute": {
+        "type": "object",
+        "properties": {
+          "receiptDisplay": {
+            "type": "boolean",
+            "description": "Determines whether or not the attribute is displayed on the receipt"
+          },
+          "attribute": {
+            "type": "string",
+            "description": "Attribute name"
+          },
+          "value": {
+            "type": "string",
+            "description": "Attribute value"
+          }
+        },
+        "description": "Additional attributes"
       },
       "RecurringRequest": {
         "type": "object",
@@ -794,46 +685,508 @@
               "echeck"
             ]
           },
-          "paymentReference": {
+          "storedPaymentMethodId": {
             "type": "string",
             "description": "A secure, tokenized identifier for a stored payment method such as a credit card or bank account."
           },
-          "itemId": {
-            "type": "string",
-            "description": "The unique item ID."
+          "item": {
+            "$ref": "#/components/schemas/Item"
           },
           "recurringFrequency": {
             "type": "string",
-            "description": "Defines how often the payment recurs.",
+            "description": "Payment recurrence frequency",
             "enum": [
-              "Monthly",
-              "Annually"
+              "DAILY",
+              "WEEKLY",
+              "MONTHLY",
+              "BI_WEEKLY",
+              "BI_MONTHLY",
+              "ANNUALLY"
             ]
           },
           "recurringStartDate": {
             "type": "string",
             "description": "The start date of the recurring schedule.",
-            "format": "date-time"
+            "format": "date"
           },
           "recurringEndDate": {
             "type": "string",
             "description": "The end date of the recurring schedule.",
-            "format": "date-time"
-          },
-          "recurringAmount": {
-            "minimum": 1,
-            "exclusiveMinimum": false,
-            "type": "number",
-            "description": "The amount applied for each recurring payment."
+            "format": "date"
           }
         }
       },
       "RecurringResponse": {
-        "type": "object"
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string",
+            "description": "The unique subscription ID linked to the customer for which the payment method is used."
+          },
+          "recurringId": {
+            "type": "string",
+            "description": "The unique reurring ID."
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the recurring setup.",
+            "example": "success",
+            "enum": [
+              "success",
+              "failed"
+            ]
+          },
+          "statusCode": {
+            "type": "integer",
+            "description": "Http status code",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "description": "Success message"
+          },
+          "responseTimeStamp": {
+            "type": "string",
+            "description": "Date of response",
+            "format": "date-time"
+          },
+          "errorDetails": {
+            "type": "string",
+            "description": "Error details when status is failed"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "RecurringDetailsRequest": {
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string",
+            "description": "The unique subscription ID linked to the customer for which the payment method is used."
+          },
+          "recurringId": {
+            "type": "string",
+            "description": "The unique reurring ID."
+          }
+        }
+      },
+      "RecurringDetailsResponse": {
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string",
+            "description": "The unique subscription ID linked to the customer for which the payment method is used."
+          },
+          "recurringId": {
+            "type": "string",
+            "description": "The unique reurring ID."
+          },
+          "paymentMethod": {
+            "type": "string",
+            "description": "Type of payment method.",
+            "enum": [
+              "creditcard",
+              "echeck"
+            ]
+          },
+          "storedPaymentMethodId": {
+            "type": "string",
+            "description": "A secure, tokenized identifier for a stored payment method such as a credit card or bank account."
+          },
+          "item": {
+            "$ref": "#/components/schemas/Item"
+          },
+          "recurringFrequency": {
+            "type": "string",
+            "description": "Payment recurrence frequency",
+            "enum": [
+              "DAILY",
+              "WEEKLY",
+              "MONTHLY",
+              "BI_WEEKLY",
+              "BI_MONTHLY",
+              "ANNUALLY"
+            ]
+          },
+          "recurringStartDate": {
+            "type": "string",
+            "description": "The start date of the recurring schedule.",
+            "format": "date"
+          },
+          "recurringEndDate": {
+            "type": "string",
+            "description": "The end date of the recurring schedule.",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the recurring setup.",
+            "example": "success",
+            "enum": [
+              "success",
+              "failed"
+            ]
+          },
+          "statusCode": {
+            "type": "integer",
+            "description": "Http status code",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "description": "Success message"
+          },
+          "errorDetails": {
+            "type": "string",
+            "description": "Error details when status is failed"
+          }
+        }
+      },
+      "RecurringCancelRequest": {
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string",
+            "description": "The unique subscription ID linked to the customer for which the payment method is used."
+          },
+          "recurringId": {
+            "type": "string",
+            "description": "The unique reurring ID."
+          },
+          "cancelReason": {
+            "type": "string",
+            "description": "Reason for cancelling the recurring schedule"
+          }
+        }
+      },
+      "RecurringCancelResponse": {
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string",
+            "description": "The unique subscription ID linked to the customer"
+          },
+          "recurringId": {
+            "type": "string",
+            "description": "The unique recurring ID"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the cancellation request",
+            "example": "success",
+            "enum": [
+              "success",
+              "failed"
+            ]
+          },
+          "statusCode": {
+            "type": "integer",
+            "description": "Http status code",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "description": "Detailed message about the cancellation"
+          },
+          "cancelledAt": {
+            "type": "string",
+            "description": "Timestamp when the cancellation was processed",
+            "format": "date-time"
+          }
+        }
+      },
+      "AttributeValue": {
+        "type": "object",
+        "properties": {
+          "attribute": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "Address": {
+        "required": [
+          "city",
+          "countryCode",
+          "postalCode",
+          "state",
+          "street1"
+        ],
+        "type": "object",
+        "properties": {
+          "street1": {
+            "type": "string",
+            "description": "Address line 1"
+          },
+          "street2": {
+            "type": "string",
+            "description": "Address line 2"
+          },
+          "city": {
+            "type": "string",
+            "description": "City"
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "Zip/Postal code"
+          },
+          "state": {
+            "type": "string",
+            "description": "State/Province"
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "Country Code"
+          }
+        },
+        "description": "Payer's address"
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "Username"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Primary phone number"
+          },
+          "phone2": {
+            "type": "string",
+            "description": "Secondary phone number"
+          },
+          "company": {
+            "type": "string",
+            "description": "Company name"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address"
+          },
+          "fax": {
+            "type": "string",
+            "description": "Fax number"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "First name"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Last name"
+          },
+          "middleName": {
+            "type": "string",
+            "description": "Middle name"
+          },
+          "ip": {
+            "type": "string",
+            "description": "IP address"
+          },
+          "deviceFingerprint": {
+            "type": "string",
+            "description": "Device fingerprint"
+          },
+          "identities": {
+            "type": "array",
+            "description": "Extra identity information needed when grand total is $3000 or more",
+            "items": {
+              "$ref": "#/components/schemas/CustomerIdentity"
+            }
+          },
+          "employer": {
+            "type": "boolean",
+            "description": "Indicates whether or not you are an employer"
+          },
+          "employerFein": {
+            "type": "string",
+            "description": "Employer FEIN"
+          }
+        },
+        "description": "Payer"
+      },
+      "Payment": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Type of payment method.",
+            "enum": [
+              "creditcard",
+              "echeck"
+            ]
+          },
+          "shopperPaymentInfo": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Payment details as key-value pairs, based on the selected payment type. If type is 'creditcard', required keys are: encryptedCardNumber, encryptedSecurityCode, encryptedExpiryMonth, encryptedExpiryYear, cardHolderName. If type is 'echeck', required keys are: accountNumber, routingNumber, and either (firstName, lastName) or businessName."
+            },
+            "description": "Payment details as key-value pairs, based on the selected payment type. If type is 'creditcard', required keys are: encryptedCardNumber, encryptedSecurityCode, encryptedExpiryMonth, encryptedExpiryYear, cardHolderName. If type is 'echeck', required keys are: accountNumber, routingNumber, and either (firstName, lastName) or businessName."
+          },
+          "paymentProcess": {
+            "type": "string",
+            "description": "Specifies the payment process. Must be 'subscription_tokenization' when performing payment method tokenization.",
+            "enum": [
+              "subscription_tokenization"
+            ]
+          }
+        },
+        "description": "Payment method data"
+      },
+      "PaymentRequest": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "List of items to be paid for. Do not include this field when the request is intended only for payment method tokenization.",
+            "items": {
+              "$ref": "#/components/schemas/Item"
+            }
+          },
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/Customer"
+          },
+          "payment": {
+            "$ref": "#/components/schemas/Payment"
+          },
+          "paymentReference": {
+            "type": "string",
+            "description": "A secure, tokenized identifier for a stored payment method such as a credit card or bank account."
+          },
+          "subscriptionId": {
+            "type": "string",
+            "description": "The unique subscription ID linked to the customer for which the payment method is used."
+          }
+        }
+      },
+      "TpePaymentResponse": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "integer",
+            "description": "This is a unique identifier for the payment transaction.",
+            "format": "int64"
+          },
+          "subscriptionId": {
+            "type": "string",
+            "description": "The unique subscription ID linked to the customer."
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the order",
+            "example": "success",
+            "enum": [
+              "success",
+              "failed"
+            ]
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "This is an error message returned in case the OrderId could not be created. This will be null if the OrderId was created successfully."
+          },
+          "errorDetails": {
+            "type": "string"
+          },
+          "retry": {
+            "type": "boolean"
+          },
+          "review": {
+            "type": "boolean"
+          }
+        }
+      },
+
+      "PaymentMethodsRequest": {
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          }
+        }
+      },
+      "PaymentMethod": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "totalAmount": {
+            "type": "number"
+          },
+          "config": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "fee": {
+            "$ref": "#/components/schemas/PaymentMethodFee"
+          }
+        }
+      },
+      "PaymentMethodFee": {
+        "type": "object",
+        "properties": {
+          "itemKey": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          }
+        }
+      },
+      "PaymentMethodsResponse": {
+        "type": "object",
+        "properties": {
+          "environment": {
+            "type": "string"
+          },
+          "paymentMethods": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentMethod"
+            }
+          }
+        }
       }
+
+
 		},
 		"securitySchemes": {
-			"BearerAuth": {
+			"bearerAuth": {
 				"type": "http",
 				"scheme": "bearer",
 				"bearerFormat": "JWT",
