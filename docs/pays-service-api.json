@@ -1212,6 +1212,15 @@
             "type": "string",
             "description": "Detailed error information for troubleshooting purposes"
           },
+          "storePaymentMethodStatus": {
+            "type": "string",
+            "description": "Status of storing the payment method. Returned only when 'storePaymentMethod' is true in the request",
+            "example": "success",
+            "enum": [
+              "success",
+              "failed"
+            ]
+          },
           "retry": {
             "type": "boolean",
             "description": "Indicates whether the payment attempt can be retried",
