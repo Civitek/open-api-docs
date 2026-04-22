@@ -40,22 +40,12 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Payment methods successfully retrieved",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/SavedPaymentsMethodsResponse"
-                }
-              }
-            }
-          },
           "500": {
             "description": "Internal server error",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SavedPaymentsMethodsResponse"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -63,9 +53,29 @@
           "400": {
             "description": "Invalid input data",
             "content": {
-              "*/*": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Payment methods successfully retrieved",
+            "content": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SavedPaymentsMethodsResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No saved payment methods found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -97,12 +107,12 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Payment method deleted",
+          "404": {
+            "description": "Not found",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubscriptionResponse"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -110,9 +120,9 @@
           "500": {
             "description": "Internal server error",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubscriptionResponse"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -120,7 +130,17 @@
           "400": {
             "description": "Invalid input data",
             "content": {
-              "*/*": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Payment method deleted",
+            "content": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SubscriptionResponse"
                 }
@@ -157,7 +177,7 @@
           "200": {
             "description": "Identities added",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SubscriptionResponse"
                 }
@@ -167,9 +187,9 @@
           "500": {
             "description": "Internal server error",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubscriptionResponse"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -177,9 +197,9 @@
           "400": {
             "description": "Invalid input data",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubscriptionResponse"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -192,7 +212,7 @@
         ]
       }
     },
-    "/recurring/setup": {
+     "/recurring/setup": {
       "post": {
         "tags": [
           "Recurring Service"
@@ -211,12 +231,12 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Setup completed successfully",
+          "500": {
+            "description": "Internal server error",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RecurringResponse"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -231,12 +251,12 @@
               }
             }
           },
-          "500": {
-            "description": "Internal server error",
+          "200": {
+            "description": "Setup completed successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/RecurringResponse"
                 }
               }
             }
@@ -268,8 +288,8 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "Recurring payment not found",
+          "500": {
+            "description": "Internal server error",
             "content": {
               "application/json": {
                 "schema": {
@@ -278,8 +298,18 @@
               }
             }
           },
-          "500": {
-            "description": "Internal server error",
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurring payment not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -325,16 +355,6 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "Recurring payment not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Recurring payment cancelled successfully",
             "content": {
@@ -347,6 +367,26 @@
           },
           "500": {
             "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurring payment not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -382,10 +422,30 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "500": {
+            "description": "Internal server error",
             "content": {
-              "*/*": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Payment successfull.",
+            "content": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TpePaymentResponse"
                 }
@@ -400,7 +460,7 @@
         ]
       }
     },
-    "/payment/paymentMethods": {
+"/payment/paymentMethods": {
       "post": {
         "tags": [
           "Payment Service"
@@ -419,10 +479,40 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "500": {
+            "description": "Internal server error",
             "content": {
-              "*/*": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurring payment not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Retrieved payment methods successfully.",
+            "content": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PaymentMethodsResponse"
                 }
@@ -449,12 +539,32 @@
           }
         }
       },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "responseTimestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "httpStatusCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
       "SavedPayment": {
         "type": "object",
         "properties": {
           "type": {
             "type": "string",
-            "description": "Saved payment type: creditcard oe echeck."
+            "description": "Saved payment type",
+            "enum": [
+              "creditcard",
+              "echeck"
+            ]
           },
           "info": {
             "$ref": "#/components/schemas/SavedPaymentInfo"
@@ -502,13 +612,10 @@
             "type": "string",
             "description": "Identifies a specific stored payment"
           },
-          "status": {
-            "type": "string",
-            "description": "Status: success or failed"
-          },
-          "statusCode": {
-            "type": "string",
-            "description": "Http status code"
+          "httpStatusCode": {
+            "type": "integer",
+            "description": "Http status code",
+            "format": "int32"
           },
           "message": {
             "type": "string",
@@ -518,10 +625,6 @@
             "type": "string",
             "description": "Date of response",
             "format": "date-time"
-          },
-          "errorDetails": {
-            "type": "string",
-            "description": "Error response message"
           }
         }
       },
@@ -545,13 +648,10 @@
             "type": "string",
             "description": "Identifies a specific stored payment"
           },
-          "status": {
-            "type": "string",
-            "description": "Status: success or failed"
-          },
-          "statusCode": {
-            "type": "string",
-            "description": "Http status code"
+          "httpStatusCode": {
+            "type": "integer",
+            "description": "Http status code",
+            "format": "int32"
           },
           "message": {
             "type": "string",
@@ -561,10 +661,6 @@
             "type": "string",
             "description": "Date of response",
             "format": "date-time"
-          },
-          "errorDetails": {
-            "type": "string",
-            "description": "Error details when status is failed"
           }
         }
       },
@@ -575,7 +671,8 @@
             "type": "integer",
             "description": "Valid values: 1=SSN, 2=Passport, 4=Alien Registration Number for Identity One; 0=Other, 3=Driver’s License for Identity Two",
             "format": "int32",
-            "example": 1
+            "example": 1,
+            "enum": [0, 1, 2, 3, 4]
           },
           "value": {
             "type": "string"
@@ -727,16 +824,7 @@
             "type": "string",
             "description": "The unique reurring ID."
           },
-          "status": {
-            "type": "string",
-            "description": "Status of the recurring setup.",
-            "example": "success",
-            "enum": [
-              "success",
-              "failed"
-            ]
-          },
-          "statusCode": {
+          "httpStatusCode": {
             "type": "integer",
             "description": "Http status code",
             "format": "int32"
@@ -749,25 +837,6 @@
             "type": "string",
             "description": "Date of response",
             "format": "date-time"
-          },
-          "errorDetails": {
-            "type": "string",
-            "description": "Error details when status is failed"
-          }
-        }
-      },
-      "ErrorResponse": {
-        "type": "object",
-        "properties": {
-          "timestamp": {
-            "type": "string"
-          },
-          "status": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "message": {
-            "type": "string"
           }
         }
       },
@@ -832,16 +901,7 @@
             "description": "The end date of the recurring schedule.",
             "format": "date"
           },
-          "status": {
-            "type": "string",
-            "description": "Status of the recurring setup.",
-            "example": "success",
-            "enum": [
-              "success",
-              "failed"
-            ]
-          },
-          "statusCode": {
+          "httpStatusCode": {
             "type": "integer",
             "description": "Http status code",
             "format": "int32"
@@ -849,10 +909,6 @@
           "message": {
             "type": "string",
             "description": "Success message"
-          },
-          "errorDetails": {
-            "type": "string",
-            "description": "Error details when status is failed"
           }
         }
       },
@@ -884,16 +940,7 @@
             "type": "string",
             "description": "The unique recurring ID"
           },
-          "status": {
-            "type": "string",
-            "description": "Status of the cancellation request",
-            "example": "success",
-            "enum": [
-              "success",
-              "failed"
-            ]
-          },
-          "statusCode": {
+          "httpStatusCode": {
             "type": "integer",
             "description": "Http status code",
             "format": "int32"
