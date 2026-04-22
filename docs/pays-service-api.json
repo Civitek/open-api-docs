@@ -217,7 +217,7 @@
         "tags": [
           "Recurring Service"
         ],
-        "summary": "Create recurring payment configuration",
+        "summary": "Create recurring payment",
         "description": "Sets up a subscription-like recurring payment with defined amount, frequency, and payment method.",
         "operationId": "setup",
         "requestBody": {
