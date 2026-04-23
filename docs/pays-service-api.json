@@ -749,7 +749,7 @@
             "type": "string",
             "description": "Success message"
           },
-          "responseTimeStamp": {
+          "responseTimestamp": {
             "type": "string",
             "description": "Date of response",
             "format": "date-time"
@@ -930,7 +930,7 @@
             "type": "string",
             "description": "Response message."
           },
-          "responseTimeStamp": {
+          "responseTimestamp": {
             "type": "string",
             "description": "Date and time when the response was generated.",
             "format": "date-time"
@@ -1011,7 +1011,7 @@
             "type": "string",
             "description": "Response message."
           },
-          "responseTimeStamp": {
+          "responseTimestamp": {
             "type": "string",
             "description": "Date and time when the response was generated.",
             "format": "date-time"
