@@ -1201,7 +1201,7 @@
           },
           "storePaymentMethod": {
             "type": "boolean",
-            "description": "Whether the entered payment method should be stored for future use."
+            "description": "Whether the entered payment method should be stored for future use. If true and subscriptionId is not provided, a new subscriptionId is created during payment processing."
           }
         },
         "description": "Payment information used to process a transaction.\n\nUse payment.type to indicate the payment method.\n\nIf using a stored payment method, provide storedPaymentMethodId in the request and do not provide shopperPaymentInfo.\n\nIf not using a stored payment method, provide shopperPaymentInfo based on payment.type.\n\nSupported payment.type values in this document:\n- creditcard\n- echeck"
@@ -1234,12 +1234,12 @@
           },
           "subscriptionId": {
             "type": "string",
-            "description": "Unique subscription identifier associated with the customer and payment method."
+            "description": "Unique subscription identifier associated with the customer and payment method. Provide this field to use an existing subscription. If storePaymentMethod is true and this field is not provided, a new subscriptionId is created during payment processing."
           }
         },
-        "description": "Request used to process a payment transaction.\n\nProvide payment information in the payment object.\n\nIf using a stored payment method, provide storedPaymentMethodId and do not provide shopperPaymentInfo.\n\nIf not using a stored payment method, provide shopperPaymentInfo based on payment.type.\n\nInclude items when processing a payment.\n\nDo not include items when the request is intended only for payment method tokenization.\n\nsubscriptionId may be provided when the payment is associated with a subscriber or when storing or using a stored payment method."
+        "description": "Request used to process a payment transaction.\n\nProvide payment information in the payment object.\n\nIf using a stored payment method, provide storedPaymentMethodId and do not provide shopperPaymentInfo.\n\nIf not using a stored payment method, provide shopperPaymentInfo based on payment.type.\n\nInclude items when processing a payment.\n\nDo not include items when the request is intended only for payment method tokenization.\n\nIf storePaymentMethod is true and subscriptionId is not provided, a new subscriptionId is created during payment processing and returned in the response.\n\nIf subscriptionId is provided, the payment method is associated with the existing subscription."
       },
-            "PaymentResponse": {
+      "PaymentResponse": {
         "type": "object",
         "properties": {
           "orderId": {
@@ -1247,9 +1247,14 @@
             "description": "Unique identifier of the payment transaction.",
             "format": "int64"
           },
+          "paymentTimestamp": {
+            "type": "string",
+            "description": "Date and time when the payment transaction was processed.",
+            "format": "date-time"
+          },
           "subscriptionId": {
             "type": "string",
-            "description": "Unique subscription identifier associated with the customer."
+            "description": "Unique subscription identifier associated with the customer. Returned when an existing subscription is used, or when a new subscriptionId is created because storePaymentMethod is true and subscriptionId was not provided in the request."
           },
           "status": {
             "type": "string",
