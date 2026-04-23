@@ -413,7 +413,7 @@
         ]
       }
     },
-    "/payment/process": {
+    "/payment/paymentProcess": {
       "post": {
         "tags": [
           "Payment Service"
@@ -548,7 +548,7 @@
         "properties": {
           "subscriptionId": {
             "type": "string",
-            "description": "Id associated with a user's stored payments"
+            "description": "Unique subscription identifier used to retrieve stored payment methods."
           }
         }
       },
@@ -628,14 +628,14 @@
         "properties": {
           "creditCards": {
             "type": "array",
-            "description": "List of stored credit cards for the subscriber.",
+            "description": "List of stored credit cards for the subscription.",
             "items": {
               "$ref": "#/components/schemas/StoredCreditCard"
             }
           },
           "bankAccounts": {
             "type": "array",
-            "description": "List of stored bank accounts for the subscriber.",
+            "description": "List of stored bank accounts for the subscription.",
             "items": {
               "$ref": "#/components/schemas/StoredBankAccount"
             }
@@ -653,7 +653,7 @@
             "type": "string",
             "description": "Response message."
           },
-          "responseTimeStamp": {
+          "responseTimestamp": {
             "type": "string",
             "description": "Date and time when the response was generated.",
             "format": "date-time"
@@ -1233,9 +1233,10 @@
           }
         }
       },
-      "PaymentMethodsRequest": {
+           "PaymentMethodsRequest": {
         "required": [
-          "amount"
+          "amount",
+          "itemKey"
         ],
         "type": "object",
         "properties": {
@@ -1243,11 +1244,15 @@
             "type": "string",
             "description": "Unique subscription identifier used to retrieve stored payment methods. If not provided, only generally available payment methods are returned."
           },
+          "itemKey": {
+            "type": "string",
+            "description": "Unique item key used to determine the applicable payment methods and fees."
+          },
           "amount": {
             "minimum": 0,
             "exclusiveMinimum": true,
             "type": "number",
-            "description": "Payment amount used to determine available payment methods and applicable fees.",
+            "description": "Payment amount used to determine the applicable fees for various payment methods.",
             "example": 25.5
           }
         }
@@ -1360,27 +1365,24 @@
       "StoredPaymentMethod": {
         "type": "object",
         "properties": {
+          "storedPaymentMethodId": {
+            "type": "string",
+            "description": "Identifier of the stored payment method."
+          },
           "name": {
             "type": "string",
-            "description": "Display name of the stored payment method type.",
-            "example": "Credit Card"
+            "description": "Display name of the stored payment method.",
+            "example": "Visa ending in 1234"
           },
           "type": {
             "type": "string",
-            "description": "Type of payment method, such as creditcard, echeck, googlepay, or applepay.",
+            "description": "Type of payment method, such as creditcard or echeck.",
             "example": "creditcard"
           },
           "totalAmount": {
             "type": "number",
             "description": "Total payment amount for the transaction, including any applicable fee.",
             "example": 10.35
-          },
-          "storedPayments": {
-            "type": "array",
-            "description": "List of stored payment methods available for the provided subscription.",
-            "items": {
-              "$ref": "#/components/schemas/SavedPaymentInfo"
-            }
           },
           "fee": {
             "$ref": "#/components/schemas/PaymentMethodFee"
