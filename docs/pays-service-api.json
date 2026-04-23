@@ -1020,7 +1020,7 @@
       },
       "RecurringCancelRequest": {
         "required": [
-          "cancelReason",
+          "cancelReasonCode",
           "recurringId",
           "subscriptionId"
         ],
@@ -1034,9 +1034,16 @@
             "type": "string",
             "description": "Unique identifier of the recurring payment."
           },
-          "cancelReason": {
+          "cancelReasonCode": {
+            "type": "integer",
+            "description": "Cancellation reason code. Valid values: 1 = Payment Failure, 2 = Fraud-Related, 3 = Chargeback, 4 = Disabled/Blocked Case/Payer, 5 = Customer Initiated, 6 = Other.",
+            "format": "int32",
+            "example": 5
+          },
+          "cancelReasonText": {
             "type": "string",
-            "description": "Reason for cancelling the recurring payment."
+            "description": "Additional free-text details for the cancellation reason.",
+            "example": "Customer requested cancellation by phone."
           }
         }
       },
