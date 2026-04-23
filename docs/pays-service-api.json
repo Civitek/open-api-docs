@@ -1,26 +1,171 @@
 {
-	"openapi": "3.0.1",
-	"info": {
-		"title": "Pays Service API Specifications",
-		"version": "1.0.0",
-		"description": "API to manage payment transactions."
-	},
-	"externalDocs": {
-		"description": "TPE Auth Server API Documentation",
-		"url": "https://civitek.github.io/open-api-docs/tpe-auth.html"
-	},
-	"servers": [
-		{
-			"url": "https:testapi.civikestpayment.com",
-			"description": "Generated server url"
-		}
-	],
-	"security": [
-		{
-			"BearerAuth": []
-		}
-	],
-"paths": {
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Pays Service API Specifications",
+    "version": "1.0.0",
+    "description": "API to manage payment transactions."
+  },
+  "externalDocs": {
+    "description": "TPE Auth Server API Documentation",
+    "url": "https://civitek.github.io/open-api-docs/tpe-auth.html"
+  },
+  "servers": [
+    {
+      "url": "https:testapi.civikestpayment.com",
+      "description": "Generated server url"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Payment Service",
+      "description": "Operations for processing payments and retrieving available payment methods."
+    },
+    {
+      "name": "Subscription Service",
+      "description": "Operations for managing subscriptions and stored payment methods."
+    },
+    {
+      "name": "Recurring Service",
+      "description": "Operations for setting up and managing recurring payments."
+    }
+  ],
+  "paths": {
+        "/payment/processPayment": {
+      "post": {
+        "tags": [
+          "Payment Service"
+        ],
+        "summary": "Process a payment transaction",
+        "description": "Accepts payment details and processes the transaction.",
+        "operationId": "processPayment",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Payment request processed successfully. The payment may be approved or declined. Check the response status for the transaction outcome.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/payment/paymentMethods": {
+      "post": {
+        "tags": [
+          "Payment Service"
+        ],
+        "summary": "Retrieve payment methods",
+        "description": "Returns a list of available payment methods, along with their corresponding fees.",
+        "operationId": "getpaymentMethods",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentMethodsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "description": "Payment methods not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Retrieved payment methods successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentMethodsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+
     "/subscription/getPaymentMethods": {
       "post": {
         "tags": [
@@ -60,6 +205,9 @@
               }
             }
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
           "404": {
             "description": "No saved payment methods found",
             "content": {
@@ -94,7 +242,7 @@
           "Subscription Service"
         ],
         "summary": "Deletes a stored payment method",
-        "description": "Deletes the stored payment associated with a referenceId",
+        "description": "Deletes the stored payment method associated with a referenceId",
         "operationId": "deleteSavedPaymentMethod",
         "requestBody": {
           "content": {
@@ -126,6 +274,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "404": {
             "description": "Not found",
@@ -194,6 +345,9 @@
               }
             }
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
           "200": {
             "description": "Identities added",
             "content": {
@@ -212,6 +366,7 @@
         ]
       }
     },
+
     "/recurring/setup": {
       "post": {
         "tags": [
@@ -261,6 +416,9 @@
               }
             }
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
           "404": {
             "description": "Subscription or stored payment method not found",
             "content": {
@@ -307,6 +465,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "400": {
             "description": "Invalid request data",
@@ -375,6 +536,9 @@
               }
             }
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
           "400": {
             "description": "Invalid request data",
             "content": {
@@ -412,134 +576,22 @@
           }
         ]
       }
-    },
-    "/payment/paymentProcess": {
-      "post": {
-        "tags": [
-          "Payment Service"
-        ],
-        "summary": "Process a payment transaction",
-        "description": "Accepts payment details and processes the transaction. ",
-        "operationId": "processPayment",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PaymentRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Payment successfull.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TpePaymentResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid input data",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
+    }
+  },
+"components": {
+  "responses": {
+    "UnauthorizedError": {
+      "description": "Unauthorized. The access token is missing, invalid, or expired.",
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ErrorResponse"
           }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/payment/paymentMethods": {
-      "post": {
-        "tags": [
-          "Payment Service"
-        ],
-        "summary": "Retrieve payment methods",
-        "description": "Returns a list of avialable payment methods, along with their corresponding fees.",
-        "operationId": "getpaymentMethods",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PaymentMethodsRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid input data",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Recurring payment not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Retrieved payment methods successfully.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaymentMethodsResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
+        }
       }
     }
   },
-  "components": {
-    "schemas": {
+  "schemas": {
       "StoredPaymentMethodRequest": {
         "required": [
           "subscriptionId"
@@ -1143,18 +1195,21 @@
             "type": "object",
             "additionalProperties": {
               "type": "object",
-              "description": "To make a payment using a stored payment method, provide storedPaymentMethodId instead of this field. Otherwise, provide the payment details required to process the payment. Expected fields depend on payment.type. For 'creditcard', required keys are: encryptedCardNumber, encryptedSecurityCode, encryptedExpiryMonth, encryptedExpiryYear, and cardHolderName. For 'echeck', required keys are: accountNumber, routingNumber, and either firstName and lastName, or businessName."
+              "description": "Payment details for the selected payment type.\n\nFor creditcard, provide:\n- encryptedCardNumber\n- encryptedSecurityCode\n- encryptedExpiryMonth\n- encryptedExpiryYear\n- cardHolderName\n\nFor echeck, provide:\n- accountNumber\n- routingNumber\n- either firstName and lastName, or businessName"
             },
-            "description": "To make a payment using a stored payment method, provide storedPaymentMethodId instead of this field. Otherwise, provide the payment details required to process the payment. Expected fields depend on payment.type. For 'creditcard', required keys are: encryptedCardNumber, encryptedSecurityCode, encryptedExpiryMonth, encryptedExpiryYear, and cardHolderName. For 'echeck', required keys are: accountNumber, routingNumber, and either firstName and lastName, or businessName."
+            "description": "Payment details for the selected payment type.\n\nFor creditcard, provide:\n- encryptedCardNumber\n- encryptedSecurityCode\n- encryptedExpiryMonth\n- encryptedExpiryYear\n- cardHolderName\n\nFor echeck, provide:\n- accountNumber\n- routingNumber\n- either firstName and lastName, or businessName"
           },
           "storePaymentMethod": {
             "type": "boolean",
-            "description": "Whether the newly entered payment method should be stored for future use."
+            "description": "Whether the entered payment method should be stored for future use."
           }
         },
-        "description": "Payment information, including payment type and payment details."
+        "description": "Payment information used to process a transaction.\n\nUse payment.type to indicate the payment method.\n\nIf using a stored payment method, provide storedPaymentMethodId in the request and do not provide shopperPaymentInfo.\n\nIf not using a stored payment method, provide shopperPaymentInfo based on payment.type.\n\nSupported payment.type values in this document:\n- creditcard\n- echeck"
       },
       "PaymentRequest": {
+        "required": [
+          "payment"
+        ],
         "type": "object",
         "properties": {
           "items": {
@@ -1181,23 +1236,24 @@
             "type": "string",
             "description": "Unique subscription identifier associated with the customer and payment method."
           }
-        }
+        },
+        "description": "Request used to process a payment transaction.\n\nProvide payment information in the payment object.\n\nIf using a stored payment method, provide storedPaymentMethodId and do not provide shopperPaymentInfo.\n\nIf not using a stored payment method, provide shopperPaymentInfo based on payment.type.\n\nInclude items when processing a payment.\n\nDo not include items when the request is intended only for payment method tokenization.\n\nsubscriptionId may be provided when the payment is associated with a subscriber or when storing or using a stored payment method."
       },
-      "TpePaymentResponse": {
+            "PaymentResponse": {
         "type": "object",
         "properties": {
           "orderId": {
             "type": "integer",
-            "description": "This is a unique identifier for the payment transaction.",
+            "description": "Unique identifier of the payment transaction.",
             "format": "int64"
           },
           "subscriptionId": {
             "type": "string",
-            "description": "The unique subscription ID linked to the customer."
+            "description": "Unique subscription identifier associated with the customer."
           },
           "status": {
             "type": "string",
-            "description": "Status of the order",
+            "description": "Status of the payment transaction.",
             "example": "success",
             "enum": [
               "success",
@@ -1206,15 +1262,15 @@
           },
           "errorMessage": {
             "type": "string",
-            "description": "Error message returned if the transaction failed; null if successful"
+            "description": "Error message returned when the transaction fails."
           },
           "errorDetails": {
             "type": "string",
-            "description": "Detailed error information for troubleshooting purposes"
+            "description": "Detailed error information for troubleshooting purposes."
           },
           "storePaymentMethodStatus": {
             "type": "string",
-            "description": "Status of storing the payment method. Returned only when 'storePaymentMethod' is true in the request",
+            "description": "Status of storing the payment method. Returned only when storePaymentMethod is true in the request.",
             "example": "success",
             "enum": [
               "success",
@@ -1223,17 +1279,18 @@
           },
           "retry": {
             "type": "boolean",
-            "description": "Indicates whether the payment attempt can be retried",
+            "description": "Indicates whether the payment attempt can be retried.",
             "example": true
           },
           "review": {
             "type": "boolean",
-            "description": "Indicates whether the transaction requires manual review",
+            "description": "Indicates whether the transaction requires manual review.",
             "example": false
           }
-        }
+        },
+        "description": "Response returned after a payment transaction is processed.\n\nFor successful payments, orderId and status are returned.\n\nIf the payment method was requested to be stored, storePaymentMethodStatus indicates whether the payment method was stored successfully.\n\nIf the transaction fails, errorMessage and errorDetails may be returned.\n\nretry indicates whether the payment attempt can be retried, and review indicates whether the transaction requires manual review."
       },
-           "PaymentMethodsRequest": {
+      "PaymentMethodsRequest": {
         "required": [
           "amount",
           "itemKey"
