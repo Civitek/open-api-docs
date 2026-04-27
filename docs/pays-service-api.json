@@ -166,7 +166,7 @@
       }
     },
 
-    "/subscription/getPaymentMethods": {
+    "/subscription/paymentMethods": {
       "post": {
         "tags": [
           "Subscription Service"
