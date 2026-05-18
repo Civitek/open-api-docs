@@ -576,6 +576,73 @@
           }
         ]
       }
+    },
+    "/recurring/subscription": {
+      "post": {
+        "tags": [
+          "Recurring Service"
+        ],
+        "summary": "Recurring payment details by subscriptionId",
+        "description": "Retrieves all the recurring payment details associated with a subscriptionId.",
+        "operationId": "subscriptionDetails",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecurringSubscriptionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Retrived the recurring payment details successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecurringSubscriptionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "SubscriptionId not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
     }
   },
 "components": {
@@ -1015,6 +1082,100 @@
             "type": "string",
             "description": "Date and time when the response was generated.",
             "format": "date-time"
+          }
+        }
+      },
+      "RecurringSubscriptionRequest": {
+        "required": [
+          "subscriptionId"
+        ],
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string",
+            "description": "Unique subscription identifier associated with the customer and stored payment method."
+          }
+        }
+      },
+      "RecurringSubscriptionDetails": {
+        "type": "object",
+        "properties": {
+          "recurringId": {
+            "type": "string",
+            "description": "Unique identifier of the recurring payment."
+          },
+          "paymentType": {
+            "type": "string",
+            "description": "Type of payment method.",
+            "enum": [
+              "creditcard",
+              "echeck"
+            ]
+          },
+          "storedPaymentMethodId": {
+            "type": "string",
+            "description": "Identifier of the stored payment method used for the recurring payment."
+          },
+          "item": {
+            "$ref": "#/components/schemas/Item"
+          },
+          "recurringFrequency": {
+            "type": "string",
+            "description": "Recurring payment frequency.",
+            "enum": [
+              "daily",
+              "weekly",
+              "monthly",
+              "bi_weekly",
+              "bi_monthly",
+              "annually"
+            ]
+          },
+          "recurringStartDate": {
+            "type": "string",
+            "description": "Start date of the recurring schedule.",
+            "format": "date"
+          },
+          "recurringEndDate": {
+            "type": "string",
+            "description": "End date of the recurring schedule.",
+            "format": "date"
+          },
+          "createDate": {
+            "type": "string",
+            "description": "Date that the recurring payment was created.",
+            "format": "date"
+          }
+        },
+        "description": "All recurring payment details associated with subscriptionId."
+      },
+      "RecurringSubscriptionResponse": {
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string",
+            "description": "Unique subscription identifier associated with the recurring payment."
+          },
+          "httpStatusCode": {
+            "type": "integer",
+            "description": "HTTP status code.",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "description": "Response message."
+          },
+          "responseTimestamp": {
+            "type": "string",
+            "description": "Date and time when the response was generated.",
+            "format": "date-time"
+          },
+          "recurringItems": {
+            "type": "array",
+            "description": "All recurring payment details associated with subscriptionId.",
+            "items": {
+              "$ref": "#/components/schemas/RecurringSubscriptionDetails"
+            }
           }
         }
       },
