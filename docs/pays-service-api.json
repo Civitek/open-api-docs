@@ -1085,6 +1085,18 @@
           }
         }
       },
+      "RecurringSubscriptionRequest": {
+        "required": [
+          "subscriptionId"
+        ],
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string",
+            "description": "Unique subscription identifier associated with the customer and stored payment method."
+          }
+        }
+      },
       "RecurringSubscriptionDetails": {
         "type": "object",
         "properties": {
