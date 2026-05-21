@@ -643,6 +643,73 @@
           }
         ]
       }
+    },
+    "/recurring/history": {
+      "post": {
+        "tags": [
+          "Recurring Service"
+        ],
+        "summary": "Get recurring payment history",
+        "description": "Retrieves all the recurring payments associated with a subscriptionId and recurringId.",
+        "operationId": "getRecurringPaymentHistory",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecurringHistoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "404": {
+            "description": "No records found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Retrived the recurring payment history successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecurringHistoryResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
     }
   },
 "components": {
@@ -1651,6 +1718,110 @@
           }
         },
         "description": "List of stored payment methods available for the subscription."
+      },
+      "RecurringHistoryRequest": {
+        "required": [
+          "recurringId",
+          "subscriptionId"
+        ],
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string",
+            "description": "Unique subscription identifier associated with the recurring payment."
+          },
+          "recurringId": {
+            "type": "string",
+            "description": "Unique identifier of the recurring payment."
+          }
+        }
+      },
+      "RecurringHistoryDetails": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "integer",
+            "description": "Recurring payment Order Id.",
+            "format": "int64"
+          },
+          "recurringStartDate": {
+            "type": "string",
+            "description": "Start date of the recurring payment.",
+            "format": "date"
+          },
+          "recurringCompletedDate": {
+            "type": "string",
+            "description": "Completed date of the recurring payment.",
+            "format": "date"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Recurring Payment Amount"
+          },
+          "recurringPaymentStatus": {
+            "type": "string",
+            "description": "Recurring Payment Status"
+          }
+        },
+        "description": "List of all the recurring payments associated with subscriptionId and recurringId."
+      },
+      "RecurringHistoryResponse": {
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string",
+            "description": "Unique subscription identifier associated with the recurring payment."
+          },
+          "recurringId": {
+            "type": "string",
+            "description": "Unique identifier of the recurring payment."
+          },
+          "paymentHistory": {
+            "type": "array",
+            "description": "List of all the recurring payments associated with subscriptionId and recurringId.",
+            "items": {
+              "$ref": "#/components/schemas/RecurringHistoryDetails"
+            }
+          },
+          "httpStatusCode": {
+            "type": "integer",
+            "description": "HTTP status code.",
+            "format": "int32"
+          },
+          "responseTimestamp": {
+            "type": "string",
+            "description": "Date and time when the response was generated.",
+            "format": "date"
+          }
+        }
+      },
+      "PaymentItem": {
+        "type": "object",
+        "properties": {
+          "itemKey": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number",
+            "maximum": 999999.99,
+            "minimum": 0.15
+          },
+          "instanceId": {
+            "type": "string"
+          },
+          "attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemAttribute"
+            }
+          }
+        },
+        "required": [
+          "amount"
+        ]
       }
     },
 		"securitySchemes": {
