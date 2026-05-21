@@ -582,8 +582,8 @@
         "tags": [
           "Recurring Service"
         ],
-        "summary": "Recurring payment details by subscriptionId",
-        "description": "Retrieves all the recurring payment details associated with a subscriptionId.",
+        "summary": "Get recurring items",
+        "description": "Retrieves all the recurring payment items associated with a subscriptionId.",
         "operationId": "subscriptionDetails",
         "requestBody": {
           "content": {
@@ -1086,16 +1086,26 @@
         }
       },
       "RecurringSubscriptionRequest": {
-        "required": [
-          "subscriptionId"
-        ],
         "type": "object",
         "properties": {
           "subscriptionId": {
             "type": "string",
-            "description": "Unique subscription identifier associated with the customer and stored payment method."
+            "description": "Unique subscription identifier associated with the recurring payment.",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "description": "Optional recurring payment status. Default is active",
+            "enum": [
+              "active",
+              "cancel",
+              "all"
+            ]
           }
-        }
+        },
+        "required": [
+          "subscriptionId"
+        ]
       },
       "RecurringSubscriptionDetails": {
         "type": "object",
@@ -1116,8 +1126,26 @@
             "type": "string",
             "description": "Identifier of the stored payment method used for the recurring payment."
           },
+          "recurringStatus": {
+            "type": "string",
+            "description": "Recurring payment Status"
+          },
+          "cancelReason": {
+            "type": "string",
+            "description": "Cancel Reason"
+          },
+          "cancelReasonText": {
+            "type": "string",
+            "description": "Cancel Reason Text"
+          },
+          "cancelledDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Cancelled Date"
+          },
           "item": {
-            "$ref": "#/components/schemas/Item"
+            "$ref": "#/components/schemas/PaymentItem",
+            "description": "Item charged on the recurring schedule."
           },
           "recurringFrequency": {
             "type": "string",
@@ -1133,21 +1161,25 @@
           },
           "recurringStartDate": {
             "type": "string",
-            "description": "Start date of the recurring schedule.",
-            "format": "date"
+            "format": "date",
+            "description": "Start date of the recurring schedule."
           },
           "recurringEndDate": {
             "type": "string",
-            "description": "End date of the recurring schedule.",
-            "format": "date"
+            "format": "date",
+            "description": "End date of the recurring schedule."
+          },
+          "nextPaymentDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Next recurring payment date."
           },
           "createDate": {
             "type": "string",
-            "description": "Date that the recurring payment was created.",
-            "format": "date"
+            "format": "date",
+            "description": "Date that the recurring payment was created."
           }
-        },
-        "description": "All recurring payment details associated with subscriptionId."
+        }
       },
       "RecurringSubscriptionResponse": {
         "type": "object",
