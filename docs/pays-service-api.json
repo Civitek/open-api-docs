@@ -32,6 +32,10 @@
     {
       "name": "Recurring Service",
       "description": "Operations for setting up and managing recurring payments."
+    },
+    {
+      "name": "Order Service",
+      "description": "Operations for retrieving order and receipt details."
     }
   ],
   "paths": {
@@ -168,7 +172,7 @@
     "/order/receipt/{orderId}": {
       "post": {
         "tags": [
-          "Payment Service"
+          "Order Service"
         ],
         "summary": "Get order receipt",
         "description": "Retrieves receipt details for a completed order using the orderId.",
