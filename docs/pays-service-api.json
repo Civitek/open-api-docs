@@ -1982,23 +1982,47 @@
             "description": "Recurring payment Order Id.",
             "format": "int64"
           },
-          "recurringStartDate": {
+          "orderStatus": {
             "type": "string",
-            "description": "Start date of the recurring payment.",
-            "format": "date"
-          },
-          "recurringCompletedDate": {
-            "type": "string",
-            "description": "Completed date of the recurring payment.",
-            "format": "date"
+            "description": "Status of the recurring payment order."
           },
           "amount": {
             "type": "number",
-            "description": "Recurring Payment Amount"
+            "description": "Recurring payment amount."
           },
-          "recurringPaymentStatus": {
+          "orderDate": {
             "type": "string",
-            "description": "Recurring Payment Status"
+            "description": "Date and time when the order was created.",
+            "format": "date-time"
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "Error message returned if processing the recurring payment failed."
+          },
+          "recurringFrequency": {
+            "type": "string",
+            "description": "Configured frequency of the recurring payment.",
+            "enum": [
+              "daily",
+              "weekly",
+              "monthly",
+              "bi_weekly",
+              "bi_monthly",
+              "annually"
+            ]
+          },
+          "scheduledPaymentDate": {
+            "type": "string",
+            "description": "Scheduled date for the recurring payment.",
+            "format": "date"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "description": "Payment method used for the recurring transaction."
+          },
+          "lastFourAccount": {
+            "type": "string",
+            "description": "Last four digits of the account or card used for payment."
           }
         },
         "description": "List of all the recurring payments associated with subscriptionId and recurringId."
