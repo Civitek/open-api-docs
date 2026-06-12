@@ -1581,9 +1581,25 @@
             "description": "Date and time when the payment transaction was processed.",
             "format": "date-time"
           },
+          "amount": {
+            "type": "number",
+            "description": "Base payment amount for the transaction, excluding fees."
+          },
+          "feeAmount": {
+            "type": "number",
+            "description": "Fee amount applied to the transaction."
+          },
+          "totalAmount": {
+            "type": "number",
+            "description": "Total amount charged for the transaction, including fees."
+          },
           "subscriptionId": {
             "type": "string",
             "description": "Unique subscription identifier associated with the customer. Returned when an existing subscription is used, or when a new subscriptionId is created because storePaymentMethod is true and subscriptionId was not provided in the request."
+          },
+          "storedPaymentMethodId": {
+            "type": "string",
+            "description": "Identifier of the stored payment method. Returned when storePaymentMethod is true and the payment method is successfully stored."
           },
           "status": {
             "type": "string",
