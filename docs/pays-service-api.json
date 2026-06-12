@@ -1604,10 +1604,15 @@
           "status": {
             "type": "string",
             "description": "Status of the payment transaction.",
-            "example": "success",
+            "example": "Success",
             "enum": [
-              "success",
-              "failed"
+              "Success",
+              "Refused",
+              "Failed",
+              "Cancelled",
+              "PendingPayment",
+              "PendingSettle",
+              "Review"
             ]
           },
           "errorMessage": {
@@ -1631,14 +1636,9 @@
             "type": "boolean",
             "description": "Indicates whether the payment attempt can be retried.",
             "example": true
-          },
-          "review": {
-            "type": "boolean",
-            "description": "Indicates whether the transaction requires manual review.",
-            "example": false
           }
         },
-        "description": "Response returned after a payment transaction is processed.\n\nFor successful payments, orderId and status are returned.\n\nIf the payment method was requested to be stored, storePaymentMethodStatus indicates whether the payment method was stored successfully.\n\nIf the transaction fails, errorMessage and errorDetails may be returned.\n\nretry indicates whether the payment attempt can be retried, and review indicates whether the transaction requires manual review."
+        "description": "Response returned after a payment transaction is processed.\n\nFor successful payments, orderId and status are returned.\n\nIf the payment method was requested to be stored, storePaymentMethodStatus indicates whether the payment method was stored successfully.\n\nIf the transaction fails, errorMessage and errorDetails may be returned.\n\nretry indicates whether the payment attempt can be retried."
       },
       "OrderPaymentInfo": {
         "type": "object",
