@@ -165,6 +165,68 @@
         ]
       }
     },
+    "/order/receipt/{orderId}": {
+      "post": {
+        "tags": [
+          "Payment Service"
+        ],
+        "summary": "Get order receipt",
+        "description": "Retrieves receipt details for a completed order using the orderId.",
+        "operationId": "orderReceiptDetails",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Unique identifier of the order."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order receipt retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReceiptModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "description": "Order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
 
     "/subscription/paymentMethods": {
       "post": {
@@ -1561,6 +1623,142 @@
           }
         },
         "description": "Response returned after a payment transaction is processed.\n\nFor successful payments, orderId and status are returned.\n\nIf the payment method was requested to be stored, storePaymentMethodStatus indicates whether the payment method was stored successfully.\n\nIf the transaction fails, errorMessage and errorDetails may be returned.\n\nretry indicates whether the payment attempt can be retried, and review indicates whether the transaction requires manual review."
+      },
+      "OrderPaymentInfo": {
+        "type": "object",
+        "properties": {
+          "paymentMethod": {
+            "type": "string",
+            "description": "Payment method used in the order.",
+            "enum": [
+              "Unkown",
+              "CreditCard",
+              "BankAccount",
+              "BillingAccount",
+              "ApplePay",
+              "GooglePay",
+              "PayPal",
+              "WeChat",
+              "AliPay",
+              "PointOfSale",
+              "Venmo",
+              "Cash"
+            ]
+          },
+          "cardHolderName": {
+            "type": "string"
+          },
+          "cardSummary": {
+            "type": "string"
+          },
+          "cardType": {
+            "type": "string"
+          },
+          "expiryDate": {
+            "type": "string"
+          },
+          "bankAccountSummary": {
+            "type": "string"
+          },
+          "bankAccountName": {
+            "type": "string"
+          },
+          "paymentMethodId": {
+            "type": "string"
+          },
+          "paymentMethodName": {
+            "type": "string"
+          }
+        }
+      },
+      "ReceiptItem": {
+        "type": "object",
+        "properties": {
+          "orderItemId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "skuLabel": {
+            "type": "string"
+          },
+          "skuValue": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "itemKey": {
+            "type": "string"
+          },
+          "itemName": {
+            "type": "string"
+          },
+          "attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemAttribute"
+            }
+          }
+        }
+      },
+      "ReceiptModel": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "orderDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "paymentAmount": {
+            "type": "number"
+          },
+          "partnerName": {
+            "type": "string"
+          },
+          "shopperStatement": {
+            "type": "string"
+          },
+          "paymentItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReceiptItem"
+            }
+          },
+          "feeItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReceiptItem"
+            }
+          },
+          "customer": {
+            "$ref": "#/components/schemas/Customer"
+          },
+          "paymentInfo": {
+            "$ref": "#/components/schemas/OrderPaymentInfo"
+          },
+          "review": {
+            "type": "boolean"
+          },
+          "disclaimers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "emailSubject": {
+            "type": "string"
+          }
+        }
       },
       "PaymentMethodsRequest": {
         "required": [
