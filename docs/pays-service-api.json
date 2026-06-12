@@ -1646,119 +1646,151 @@
             ]
           },
           "cardHolderName": {
-            "type": "string"
+            "type": "string",
+            "description": "Card holder name when payment is made by card."
           },
           "cardSummary": {
-            "type": "string"
+            "type": "string",
+            "description": "Masked card number summary shown to the customer."
           },
           "cardType": {
-            "type": "string"
+            "type": "string",
+            "description": "Card brand or type, for example Visa or MasterCard."
           },
           "expiryDate": {
-            "type": "string"
+            "type": "string",
+            "description": "Card expiration date in display format."
           },
           "bankAccountSummary": {
-            "type": "string"
+            "type": "string",
+            "description": "Masked bank account summary when payment is made by bank account."
           },
           "bankAccountName": {
-            "type": "string"
+            "type": "string",
+            "description": "Name on the bank account used for payment."
           },
           "paymentMethodId": {
-            "type": "string"
+            "type": "string",
+            "description": "Unique identifier of the payment method used in the order."
           },
           "paymentMethodName": {
-            "type": "string"
+            "type": "string",
+            "description": "Display name of the payment method used."
           }
-        }
+        },
+        "description": "Details about the payment instrument used to complete the order."
       },
       "ReceiptItem": {
         "type": "object",
         "properties": {
           "orderItemId": {
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "description": "Unique identifier of the item in the order."
           },
           "skuLabel": {
-            "type": "string"
+            "type": "string",
+            "description": "Display label of the SKU attribute."
           },
           "skuValue": {
-            "type": "string"
+            "type": "string",
+            "description": "Value of the SKU attribute."
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "description": "Description of the billed line item."
           },
           "amount": {
-            "type": "number"
+            "type": "number",
+            "description": "Monetary amount for this line item."
           },
           "quantity": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "description": "Quantity billed for this line item."
           },
           "itemKey": {
-            "type": "string"
+            "type": "string",
+            "description": "Unique item key associated with this line item."
           },
           "itemName": {
-            "type": "string"
+            "type": "string",
+            "description": "Display name of the billed item."
           },
           "attributes": {
             "type": "array",
+            "description": "Additional attributes associated with this receipt line item.",
             "items": {
               "$ref": "#/components/schemas/ItemAttribute"
             }
           }
-        }
+        },
+        "description": "Line item details included in the receipt."
       },
       "ReceiptModel": {
         "type": "object",
         "properties": {
           "orderId": {
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "description": "Unique identifier of the order."
           },
           "orderDate": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Date and time when the order was created."
           },
           "paymentAmount": {
-            "type": "number"
+            "type": "number",
+            "description": "Total paid amount for the order."
           },
           "partnerName": {
-            "type": "string"
+            "type": "string",
+            "description": "Name of the partner or agency receiving payment."
           },
           "shopperStatement": {
-            "type": "string"
+            "type": "string",
+            "description": "Statement text shown to the customer for this payment."
           },
           "paymentItems": {
             "type": "array",
+            "description": "List of primary payment items included in the receipt.",
             "items": {
               "$ref": "#/components/schemas/ReceiptItem"
             }
           },
           "feeItems": {
             "type": "array",
+            "description": "List of fee-related items included in the receipt.",
             "items": {
               "$ref": "#/components/schemas/ReceiptItem"
             }
           },
           "customer": {
-            "$ref": "#/components/schemas/Customer"
+            "$ref": "#/components/schemas/Customer",
+            "description": "Customer information associated with the order."
           },
           "paymentInfo": {
-            "$ref": "#/components/schemas/OrderPaymentInfo"
+            "$ref": "#/components/schemas/OrderPaymentInfo",
+            "description": "Payment method details used to complete the order."
           },
           "review": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether the order requires manual review."
           },
           "disclaimers": {
             "type": "array",
+            "description": "List of disclaimer messages shown on the receipt.",
             "items": {
               "type": "string"
             }
           },
           "emailSubject": {
-            "type": "string"
+            "type": "string",
+            "description": "Subject line used when the receipt is sent by email."
           }
-        }
+        },
+        "description": "Receipt details returned for an order."
       },
       "PaymentMethodsRequest": {
         "required": [
