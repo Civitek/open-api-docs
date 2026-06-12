@@ -1668,14 +1668,6 @@
           "bankAccountName": {
             "type": "string",
             "description": "Name on the bank account used for payment."
-          },
-          "paymentMethodId": {
-            "type": "string",
-            "description": "Unique identifier of the payment method used in the order."
-          },
-          "paymentMethodName": {
-            "type": "string",
-            "description": "Display name of the payment method used."
           }
         },
         "description": "Details about the payment instrument used to complete the order."
