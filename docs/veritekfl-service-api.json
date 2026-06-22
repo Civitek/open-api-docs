@@ -19,11 +19,6 @@
       "url": "https://test.veritekfl.com/api",
       "description": "Test"
     }
-    ,
-    {
-      "url": "http://localhost:8080",
-      "description": "Local"
-    }
   ],
   "security": [
     {
