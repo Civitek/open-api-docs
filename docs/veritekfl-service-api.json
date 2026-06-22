@@ -11,18 +11,13 @@
   },
   "servers": [
     {
-      "url": "https://veritekfl.com/api",
+      "url": "https://www.veritekfl.com/api",
       "description": "Production"
     }
     ,
     {
       "url": "https://test.veritekfl.com/api",
       "description": "Test"
-    }
-    ,
-    {
-      "url": "https://veritekfl-service-dev.veritekfl.com",
-      "description": "Development"
     }
     ,
     {
@@ -108,11 +103,7 @@
             "url": "https://test.veritekfl.com/auth",
             "description": "Test"
           }
-          ,
-          {
-            "url": "https://veritekfl-auth-server-dev.veritekfl.com",
-            "description": "Development"
-          }
+      
         ],
         "requestBody": {
           "required": true,
