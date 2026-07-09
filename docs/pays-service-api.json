@@ -364,6 +364,76 @@
         ]
       }
     },
+    "/subscription/update": {
+		"post": {
+      "tags": [
+          "Subscription Service"
+        ],
+        "summary": "Updates subscription details",
+        "description": "Updates email and phone number associated with a subscriptionId",
+        "operationId": "updateSubscriptionDetails",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionDetailsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "description": "No saved payment methods found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Payment methods successfully retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionDetailsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+        }
+    },
     "/subscription/deletePaymentMethod": {
       "post": {
         "tags": [
@@ -1072,6 +1142,50 @@
             "items": {
               "$ref": "#/components/schemas/CustomerIdentity"
             }
+          }
+        }
+      },
+	"SubscriptionDetailsRequest": {
+		"type": "object",
+  		"description": "Either email or phone must be provided.",
+		"properties": {
+			"subscriptionId": {
+				"type": "string",
+				"description": "Unique subscription identifier."
+			},
+			"email": {
+				"type": "string",
+				"description": "Subscriber's email address."
+			},
+			"phone": {
+				"type": "string",
+				"description": "Subscriber's phone number."
+			}
+		},
+		"required": [
+			"subscriptionId"
+		]
+	},
+      "SubscriptionDetailsResponse": {
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string",
+            "description": "Unique subscription identifier."
+          },
+          "httpStatusCode": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Http status code"
+          },
+          "message": {
+            "type": "string",
+            "description": "Response message"
+          },
+          "responseTimestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date of response"
           }
         }
       },
