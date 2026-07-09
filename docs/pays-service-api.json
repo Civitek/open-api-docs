@@ -2308,6 +2308,11 @@
             "description": "Date and time when the order was created.",
             "format": "date-time"
           },
+          "settleDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time when the order was settled."
+          },
           "errorMessage": {
             "type": "string",
             "description": "Error message returned if processing the recurring payment failed."
@@ -2367,6 +2372,10 @@
             "type": "string",
             "description": "Date and time when the response was generated.",
             "format": "date"
+          },
+          "item": {
+            "$ref": "#/components/schemas/PaymentItem",
+            "description": "Recurring item details."
           }
         }
       },
@@ -2380,9 +2389,7 @@
             "type": "string"
           },
           "amount": {
-            "type": "number",
-            "maximum": 999999.99,
-            "minimum": 0.15
+            "type": "number"
           },
           "instanceId": {
             "type": "string"
@@ -2393,10 +2400,7 @@
               "$ref": "#/components/schemas/ItemAttribute"
             }
           }
-        },
-        "required": [
-          "amount"
-        ]
+        }
       }
     },
 		"securitySchemes": {
