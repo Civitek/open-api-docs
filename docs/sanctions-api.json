@@ -443,6 +443,12 @@
       }
     },
     "schemas": {
+      "ServiceErrorCode": {
+        "type": "integer",
+        "format": "int32",
+        "description": "Service error code returned by FLHSMV. See Appendix I error codes below:\n\n- 01: Driver License Number not found.\n- 02: Sanction ID is invalid.\n- 03: The County performing the action is not the County associated with this Sanction.\n- 04: This Sanction ID is not associated with the provided customer DL Number.\n- 05: This Sanction can no longer be re-opened; it was cleared over 24 hours ago.\n- 06: This Sanction has not taken effect - use the Clearance Prior to Effective Date endpoint.\n- 07: Sanction already indicates court requirements met.\n- 08: Sanction does not indicate court requirements met.\n- 09: This Sanction has already taken effect - use the Clearance After Effective Date Endpoint.\n- 10: The Restore Date value is invalid.\n- 11: This sanction has already been cleared.\n- 12: This sanction has already been re-opened.\n- 13: This sanction cannot be re-opened - a fee was paid for clearance.\n- 14: No arrest data has been received for this Citation Number.\n- 15: There is already a pending clearance for this Citation Number.\n- 16: Another County has an active FTC (D6) Suspension that does not indicate Court Requirements Met. No fee can be collected, only the Court Requirements Met endpoint can be used for this sanction.\n- 17: All Effective FTC (D6) Suspensions issued by your County must be sent for Clearance when calling the Clearance After Effective Date service endpoint.\n- 18: Sanction Type is not handled by the service.\n- 19: User MOU not found or expired.\n- 98: Missing required input.\n- 99: An unexpected error has occurred.",
+        "example": 1
+      },
       "ReopenRequest": {
         "type": "object",
         "properties": {
@@ -500,9 +506,7 @@
             "format": "int64"
           },
           "ErrorCode": {
-            "type": "integer",
-            "description": "Error code",
-            "format": "int32"
+            "$ref": "#/components/schemas/ServiceErrorCode"
           },
           "ErrorMessage": {
             "type": "string",
@@ -526,9 +530,7 @@
             "format": "int32"
           },
           "ErrorCode": {
-            "type": "integer",
-            "description": "Error code",
-            "format": "int32"
+            "$ref": "#/components/schemas/ServiceErrorCode"
           },
           "ErrorMessage": {
             "type": "string",
@@ -558,9 +560,7 @@
             "description": "Florida driver license number"
           },
           "ErrorCode": {
-            "type": "integer",
-            "description": "Error code",
-            "format": "int32"
+            "$ref": "#/components/schemas/ServiceErrorCode"
           },
           "ErrorMessage": {
             "type": "string",
@@ -725,9 +725,7 @@
             "format": "int64"
           },
           "ErrorCode": {
-            "type": "integer",
-            "description": "Error code",
-            "format": "int32"
+            "$ref": "#/components/schemas/ServiceErrorCode"
           },
           "ErrorMessage": {
             "type": "string",
@@ -772,9 +770,7 @@
             "description": "Is Court Requirement Met (true or false). "
           },
           "ErrorCode": {
-            "type": "integer",
-            "description": "ErrorCode ",
-            "format": "int32"
+            "$ref": "#/components/schemas/ServiceErrorCode"
           },
           "ErrorMessage": {
             "type": "string",
@@ -795,10 +791,7 @@
             "description": "The current driver license number of the customer. Also known as a “cross reference”."
           },
           "ErrorCode": {
-            "type": "integer",
-            "description": "Error code",
-            "format": "int32",
-            "example": 1
+            "$ref": "#/components/schemas/ServiceErrorCode"
           },
           "ErrorMessage": {
             "type": "string",
