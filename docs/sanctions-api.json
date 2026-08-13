@@ -3,7 +3,11 @@
   "info": {
     "title": "OpenAPI definition",
     "version": "v0",
-    "description": "FLHSMV Sanctions API documentation"
+    "description": "FLHSMV Sanctions API documentation.\n\nThis API allows authorized users to retrieve customer sanctions, clear eligible sanctions, clear not-on-record FTC sanctions, and reopen recently cleared sanctions.\n\nAuthentication:\n1. Obtain a JWT access token from the ClerkTools Auth API.\n2. Include the token in the Authorization header as: Authorization: Bearer <token>."
+  },
+  "externalDocs": {
+    "description": "ClerkTools Auth Server API Documentation",
+    "url": "https://civitek.github.io/open-api-docs/clktools-auth.html"
   },
   "servers": [
     {
@@ -16,37 +20,45 @@
       "bearerAuth": []
     }
   ],
+  "tags": [
+    {
+      "name": "FLHSMV Sanctions Clearance",
+      "description": "Operations for retrieving, clearing, and reopening FLHSMV sanctions."
+    }
+  ],
   "paths": {
-    "/flhsmv-api/reopen": {
-      "post": {
+    "/flhsmv-api/customerSanctions/{driverLicenseNumber}": {
+      "get": {
         "tags": [
-          "flhsmv-sanction-clearance-controller"
+          "FLHSMV Sanctions Clearance"
         ],
-        "description": "This endpoint provides the ability to reopen sanctions which were cleared within the last 24 hours.",
-        "operationId": "reopen",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReopenRequest"
-              }
-            }
-          },
-          "required": true
-        },
+        "summary": "Get Customer Sanctions",
+        "description": "Retrieves customer license details and sanctions that may be updated through this service, including sanctions cleared within the last 24 hours that may be reopened.",
+        "operationId": "getCustomerSanctions",
+        "parameters": [
+          {
+            "name": "driverLicenseNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Florida driver license number for the customer whose sanctions are being requested."
+          }
+        ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Customer sanctions retrieved successfully.",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReopenResponse"
+                  "$ref": "#/components/schemas/CustomerSanctionResponse"
                 }
               }
             }
           },
           "400": {
-            "description": "",
+            "description": "Invalid driver license number or malformed request.",
             "content": {
               "application/json": {
                 "schema": {
@@ -54,6 +66,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
             "description": "Forbidden",
@@ -96,7 +111,7 @@
             }
           },
           "500": {
-            "description": "",
+            "description": "Unexpected server error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -105,107 +120,22 @@
               }
             }
           }
-        }
-      }
-    },
-    "/flhsmv-api/notOnRecordClear": {
-      "post": {
-        "tags": [
-          "flhsmv-sanction-clearance-controller"
-        ],
-        "description": "This method is used to clear FTC suspensions before they have been added to the customer driver record. The client must provide the Citation Number of the FTC to be cleared.  Each request can clear only one FTC suspension. Criminal Financial Obligation Suspensions cannot be cleared using this method",
-        "operationId": "notOnRecordClear",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NotOnRecordClearRequest"
-              }
-            }
-          },
-          "required": true
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotOnRecordClearResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "405": {
-            "description": "Method Not Allowed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
+        "security": [
+          {
+            "bearerAuth": []
           }
-        }
+        ]
       }
     },
     "/flhsmv-api/clearance": {
       "post": {
         "tags": [
-          "flhsmv-sanction-clearance-controller"
+          "FLHSMV Sanctions Clearance"
         ],
-        "description": "This method is used to clear sanctions for the different scenarios – Court Requirement Met, Clearance prior to effective date and Clearance after effective date.",
-        "operationId": "clearance",
+        "summary": "Clear Sanctions",
+        "description": "Processes sanction clearance for supported scenarios. The submitted sanctions list is evaluated and each sanction result is returned with success or error details.",
+        "operationId": "clearCustomerSanctions",
         "requestBody": {
           "content": {
             "application/json": {
@@ -218,9 +148,9 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Sanction clearance request processed successfully.",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ClearanceResponse"
                 }
@@ -228,7 +158,7 @@
             }
           },
           "400": {
-            "description": "",
+            "description": "Invalid request payload or business validation failure.",
             "content": {
               "application/json": {
                 "schema": {
@@ -236,6 +166,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
             "description": "Forbidden",
@@ -278,7 +211,7 @@
             }
           },
           "500": {
-            "description": "",
+            "description": "Unexpected server error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -287,39 +220,45 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
-    "/flhsmv-api/customerSanctions/{driverLicenseNumber}": {
-      "get": {
+    "/flhsmv-api/notOnRecordClear": {
+      "post": {
         "tags": [
-          "flhsmv-sanction-clearance-controller"
+          "FLHSMV Sanctions Clearance"
         ],
-        "description": "This method is used to retrieve sanctions that can be clear or reopen for a FLHSMV customer including name, driver license and demographic information.",
-        "operationId": "customerSanctions",
-        "parameters": [
-          {
-            "name": "driverLicenseNumber",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
+        "summary": "Not On Record Clear",
+        "description": "Clears an FTC suspension before it appears on the customer driver record. Each request clears one FTC suspension. Criminal Financial Obligation suspensions cannot be cleared using this method.",
+        "operationId": "clearNotOnRecordSanction",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotOnRecordClearRequest"
+              }
             }
-          }
-        ],
+          },
+          "required": true
+        },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Not-on-record FTC clearance processed successfully.",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CustomerSanctionResponse"
+                  "$ref": "#/components/schemas/NotOnRecordClearResponse"
                 }
               }
             }
           },
           "400": {
-            "description": "",
+            "description": "Invalid request payload or citation details.",
             "content": {
               "application/json": {
                 "schema": {
@@ -327,6 +266,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
             "description": "Forbidden",
@@ -369,7 +311,7 @@
             }
           },
           "500": {
-            "description": "",
+            "description": "Unexpected server error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -378,11 +320,128 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/flhsmv-api/reopen": {
+      "post": {
+        "tags": [
+          "FLHSMV Sanctions Clearance"
+        ],
+        "summary": "Reopen Sanctions",
+        "description": "Reopens sanctions previously cleared within the last 24 hours. Only sanctions cleared by FCCC within that time window are eligible.",
+        "operationId": "reopenSanctions",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReopenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Reopen request processed successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReopenResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request payload or reopen request is not eligible.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     }
   },
   "components": {
+    "responses": {
+      "UnauthorizedError": {
+        "description": "Unauthorized. The JWT access token is missing, invalid, or expired.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
     "schemas": {
       "ReopenRequest": {
         "type": "object",
@@ -438,7 +497,7 @@
           "TransactionId": {
             "type": "integer",
             "description": "The identifier of the transaction ",
-            "format": "int32"
+            "format": "int64"
           },
           "ErrorCode": {
             "type": "integer",
@@ -532,6 +591,11 @@
             "type": "boolean",
             "description": "Is Reinstatement fee for FTC (aka D6 or DSU) sanctions is collected to reinstate the driver license (true or false).",
             "example": true
+          },
+          "OnlineReinstatementAllowed": {
+            "type": "boolean",
+            "description": "The reinstatement allowed online. (true or false).",
+            "example": true
           }
         },
         "description": "Clearance Request Model Information"
@@ -605,11 +669,6 @@
             "items": {
               "$ref": "#/components/schemas/SanctionAction"
             }
-          },
-          "FeeCollected": {
-            "type": "boolean",
-            "description": "Is CFO Fee collected (true or false).",
-            "example": true
           },
           "RestoreDateAllowed": {
             "type": "boolean",
@@ -793,6 +852,10 @@
             "type": "boolean",
             "description": "Is Reinstatement fee for FTC (aka D6 or DSU) sanctions is allowed to reinstate the driver license (true or false)."
           },
+          "OnlineReinstatementAllowed": {
+            "type": "boolean",
+            "description": "Indicates whether online reinstatement is allowed for the customer."
+          },
           "Sanctions": {
             "type": "array",
             "description": "List of Sanction model.",
@@ -810,7 +873,7 @@
     "securitySchemes": {
       "bearerAuth": {
         "type": "http",
-        "description": "Please provide the JWT token. For login information, please contact support.",
+        "description": "Use the JWT access token issued by the ClerkTools Auth server. Obtain a token via the ClerkTools Auth API (see https://civitek.github.io/open-api-docs/clktools-auth.html) then include it as: Authorization: Bearer <token>",
         "scheme": "bearer",
         "bearerFormat": "JWT"
       }
