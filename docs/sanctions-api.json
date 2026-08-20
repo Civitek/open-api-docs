@@ -589,7 +589,7 @@
           },
           "FeeCollected": {
             "type": "boolean",
-            "description": "Is Reinstatement fee for FTC (aka D6 or DSU) sanctions is collected to reinstate the driver license (true or false).",
+            "description": "Is reinstatement fee for any sanction collected to reinstate the driver license (true or false).",
             "example": true
           },
           "OnlineReinstatementAllowed": {
@@ -652,7 +652,11 @@
           },
           "ReinstatementFeeCFORequired": {
             "type": "boolean",
-            "description": "Is Reinstatement fee for CFO sanctions is required (true or false)."
+            "description": "Deprecated. Reinstatement fee for CFO sanctions is no longer required; this value is always false.",
+            "deprecated": true,
+            "enum": [
+              false
+            ]
           },
           "ClearedByFCCC": {
             "type": "boolean",
@@ -858,7 +862,7 @@
           },
           "DriverLicenceExpired": {
             "type": "boolean",
-            "description": "is Driver License Expired (true or false). "
+            "description": "Is Driver License Expired (true or false). "
           }
         }
       }
