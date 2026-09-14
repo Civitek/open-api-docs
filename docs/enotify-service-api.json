@@ -1,0 +1,366 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "eNotify Court Event Service API",
+    "version": "v1",
+    "description": "Court Event eNotify Service API documentation.\n\nThis API allows authorized eNotify clients to search for court cases by Unified Case Number (UCN), by clerk case number, or by party (person) demographic details. Each matching case is returned with case status, party, and upcoming court event information, filtered according to the caller's matrix access role.\n\nAuthentication:\nRequests must include HTTP Basic authentication credentials issued to the eNotify client in the Authorization header as: Authorization: Basic <base64(username:password)>."
+  },
+  "servers": [
+    {
+      "url": "https://testapi.flclerktools.com/courtevent",
+      "description": "Generated server url"
+    }
+  ],
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "eNotify Court Event Search",
+      "description": "Operations for searching court cases and events for eNotify subscribers."
+    }
+  ],
+  "paths": {
+    "/rest/enotification/search": {
+      "post": {
+        "tags": [
+          "eNotify Court Event Search"
+        ],
+        "summary": "Search Court Cases",
+        "description": "Searches for court cases using one of three mutually exclusive lookup modes: by Unified Case Number (`ucn`), by clerk case number (`clerkCase` with `countyCode`), or by party demographics (`firstName`, `lastName`, `countyCode`, `dateOfBirth`). The `ucn` field takes precedence if present, followed by `clerkCase`; otherwise a person search is performed. Every matching case's fields are filtered based on the access level granted to the caller's `matrixRole` for that case type and county.",
+        "operationId": "searchCases",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UcnSearchRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ClerkCaseSearchRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/PersonSearchRequest"
+                  }
+                ]
+              },
+              "examples": {
+                "ucnSearch": {
+                  "summary": "Search by UCN",
+                  "value": {
+                    "matrixRole": 1,
+                    "ucn": "482020CA000123000ABC"
+                  }
+                },
+                "clerkCaseSearch": {
+                  "summary": "Search by clerk case number",
+                  "value": {
+                    "matrixRole": 1,
+                    "clerkCase": "2020CA000123",
+                    "countyCode": "48"
+                  }
+                },
+                "personSearch": {
+                  "summary": "Search by party demographics",
+                  "value": {
+                    "matrixRole": 1,
+                    "firstName": "JOHN",
+                    "lastName": "DOE",
+                    "countyCode": "48",
+                    "dateOfBirth": "1990-01-15"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "One or more matching cases found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CaseResult"
+                  }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No matching case was found for the supplied search criteria."
+          },
+          "400": {
+            "description": "The request body was missing, malformed, or missing required fields for the selected search mode (e.g. invalid or missing `ucn`, missing `countyCode`, or missing person search fields).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "responses": {
+      "UnauthorizedError": {
+        "description": "Unauthorized. The Basic authentication credentials are missing or invalid.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "httpStatusCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "UcnSearchRequest": {
+        "type": "object",
+        "required": [
+          "matrixRole",
+          "ucn"
+        ],
+        "properties": {
+          "matrixRole": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Role level of the requesting eNotify client, used to determine which case fields the caller is authorized to see.",
+            "example": 1
+          },
+          "ucn": {
+            "type": "string",
+            "description": "Unified Case Number to search for. Must be exactly 20 characters.",
+            "minLength": 20,
+            "maxLength": 20,
+            "example": "482020CA000123000ABC"
+          }
+        }
+      },
+      "ClerkCaseSearchRequest": {
+        "type": "object",
+        "required": [
+          "matrixRole",
+          "clerkCase",
+          "countyCode"
+        ],
+        "properties": {
+          "matrixRole": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Role level of the requesting eNotify client, used to determine which case fields the caller is authorized to see.",
+            "example": 1
+          },
+          "clerkCase": {
+            "type": "string",
+            "description": "Clerk case number to search for. Dashes and spaces are ignored when matching.",
+            "example": "2020CA000123"
+          },
+          "countyCode": {
+            "type": "string",
+            "description": "Florida county code that the clerk case belongs to.",
+            "example": "48"
+          }
+        }
+      },
+      "PersonSearchRequest": {
+        "type": "object",
+        "required": [
+          "matrixRole",
+          "firstName",
+          "lastName",
+          "countyCode",
+          "dateOfBirth"
+        ],
+        "properties": {
+          "matrixRole": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Role level of the requesting eNotify client, used to determine which case fields the caller is authorized to see.",
+            "example": 1
+          },
+          "firstName": {
+            "type": "string",
+            "description": "First name of the party to search for.",
+            "example": "JOHN"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Last name of the party to search for.",
+            "example": "DOE"
+          },
+          "suffix": {
+            "type": "string",
+            "description": "Optional name suffix. Accepted by the API but not currently used to filter search results.",
+            "example": "JR"
+          },
+          "countyCode": {
+            "type": "string",
+            "description": "Florida county code to search within.",
+            "example": "48"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date",
+            "description": "Date of birth of the party to search for, in YYYY-MM-DD format.",
+            "example": "1990-01-15"
+          }
+        }
+      },
+      "CaseResult": {
+        "type": "object",
+        "description": "A court case matching the search criteria. Fields other than `ucn` and `countyCode` are returned as null when the caller's matrix role is not authorized to view them for the case's type and county.",
+        "properties": {
+          "ucn": {
+            "type": "string",
+            "description": "Unified Case Number of the matching case."
+          },
+          "courtType": {
+            "type": "string",
+            "description": "UCN court type code for the case."
+          },
+          "caseType": {
+            "type": "string",
+            "description": "Case type code."
+          },
+          "caseStatus": {
+            "type": "string",
+            "description": "Current status of the case."
+          },
+          "confidential": {
+            "type": "boolean",
+            "description": "Indicates whether the case is flagged as confidential."
+          },
+          "clerkFileDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Date the case was filed with the clerk."
+          },
+          "clerkCase": {
+            "type": "string",
+            "description": "Clerk case number, with dashes and spaces removed."
+          },
+          "countyCode": {
+            "type": "string",
+            "description": "Florida county code the case belongs to."
+          },
+          "persons": {
+            "type": "array",
+            "description": "Parties associated with the case that are visible to the caller's matrix role.",
+            "items": {
+              "$ref": "#/components/schemas/Person"
+            }
+          },
+          "events": {
+            "type": "array",
+            "description": "Upcoming court events scheduled for the case.",
+            "items": {
+              "$ref": "#/components/schemas/CourtEvent"
+            }
+          }
+        }
+      },
+      "Person": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Party type code (e.g. plaintiff, defendant)."
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the party type."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the party."
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Party date of birth. Returned as null when the party privacy code restricts disclosure to the caller's matrix role."
+          },
+          "juvenile": {
+            "type": "boolean",
+            "description": "Indicates whether the party is a juvenile. Returned as null when the party privacy code restricts disclosure to the caller's matrix role."
+          },
+          "privacyCode": {
+            "type": "string",
+            "description": "Privacy code governing disclosure of this party's sensitive fields."
+          }
+        }
+      },
+      "CourtEvent": {
+        "type": "object",
+        "properties": {
+          "courtDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Scheduled date of the court event."
+          },
+          "courtTime": {
+            "type": "string",
+            "description": "Scheduled time of the court event."
+          },
+          "courtLocation": {
+            "type": "string",
+            "description": "Location of the court event."
+          },
+          "courtRoom": {
+            "type": "string",
+            "description": "Courtroom for the event."
+          },
+          "docketType": {
+            "type": "string",
+            "description": "Docket type for the court event."
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "HTTP Basic authentication using the username and password issued to the eNotify client."
+      }
+    }
+  }
+}
