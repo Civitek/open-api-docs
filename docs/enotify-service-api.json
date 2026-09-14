@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://testapi.flclerktools.com/courtevent",
+      "url": "https://test.flccis.com/courtevent",
       "description": "Generated server url"
     }
   ],
@@ -29,7 +29,7 @@
           "eNotify Court Event Search"
         ],
         "summary": "Search Court Cases",
-        "description": "Searches for court cases using one of three mutually exclusive lookup modes: by Unified Case Number (`ucn`), by clerk case number (`clerkCase` with `countyCode`), or by party demographics (`firstName`, `lastName`, `countyCode`, `dateOfBirth`). The `ucn` field takes precedence if present, followed by `clerkCase`; otherwise a person search is performed. Every matching case's fields are filtered based on the access level granted to the caller's `matrixRole` for that case type and county.",
+        "description": "Searches for court cases using one of three mutually exclusive lookup modes, chosen by which fields are present in the request body. The `ucn` field takes precedence if present, followed by `clerkCase`; otherwise a person search is performed. Every matching case's fields are filtered based on the access level granted to the caller's `matrixRole` for that case type and county.\n\n1. **Search by UCN** (`UcnSearchRequest`) - provide `matrixRole` and `ucn`.\n2. **Search by clerk case number** (`ClerkCaseSearchRequest`) - provide `matrixRole`, `clerkCase`, and `countyCode`.\n3. **Search by party demographics** (`PersonSearchRequest`) - provide `matrixRole`, `firstName`, `lastName`, `countyCode`, and `dateOfBirth`.\n\nUse the request body \"Pick a type\" / examples selector below to view and try each mode.",
         "operationId": "searchCases",
         "requestBody": {
           "content": {
@@ -155,6 +155,8 @@
       },
       "UcnSearchRequest": {
         "type": "object",
+        "title": "Search by UCN",
+        "description": "Search mode 1 of 3: looks up a case by its Unified Case Number.",
         "required": [
           "matrixRole",
           "ucn"
@@ -177,6 +179,8 @@
       },
       "ClerkCaseSearchRequest": {
         "type": "object",
+        "title": "Search by Clerk Case Number",
+        "description": "Search mode 2 of 3: looks up a case by clerk case number and county code.",
         "required": [
           "matrixRole",
           "clerkCase",
@@ -203,6 +207,8 @@
       },
       "PersonSearchRequest": {
         "type": "object",
+        "title": "Search by Party Demographics",
+        "description": "Search mode 3 of 3: looks up cases by party first name, last name, county code, and date of birth.",
         "required": [
           "matrixRole",
           "firstName",
