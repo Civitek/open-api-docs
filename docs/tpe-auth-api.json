@@ -3,7 +3,7 @@
   "info": {
     "title": "TPE Authentication API",
     "description": "This service provides endpoints for obtaining and refreshing OAuth2-style tokens.\n\n### Typical Usage Flow (Web or Mobile Application)\n1. Call **`/api/auth/token`** with **Basic Authentication** (username/password) to generate an **access_token** and a **refresh_token**.\n2. Use the **access_token** (JWT) in requests to access secure APIs:\n   ```\n   Authorization: Bearer {access_token}\n   ```\n3. When the access token expires, you can either:\n   - Generate a new token again with **username/password** using `/api/auth/token`, OR\n   - Continue the session without username/password by using the **refresh_token** at `/api/auth/refresh`.\n\n### Machine-to-Machine (M2M) Authentication\n- Call **`/api/auth/token`** with **Basic Authentication** using client credentials (client_id/client_secret).\n- Only an **access_token** is returned; no **refresh_token** is issued for M2M.\n- When the access token expires, the client must request a new token using its credentials.\n\n### Refresh Behavior (Web/Mobile Only)\n- A new access token is generated.\n- Both a new access token and a new refresh token are returned.\n- The previous **refresh_token** expires.\n\n⚠️ **Important:** Store the `refresh_token` securely on the client (e.g., secure storage in mobile apps). Do not expose or transmit the `refresh_token` outside the application.",
-    "version": "1.0"
+    "version": "2.0"
   },
   "servers": [
     {
