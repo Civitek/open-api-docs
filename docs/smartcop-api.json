@@ -1,0 +1,4755 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "JailAPI – Secure",
+    "description": "All endpoints return a `type` field (`Success` or `Error`). HTTP 200 = success, 400 = validation error (`message` explains why), 500 = unhandled exception (`fullError` contains the stack trace). See each response schema for field-level details.",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "/JailAPI.Rest.Secure"
+    }
+  ],
+  "paths": {
+    "/Auth/GetToken": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [
+          {
+            "name": "appId",
+            "in": "query",
+            "description": "The SmartKey application ID issued to your integration.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "requestDT",
+            "in": "query",
+            "description": "Current UTC timestamp in yyyy-MM-ddTHH:mm:ss format. Example: 2026-05-18T14:30:00",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "hash",
+            "in": "query",
+            "description": "HMAC verification hash. Compute as: SHA256(UTF8(ApiKey + AppId + \"&\" + requestDT)).ToHexString().ToLower()",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "type": "Success"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "type": "Success"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "type": "Success"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Cases/QueryCases": {
+      "get": {
+        "tags": [
+          "Cases"
+        ],
+        "parameters": [
+          {
+            "name": "ChangedAfter",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": "Return only cases changed on or after this date/time. ",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "MNINumber",
+            "in": "query",
+            "schema": {
+              "maxLength": 15,
+              "type": "string",
+              "description": "MNI number of the subject"
+            }
+          },
+          {
+            "name": "BookingNumber",
+            "in": "query",
+            "schema": {
+              "maxLength": 15,
+              "type": "string",
+              "description": "Booking number"
+            }
+          },
+          {
+            "name": "CaseNumber",
+            "in": "query",
+            "schema": {
+              "maxLength": 15,
+              "type": "string",
+              "description": "Agency-assigned case number"
+            }
+          },
+          {
+            "name": "LastName",
+            "in": "query",
+            "schema": {
+              "maxLength": 20,
+              "type": "string",
+              "description": "Last name of the subject"
+            }
+          },
+          {
+            "name": "FirstName",
+            "in": "query",
+            "schema": {
+              "maxLength": 15,
+              "type": "string",
+              "description": "First name of the subject"
+            }
+          },
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "description": "Page number for paginated results (1-indexed). Defaults to 1 if not specified.",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "description": "Number of records per page. Defaults to 50. Maximum is 500.",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryCasesResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "cases": [
+                    {
+                      "uniqueKey": "1JQSKZe3b0f8EbWmW7SICM",
+                      "caseNumber": "2026-CASE-0045",
+                      "bookingNumber": "BK2026-001234",
+                      "person": {
+                        "mniNumber": "MNI-123456",
+                        "lastName": "Johnson",
+                        "firstName": "Michael",
+                        "physicalAddress": "123 Main St, Springfield, FL 32301"
+                      },
+                      "createdDateTime": "2026-03-15T14:30:00",
+                      "changedDateTime": "2026-03-16T09:45:00",
+                      "status": "Active",
+                      "courtCaseNumber": "2026CF000123A",
+                      "active": true,
+                      "cancel": false,
+                      "judgeName": "Hon. Jane Smith",
+                      "bondType": "Bond By Judge",
+                      "bondAmount": 1000,
+                      "isInmateReleased": false
+                    }
+                  ],
+                  "pagination": {
+                    "pageNumber": 1,
+                    "pageSize": 50,
+                    "totalCount": 1,
+                    "totalPages": 1,
+                    "hasNextPage": false,
+                    "hasPreviousPage": false
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryCasesResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "cases": [
+                    {
+                      "uniqueKey": "1JQSKZe3b0f8EbWmW7SICM",
+                      "caseNumber": "2026-CASE-0045",
+                      "bookingNumber": "BK2026-001234",
+                      "person": {
+                        "mniNumber": "MNI-123456",
+                        "lastName": "Johnson",
+                        "firstName": "Michael",
+                        "physicalAddress": "123 Main St, Springfield, FL 32301"
+                      },
+                      "createdDateTime": "2026-03-15T14:30:00",
+                      "changedDateTime": "2026-03-16T09:45:00",
+                      "status": "Active",
+                      "courtCaseNumber": "2026CF000123A",
+                      "active": true,
+                      "cancel": false,
+                      "judgeName": "Hon. Jane Smith",
+                      "bondType": "Bond By Judge",
+                      "bondAmount": 1000,
+                      "isInmateReleased": false
+                    }
+                  ],
+                  "pagination": {
+                    "pageNumber": 1,
+                    "pageSize": 50,
+                    "totalCount": 1,
+                    "totalPages": 1,
+                    "hasNextPage": false,
+                    "hasPreviousPage": false
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryCasesResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "cases": [
+                    {
+                      "uniqueKey": "1JQSKZe3b0f8EbWmW7SICM",
+                      "caseNumber": "2026-CASE-0045",
+                      "bookingNumber": "BK2026-001234",
+                      "person": {
+                        "mniNumber": "MNI-123456",
+                        "lastName": "Johnson",
+                        "firstName": "Michael",
+                        "physicalAddress": "123 Main St, Springfield, FL 32301"
+                      },
+                      "createdDateTime": "2026-03-15T14:30:00",
+                      "changedDateTime": "2026-03-16T09:45:00",
+                      "status": "Active",
+                      "courtCaseNumber": "2026CF000123A",
+                      "active": true,
+                      "cancel": false,
+                      "judgeName": "Hon. Jane Smith",
+                      "bondType": "Bond By Judge",
+                      "bondAmount": 1000,
+                      "isInmateReleased": false
+                    }
+                  ],
+                  "pagination": {
+                    "pageNumber": 1,
+                    "pageSize": 50,
+                    "totalCount": 1,
+                    "totalPages": 1,
+                    "hasNextPage": false,
+                    "hasPreviousPage": false
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Cases/GetCase": {
+      "get": {
+        "tags": [
+          "Cases"
+        ],
+        "parameters": [
+          {
+            "name": "UniqueKey",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "maxLength": 22,
+              "type": "string",
+              "description": "MANDATORY. SmartCOP internal identifier of the case to retrieve. Use the `UniqueKey` returned by query/read endpoints. System-generated — do not invent or modify values."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCaseResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "case": {
+                    "uniqueKey": "1JQSKZe3b0f8EbWmW7SICM",
+                    "caseNumber": "2026-CASE-0045",
+                    "bookingNumber": "BK2026-001234",
+                    "person": {
+                      "mniNumber": "MNI-123456",
+                      "lastName": "Johnson",
+                      "firstName": "Michael",
+                      "dateOfBirth": "1989-07-04T00:00:00",
+                      "street": "123 Main St",
+                      "city": "Springfield",
+                      "state": "FL",
+                      "zip": "32301",
+                      "houseNo": "123",
+                      "physicalAddress": "123 Main St, Springfield, FL 32301",
+                      "uniqueKey": "0kR8mQ2pN5tV7wX1yZ3aBc",
+                      "suffix": "Jr",
+                      "sex": "M",
+                      "race": "W",
+                      "height": "6'1\"",
+                      "weight": 195,
+                      "eyeColor": "BRO",
+                      "hairColor": "BRN",
+                      "ssn": "412-34-5678",
+                      "idNo": "D1234567890123",
+                      "idState": "FL",
+                      "phoneNumber": "555-123-4567",
+                      "aliases": [
+                        {
+                          "uniqueKey": "1mS9nR3qO6uW8xY2zA4bCd",
+                          "firstName": "Mike",
+                          "lastName": "Johnson",
+                          "suffix": "Jr"
+                        }
+                      ]
+                    },
+                    "createdDateTime": "2026-03-15T14:30:00",
+                    "changedDateTime": "2026-03-16T09:45:00",
+                    "arrestDate": "2026-03-15T11:15:00",
+                    "status": "Active",
+                    "courtCaseNumber": "2026CF000123A",
+                    "active": true,
+                    "cancel": false,
+                    "judgeName": "Hon. Jane Smith",
+                    "facility": "Main Jail",
+                    "housingUnit": "Dorm B-2",
+                    "isInmateReleased": false,
+                    "bondType": "Bond By Judge",
+                    "bondAmount": 1000,
+                    "bondOptions": [
+                      "Cash"
+                    ],
+                    "bondConditions": [
+                      "Not leave county",
+                      "Not operate a motor vehicle"
+                    ],
+                    "bondConditionOther": false,
+                    "bondConditionOtherComments": "",
+                    "charges": [
+                      {
+                        "chargeDescription": "Burglary - Second Degree",
+                        "statuteCode": "13A-7-6",
+                        "chargeLevel": "Felony",
+                        "chargeDegree": "2",
+                        "disposition": "Pending",
+                        "dispositionDescription": "Pending Disposition",
+                        "chargeReferenceNumber": "4521",
+                        "bondAmount": 500,
+                        "uniqueKey": "2nT0oS4rP7vX9yZ3aBcDe",
+                        "bookingAgency": "SmartCOP Sheriff's Office",
+                        "bookingAgencyAbbreviation": "SRSO",
+                        "chargeSequenceNumber": 1,
+                        "goc": "1801",
+                        "gocDescription": "Burglary",
+                        "domesticViolence": false,
+                        "obts": "OBTS-2026-0042"
+                      }
+                    ],
+                    "externalValidations": [
+                      {
+                        "externalValidationID": "VAL-2026-0042",
+                        "validationResult": "Validated against external warrant source.",
+                        "submittedDateTime": "2026-03-16T11:20:00"
+                      }
+                    ]
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCaseResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "case": {
+                    "uniqueKey": "1JQSKZe3b0f8EbWmW7SICM",
+                    "caseNumber": "2026-CASE-0045",
+                    "bookingNumber": "BK2026-001234",
+                    "person": {
+                      "mniNumber": "MNI-123456",
+                      "lastName": "Johnson",
+                      "firstName": "Michael",
+                      "dateOfBirth": "1989-07-04T00:00:00",
+                      "street": "123 Main St",
+                      "city": "Springfield",
+                      "state": "FL",
+                      "zip": "32301",
+                      "houseNo": "123",
+                      "physicalAddress": "123 Main St, Springfield, FL 32301",
+                      "uniqueKey": "0kR8mQ2pN5tV7wX1yZ3aBc",
+                      "suffix": "Jr",
+                      "sex": "M",
+                      "race": "W",
+                      "height": "6'1\"",
+                      "weight": 195,
+                      "eyeColor": "BRO",
+                      "hairColor": "BRN",
+                      "ssn": "412-34-5678",
+                      "idNo": "D1234567890123",
+                      "idState": "FL",
+                      "phoneNumber": "555-123-4567",
+                      "aliases": [
+                        {
+                          "uniqueKey": "1mS9nR3qO6uW8xY2zA4bCd",
+                          "firstName": "Mike",
+                          "lastName": "Johnson",
+                          "suffix": "Jr"
+                        }
+                      ]
+                    },
+                    "createdDateTime": "2026-03-15T14:30:00",
+                    "changedDateTime": "2026-03-16T09:45:00",
+                    "arrestDate": "2026-03-15T11:15:00",
+                    "status": "Active",
+                    "courtCaseNumber": "2026CF000123A",
+                    "active": true,
+                    "cancel": false,
+                    "judgeName": "Hon. Jane Smith",
+                    "facility": "Main Jail",
+                    "housingUnit": "Dorm B-2",
+                    "isInmateReleased": false,
+                    "bondType": "Bond By Judge",
+                    "bondAmount": 1000,
+                    "bondOptions": [
+                      "Cash"
+                    ],
+                    "bondConditions": [
+                      "Not leave county",
+                      "Not operate a motor vehicle"
+                    ],
+                    "bondConditionOther": false,
+                    "bondConditionOtherComments": "",
+                    "charges": [
+                      {
+                        "chargeDescription": "Burglary - Second Degree",
+                        "statuteCode": "13A-7-6",
+                        "chargeLevel": "Felony",
+                        "chargeDegree": "2",
+                        "disposition": "Pending",
+                        "dispositionDescription": "Pending Disposition",
+                        "chargeReferenceNumber": "4521",
+                        "bondAmount": 500,
+                        "uniqueKey": "2nT0oS4rP7vX9yZ3aBcDe",
+                        "bookingAgency": "SmartCOP Sheriff's Office",
+                        "bookingAgencyAbbreviation": "SRSO",
+                        "chargeSequenceNumber": 1,
+                        "goc": "1801",
+                        "gocDescription": "Burglary",
+                        "domesticViolence": false,
+                        "obts": "OBTS-2026-0042"
+                      }
+                    ],
+                    "externalValidations": [
+                      {
+                        "externalValidationID": "VAL-2026-0042",
+                        "validationResult": "Validated against external warrant source.",
+                        "submittedDateTime": "2026-03-16T11:20:00"
+                      }
+                    ]
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCaseResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "case": {
+                    "uniqueKey": "1JQSKZe3b0f8EbWmW7SICM",
+                    "caseNumber": "2026-CASE-0045",
+                    "bookingNumber": "BK2026-001234",
+                    "person": {
+                      "mniNumber": "MNI-123456",
+                      "lastName": "Johnson",
+                      "firstName": "Michael",
+                      "dateOfBirth": "1989-07-04T00:00:00",
+                      "street": "123 Main St",
+                      "city": "Springfield",
+                      "state": "FL",
+                      "zip": "32301",
+                      "houseNo": "123",
+                      "physicalAddress": "123 Main St, Springfield, FL 32301",
+                      "uniqueKey": "0kR8mQ2pN5tV7wX1yZ3aBc",
+                      "suffix": "Jr",
+                      "sex": "M",
+                      "race": "W",
+                      "height": "6'1\"",
+                      "weight": 195,
+                      "eyeColor": "BRO",
+                      "hairColor": "BRN",
+                      "ssn": "412-34-5678",
+                      "idNo": "D1234567890123",
+                      "idState": "FL",
+                      "phoneNumber": "555-123-4567",
+                      "aliases": [
+                        {
+                          "uniqueKey": "1mS9nR3qO6uW8xY2zA4bCd",
+                          "firstName": "Mike",
+                          "lastName": "Johnson",
+                          "suffix": "Jr"
+                        }
+                      ]
+                    },
+                    "createdDateTime": "2026-03-15T14:30:00",
+                    "changedDateTime": "2026-03-16T09:45:00",
+                    "arrestDate": "2026-03-15T11:15:00",
+                    "status": "Active",
+                    "courtCaseNumber": "2026CF000123A",
+                    "active": true,
+                    "cancel": false,
+                    "judgeName": "Hon. Jane Smith",
+                    "facility": "Main Jail",
+                    "housingUnit": "Dorm B-2",
+                    "isInmateReleased": false,
+                    "bondType": "Bond By Judge",
+                    "bondAmount": 1000,
+                    "bondOptions": [
+                      "Cash"
+                    ],
+                    "bondConditions": [
+                      "Not leave county",
+                      "Not operate a motor vehicle"
+                    ],
+                    "bondConditionOther": false,
+                    "bondConditionOtherComments": "",
+                    "charges": [
+                      {
+                        "chargeDescription": "Burglary - Second Degree",
+                        "statuteCode": "13A-7-6",
+                        "chargeLevel": "Felony",
+                        "chargeDegree": "2",
+                        "disposition": "Pending",
+                        "dispositionDescription": "Pending Disposition",
+                        "chargeReferenceNumber": "4521",
+                        "bondAmount": 500,
+                        "uniqueKey": "2nT0oS4rP7vX9yZ3aBcDe",
+                        "bookingAgency": "SmartCOP Sheriff's Office",
+                        "bookingAgencyAbbreviation": "SRSO",
+                        "chargeSequenceNumber": 1,
+                        "goc": "1801",
+                        "gocDescription": "Burglary",
+                        "domesticViolence": false,
+                        "obts": "OBTS-2026-0042"
+                      }
+                    ],
+                    "externalValidations": [
+                      {
+                        "externalValidationID": "VAL-2026-0042",
+                        "validationResult": "Validated against external warrant source.",
+                        "submittedDateTime": "2026-03-16T11:20:00"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Cases/UpdateCase": {
+      "post": {
+        "tags": [
+          "Cases"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCaseRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateCaseResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "uniqueKey": "2dS9m5r6D8uhlsutq6uTz0"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateCaseResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "uniqueKey": "2dS9m5r6D8uhlsutq6uTz0"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateCaseResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "uniqueKey": "2dS9m5r6D8uhlsutq6uTz0"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Cases/SendExternalValidationResult": {
+      "post": {
+        "tags": [
+          "Cases"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendExternalValidationResultRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendExternalValidationResultResult"
+                },
+                "example": {
+                  "type": "Success"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendExternalValidationResultResult"
+                },
+                "example": {
+                  "type": "Success"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendExternalValidationResultResult"
+                },
+                "example": {
+                  "type": "Success"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Config/GetChargeStatusCodes": {
+      "get": {
+        "tags": [
+          "Config"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetChargeStatusCodesResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "chargeStatusCodes": [
+                    {
+                      "code": "ACTV",
+                      "description": "Active",
+                      "uniqueKey": "0v4RuIZ1l0hB2v6Y3dEdQm",
+                      "statusPreventsRelease": true,
+                      "includeOnPriorCharges": true
+                    }
+                  ]
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetChargeStatusCodesResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "chargeStatusCodes": [
+                    {
+                      "code": "ACTV",
+                      "description": "Active",
+                      "uniqueKey": "0v4RuIZ1l0hB2v6Y3dEdQm",
+                      "statusPreventsRelease": true,
+                      "includeOnPriorCharges": true
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetChargeStatusCodesResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "chargeStatusCodes": [
+                    {
+                      "code": "ACTV",
+                      "description": "Active",
+                      "uniqueKey": "0v4RuIZ1l0hB2v6Y3dEdQm",
+                      "statusPreventsRelease": true,
+                      "includeOnPriorCharges": true
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Config/GetCaseLevelCodes": {
+      "get": {
+        "tags": [
+          "Config"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCaseLevelCodesResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "caseLevelCodes": [
+                    {
+                      "code": "ACTV",
+                      "description": "Active",
+                      "uniqueKey": "0gLwM7R4f2Qp9uK8zXcN3b",
+                      "levelType": 1
+                    }
+                  ]
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCaseLevelCodesResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "caseLevelCodes": [
+                    {
+                      "code": "ACTV",
+                      "description": "Active",
+                      "uniqueKey": "0gLwM7R4f2Qp9uK8zXcN3b",
+                      "levelType": 1
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCaseLevelCodesResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "caseLevelCodes": [
+                    {
+                      "code": "ACTV",
+                      "description": "Active",
+                      "uniqueKey": "0gLwM7R4f2Qp9uK8zXcN3b",
+                      "levelType": 1
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Config/GetMovementTypes": {
+      "get": {
+        "tags": [
+          "Config"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetMovementTypesResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "movementTypes": [
+                    {
+                      "code": "E",
+                      "description": "Dorm Move"
+                    }
+                  ]
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetMovementTypesResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "movementTypes": [
+                    {
+                      "code": "E",
+                      "description": "Dorm Move"
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetMovementTypesResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "movementTypes": [
+                    {
+                      "code": "E",
+                      "description": "Dorm Move"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Config/GetJudges": {
+      "get": {
+        "tags": [
+          "Config"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetJudgesResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "judges": [
+                    {
+                      "uniqueKey": "a3F9kL2mN8pQ7rS1tU4vW6",
+                      "name": "Hon. Jane Smith",
+                      "active": true
+                    }
+                  ]
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetJudgesResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "judges": [
+                    {
+                      "uniqueKey": "a3F9kL2mN8pQ7rS1tU4vW6",
+                      "name": "Hon. Jane Smith",
+                      "active": true
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetJudgesResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "judges": [
+                    {
+                      "uniqueKey": "a3F9kL2mN8pQ7rS1tU4vW6",
+                      "name": "Hon. Jane Smith",
+                      "active": true
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Config/GetBondOptions": {
+      "get": {
+        "tags": [
+          "Config"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetBondOptionsResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "bondOptions": [
+                    {
+                      "uniqueKey": "0nQnFj4y9Q2h6mT1wPz5Xa",
+                      "type": "Judge",
+                      "name": "Cash",
+                      "active": true
+                    }
+                  ]
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetBondOptionsResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "bondOptions": [
+                    {
+                      "uniqueKey": "0nQnFj4y9Q2h6mT1wPz5Xa",
+                      "type": "Judge",
+                      "name": "Cash",
+                      "active": true
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetBondOptionsResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "bondOptions": [
+                    {
+                      "uniqueKey": "0nQnFj4y9Q2h6mT1wPz5Xa",
+                      "type": "Judge",
+                      "name": "Cash",
+                      "active": true
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Config/GetBondConditions": {
+      "get": {
+        "tags": [
+          "Config"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetBondConditionsResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "bondConditions": [
+                    {
+                      "uniqueKey": "6b3Rk8s2Y0dL4nW7cQ1zVe",
+                      "name": "Not leave county",
+                      "active": true
+                    }
+                  ]
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetBondConditionsResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "bondConditions": [
+                    {
+                      "uniqueKey": "6b3Rk8s2Y0dL4nW7cQ1zVe",
+                      "name": "Not leave county",
+                      "active": true
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetBondConditionsResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "bondConditions": [
+                    {
+                      "uniqueKey": "6b3Rk8s2Y0dL4nW7cQ1zVe",
+                      "name": "Not leave county",
+                      "active": true
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Config/GetCourts": {
+      "get": {
+        "tags": [
+          "Config"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCourtsResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "courts": [
+                    {
+                      "uniqueKey": "b7G2mN5pQ8rS1tU4vW6xY9",
+                      "name": "Circuit Court",
+                      "active": true
+                    }
+                  ]
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCourtsResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "courts": [
+                    {
+                      "uniqueKey": "b7G2mN5pQ8rS1tU4vW6xY9",
+                      "name": "Circuit Court",
+                      "active": true
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCourtsResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "courts": [
+                    {
+                      "uniqueKey": "b7G2mN5pQ8rS1tU4vW6xY9",
+                      "name": "Circuit Court",
+                      "active": true
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Config/GetLocations": {
+      "get": {
+        "tags": [
+          "Config"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetLocationsResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "locations": [
+                    {
+                      "uniqueKey": "c4H8kL2mN5pQ7rS1tU4vW6",
+                      "description": "Shands Hospital",
+                      "active": true
+                    }
+                  ]
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetLocationsResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "locations": [
+                    {
+                      "uniqueKey": "c4H8kL2mN5pQ7rS1tU4vW6",
+                      "description": "Shands Hospital",
+                      "active": true
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetLocationsResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "locations": [
+                    {
+                      "uniqueKey": "c4H8kL2mN5pQ7rS1tU4vW6",
+                      "description": "Shands Hospital",
+                      "active": true
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Movements/CreateMovement": {
+      "post": {
+        "tags": [
+          "Movements"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMovementRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateMovementResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "uniqueKey": "2dS9m5r6D8uhlsutq6uTz0"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateMovementResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "uniqueKey": "2dS9m5r6D8uhlsutq6uTz0"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateMovementResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "uniqueKey": "2dS9m5r6D8uhlsutq6uTz0"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Movements/UpdateMovement": {
+      "post": {
+        "tags": [
+          "Movements"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMovementRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateMovementResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "uniqueKey": "2dS9m5r6D8uhlsutq6uTz0"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateMovementResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "uniqueKey": "2dS9m5r6D8uhlsutq6uTz0"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateMovementResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "uniqueKey": "2dS9m5r6D8uhlsutq6uTz0"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Movements/QueryMovements": {
+      "get": {
+        "tags": [
+          "Movements"
+        ],
+        "parameters": [
+          {
+            "name": "ChangedAfter",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": "Return only movements entered/changed on or after this date/time.",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "MNINumber",
+            "in": "query",
+            "schema": {
+              "maxLength": 15,
+              "type": "string",
+              "description": "MNI number of the subject"
+            }
+          },
+          {
+            "name": "BookingNumber",
+            "in": "query",
+            "schema": {
+              "maxLength": 15,
+              "type": "string",
+              "description": "Booking number"
+            }
+          },
+          {
+            "name": "MovementType",
+            "in": "query",
+            "schema": {
+              "maxLength": 1,
+              "type": "string",
+              "description": "Movement type filter"
+            }
+          },
+          {
+            "name": "MovementDateFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": "Return movements with MovementDateTime on or after this value.",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "MovementDateTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": "Return movements with MovementDateTime on or before this value.",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "description": "Page number for paginated results (1-indexed). Defaults to 1 if not specified.",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "description": "Number of records per page. Defaults to 50. Maximum is 500.",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryMovementsResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "movements": [
+                    {
+                      "uniqueKey": "2dS9m5r6D8uhlsutq6uTz0",
+                      "person": {
+                        "mniNumber": "MNI-123456",
+                        "lastName": "Johnson",
+                        "firstName": "Michael",
+                        "physicalAddress": "123 Main St, Springfield, FL 32301"
+                      },
+                      "bookingNumber": "BK2026-001234",
+                      "movementDateTime": "2026-03-15T08:00:00",
+                      "changedDateTime": "2026-03-15T08:05:00",
+                      "movementType": "E",
+                      "description": "Dorm B-2",
+                      "judgeUniqueKey": "a3F9kL2mN8pQ7rS1tU4vW6",
+                      "judgeName": "Hon. Jane Smith",
+                      "courtUniqueKey": "b7G2mN5pQ8rS1tU4vW6xY9",
+                      "courtName": "Circuit Court",
+                      "locationUniqueKey": "c4H8kL2mN5pQ7rS1tU4vW6",
+                      "locationName": "Shands Hospital",
+                      "moveCompletedFlag": false,
+                      "cancelled": false,
+                      "inProgress": false,
+                      "isInmateReleased": false
+                    }
+                  ],
+                  "pagination": {
+                    "pageNumber": 1,
+                    "pageSize": 50,
+                    "totalCount": 1,
+                    "totalPages": 1,
+                    "hasNextPage": false,
+                    "hasPreviousPage": false
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryMovementsResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "movements": [
+                    {
+                      "uniqueKey": "2dS9m5r6D8uhlsutq6uTz0",
+                      "person": {
+                        "mniNumber": "MNI-123456",
+                        "lastName": "Johnson",
+                        "firstName": "Michael",
+                        "physicalAddress": "123 Main St, Springfield, FL 32301"
+                      },
+                      "bookingNumber": "BK2026-001234",
+                      "movementDateTime": "2026-03-15T08:00:00",
+                      "changedDateTime": "2026-03-15T08:05:00",
+                      "movementType": "E",
+                      "description": "Dorm B-2",
+                      "judgeUniqueKey": "a3F9kL2mN8pQ7rS1tU4vW6",
+                      "judgeName": "Hon. Jane Smith",
+                      "courtUniqueKey": "b7G2mN5pQ8rS1tU4vW6xY9",
+                      "courtName": "Circuit Court",
+                      "locationUniqueKey": "c4H8kL2mN5pQ7rS1tU4vW6",
+                      "locationName": "Shands Hospital",
+                      "moveCompletedFlag": false,
+                      "cancelled": false,
+                      "inProgress": false,
+                      "isInmateReleased": false
+                    }
+                  ],
+                  "pagination": {
+                    "pageNumber": 1,
+                    "pageSize": 50,
+                    "totalCount": 1,
+                    "totalPages": 1,
+                    "hasNextPage": false,
+                    "hasPreviousPage": false
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryMovementsResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "movements": [
+                    {
+                      "uniqueKey": "2dS9m5r6D8uhlsutq6uTz0",
+                      "person": {
+                        "mniNumber": "MNI-123456",
+                        "lastName": "Johnson",
+                        "firstName": "Michael",
+                        "physicalAddress": "123 Main St, Springfield, FL 32301"
+                      },
+                      "bookingNumber": "BK2026-001234",
+                      "movementDateTime": "2026-03-15T08:00:00",
+                      "changedDateTime": "2026-03-15T08:05:00",
+                      "movementType": "E",
+                      "description": "Dorm B-2",
+                      "judgeUniqueKey": "a3F9kL2mN8pQ7rS1tU4vW6",
+                      "judgeName": "Hon. Jane Smith",
+                      "courtUniqueKey": "b7G2mN5pQ8rS1tU4vW6xY9",
+                      "courtName": "Circuit Court",
+                      "locationUniqueKey": "c4H8kL2mN5pQ7rS1tU4vW6",
+                      "locationName": "Shands Hospital",
+                      "moveCompletedFlag": false,
+                      "cancelled": false,
+                      "inProgress": false,
+                      "isInmateReleased": false
+                    }
+                  ],
+                  "pagination": {
+                    "pageNumber": 1,
+                    "pageSize": 50,
+                    "totalCount": 1,
+                    "totalPages": 1,
+                    "hasNextPage": false,
+                    "hasPreviousPage": false
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Movements/GetMovement": {
+      "get": {
+        "tags": [
+          "Movements"
+        ],
+        "parameters": [
+          {
+            "name": "UniqueKey",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "maxLength": 22,
+              "type": "string",
+              "description": "MANDATORY. SmartCOP internal identifier of the movement to retrieve. Use the `UniqueKey` returned by query/read endpoints. System-generated — do not invent or modify values."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetMovementResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "movement": {
+                    "uniqueKey": "2dS9m5r6D8uhlsutq6uTz0",
+                    "mniNumber": "MNI-123456",
+                    "bookingNumber": "BK2026-001234",
+                    "movementDateTime": "2026-03-15T08:00:00",
+                    "movementType": "E",
+                    "description": "Dorm B-2",
+                    "createdByPerNo": "12345",
+                    "notes": "Dorm move entered by classification desk.",
+                    "person": {
+                      "lastName": "Johnson",
+                      "firstName": "Michael",
+                      "dateOfBirth": "1989-07-04T00:00:00",
+                      "street": "123 Main St",
+                      "city": "Springfield",
+                      "state": "FL",
+                      "zip": "32301",
+                      "houseNo": "123",
+                      "physicalAddress": "123 Main St, Springfield, FL 32301",
+                      "uniqueKey": "0kR8mQ2pN5tV7wX1yZ3aBc",
+                      "suffix": "Jr",
+                      "sex": "M",
+                      "race": "W",
+                      "height": "6'1\"",
+                      "weight": 195,
+                      "eyeColor": "BRO",
+                      "hairColor": "BRN",
+                      "ssn": "412-34-5678",
+                      "idNo": "D1234567890123",
+                      "idState": "FL",
+                      "phoneNumber": "555-123-4567",
+                      "aliases": [
+                        {
+                          "uniqueKey": "1mS9nR3qO6uW8xY2zA4bCd",
+                          "firstName": "Mike",
+                          "lastName": "Johnson",
+                          "suffix": "Jr"
+                        }
+                      ]
+                    },
+                    "judgeUniqueKey": "a3F9kL2mN8pQ7rS1tU4vW6",
+                    "judgeName": "Hon. Jane Smith",
+                    "courtUniqueKey": "b7G2mN5pQ8rS1tU4vW6xY9",
+                    "courtName": "Circuit Court",
+                    "locationUniqueKey": "c4H8kL2mN5pQ7rS1tU4vW6",
+                    "locationName": "Shands Hospital",
+                    "moveCompletedFlag": false,
+                    "isInmateReleased": false
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetMovementResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "movement": {
+                    "uniqueKey": "2dS9m5r6D8uhlsutq6uTz0",
+                    "mniNumber": "MNI-123456",
+                    "bookingNumber": "BK2026-001234",
+                    "movementDateTime": "2026-03-15T08:00:00",
+                    "movementType": "E",
+                    "description": "Dorm B-2",
+                    "createdByPerNo": "12345",
+                    "notes": "Dorm move entered by classification desk.",
+                    "person": {
+                      "lastName": "Johnson",
+                      "firstName": "Michael",
+                      "dateOfBirth": "1989-07-04T00:00:00",
+                      "street": "123 Main St",
+                      "city": "Springfield",
+                      "state": "FL",
+                      "zip": "32301",
+                      "houseNo": "123",
+                      "physicalAddress": "123 Main St, Springfield, FL 32301",
+                      "uniqueKey": "0kR8mQ2pN5tV7wX1yZ3aBc",
+                      "suffix": "Jr",
+                      "sex": "M",
+                      "race": "W",
+                      "height": "6'1\"",
+                      "weight": 195,
+                      "eyeColor": "BRO",
+                      "hairColor": "BRN",
+                      "ssn": "412-34-5678",
+                      "idNo": "D1234567890123",
+                      "idState": "FL",
+                      "phoneNumber": "555-123-4567",
+                      "aliases": [
+                        {
+                          "uniqueKey": "1mS9nR3qO6uW8xY2zA4bCd",
+                          "firstName": "Mike",
+                          "lastName": "Johnson",
+                          "suffix": "Jr"
+                        }
+                      ]
+                    },
+                    "judgeUniqueKey": "a3F9kL2mN8pQ7rS1tU4vW6",
+                    "judgeName": "Hon. Jane Smith",
+                    "courtUniqueKey": "b7G2mN5pQ8rS1tU4vW6xY9",
+                    "courtName": "Circuit Court",
+                    "locationUniqueKey": "c4H8kL2mN5pQ7rS1tU4vW6",
+                    "locationName": "Shands Hospital",
+                    "moveCompletedFlag": false,
+                    "isInmateReleased": false
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetMovementResult"
+                },
+                "example": {
+                  "type": "Success",
+                  "movement": {
+                    "uniqueKey": "2dS9m5r6D8uhlsutq6uTz0",
+                    "mniNumber": "MNI-123456",
+                    "bookingNumber": "BK2026-001234",
+                    "movementDateTime": "2026-03-15T08:00:00",
+                    "movementType": "E",
+                    "description": "Dorm B-2",
+                    "createdByPerNo": "12345",
+                    "notes": "Dorm move entered by classification desk.",
+                    "person": {
+                      "lastName": "Johnson",
+                      "firstName": "Michael",
+                      "dateOfBirth": "1989-07-04T00:00:00",
+                      "street": "123 Main St",
+                      "city": "Springfield",
+                      "state": "FL",
+                      "zip": "32301",
+                      "houseNo": "123",
+                      "physicalAddress": "123 Main St, Springfield, FL 32301",
+                      "uniqueKey": "0kR8mQ2pN5tV7wX1yZ3aBc",
+                      "suffix": "Jr",
+                      "sex": "M",
+                      "race": "W",
+                      "height": "6'1\"",
+                      "weight": 195,
+                      "eyeColor": "BRO",
+                      "hairColor": "BRN",
+                      "ssn": "412-34-5678",
+                      "idNo": "D1234567890123",
+                      "idState": "FL",
+                      "phoneNumber": "555-123-4567",
+                      "aliases": [
+                        {
+                          "uniqueKey": "1mS9nR3qO6uW8xY2zA4bCd",
+                          "firstName": "Mike",
+                          "lastName": "Johnson",
+                          "suffix": "Jr"
+                        }
+                      ]
+                    },
+                    "judgeUniqueKey": "a3F9kL2mN8pQ7rS1tU4vW6",
+                    "judgeName": "Hon. Jane Smith",
+                    "courtUniqueKey": "b7G2mN5pQ8rS1tU4vW6xY9",
+                    "courtName": "Circuit Court",
+                    "locationUniqueKey": "c4H8kL2mN5pQ7rS1tU4vW6",
+                    "locationName": "Shands Hospital",
+                    "moveCompletedFlag": false,
+                    "isInmateReleased": false
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "The request failed validation. Review required fields and submitted values."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwaggerErrorResponse"
+                },
+                "example": {
+                  "type": "Error",
+                  "message": "An unexpected server error occurred while processing the request.",
+                  "fullError": "System.Exception: Example stack trace for an unhandled server exception."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BondConditionCode": {
+        "type": "object",
+        "properties": {
+          "uniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "SmartCOP internal identifier for this bond condition configuration entry. Read-only — do not modify.",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the bond condition.",
+            "nullable": true
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether this bond condition configuration entry is currently active."
+          }
+        },
+        "additionalProperties": false
+      },
+      "BondOptionCode": {
+        "type": "object",
+        "properties": {
+          "uniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "SmartCOP internal identifier for this bond option configuration entry. Read-only — do not modify.",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "description": "Whether this option applies to a judge-set bond or an LEO-set bond (\"Judge\" or \"LEO\").",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the bond option.",
+            "nullable": true
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether this bond option configuration entry is currently active."
+          }
+        },
+        "additionalProperties": false
+      },
+      "CaseLevelCode": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "maxLength": 4,
+            "type": "string",
+            "description": "Case level/status code value.",
+            "nullable": true
+          },
+          "description": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "Human-readable description of the case level/status.",
+            "nullable": true
+          },
+          "uniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "SmartCOP internal identifier for this configuration entry. Read-only — do not modify.",
+            "nullable": true
+          },
+          "levelType": {
+            "type": "integer",
+            "description": "Case level type classifier.",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "example": {
+          "code": "ACTV",
+          "description": "Active",
+          "uniqueKey": "0gLwM7R4f2Qp9uK8zXcN3b",
+          "levelType": 1
+        }
+      },
+      "ChargeStatusCode": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "maxLength": 4,
+            "type": "string",
+            "description": "Charge status code value (matched to a charge's status).",
+            "nullable": true
+          },
+          "description": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "Human-readable description of the charge status.",
+            "nullable": true
+          },
+          "uniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "SmartCOP internal identifier for this configuration entry. Read-only — do not modify.",
+            "nullable": true
+          },
+          "statusPreventsRelease": {
+            "type": "boolean",
+            "description": "When true, a charge in this status prevents release."
+          },
+          "includeOnPriorCharges": {
+            "type": "boolean",
+            "description": "When true, charges in this status are included on prior-charges listings."
+          }
+        },
+        "additionalProperties": false,
+        "example": {
+          "code": "ACTV",
+          "description": "Active",
+          "uniqueKey": "0v4RuIZ1l0hB2v6Y3dEdQm",
+          "statusPreventsRelease": true,
+          "includeOnPriorCharges": true
+        }
+      },
+      "CourtCode": {
+        "type": "object",
+        "properties": {
+          "uniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "SmartCOP internal identifier for this court configuration entry. Use this value as `CourtUniqueKey` on CreateMovement/UpdateMovement. Read-only — do not modify.",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the court.",
+            "nullable": true
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether this court configuration entry is currently active."
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateMovementRequest": {
+        "required": [
+          "movement"
+        ],
+        "type": "object",
+        "properties": {
+          "movement": {
+            "$ref": "#/components/schemas/JailMovementUpdate"
+          }
+        },
+        "additionalProperties": false,
+        "example": {
+          "movement": {
+            "uniqueKey": null,
+            "mniNumber": "MNI-123456",
+            "bookingNumber": "BK2026-001234",
+            "movementDateTime": "2026-03-15T08:00:00",
+            "movementType": "E",
+            "description": "Dorm B-2",
+            "judgeUniqueKey": "a3F9kL2mN8pQ7rS1tU4vW6",
+            "courtUniqueKey": "b7G2mN5pQ8rS1tU4vW6xY9",
+            "locationUniqueKey": "c4H8kL2mN5pQ7rS1tU4vW6",
+            "createdByPerNo": "12345",
+            "notes": "Intra-facility dorm reassignment.",
+            "moveCompletedFlag": false,
+            "cancelled": false,
+            "inProgress": false
+          }
+        }
+      },
+      "CreateMovementResult": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ResultType"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable description of the outcome. On `Error`, describes what went wrong (missing fields, invalid values, rejection reason, etc.). Omitted from the response on `Success`.",
+            "nullable": true
+          },
+          "fullError": {
+            "type": "string",
+            "description": "Stack trace of the unhandled server exception. Present only when `type` is `Error` and the HTTP status code is 500. Always absent on HTTP 400 validation errors and HTTP 200 success responses.",
+            "nullable": true
+          },
+          "uniqueKey": {
+            "type": "string",
+            "description": "SmartCOP internal identifier of the newly created movement, generated by the system. Store this value for later retrieval or updates. Null on error.",
+            "nullable": true
+          },
+          "mniNumber": {
+            "type": "string",
+            "description": "Resolved MNI number for this movement's subject — useful when the request supplied only BookingNumber. Null on error.",
+            "nullable": true
+          },
+          "bookingNumber": {
+            "type": "string",
+            "description": "Resolved booking number for this movement's subject — useful when the request supplied only MNINumber. Null on error.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetBondConditionsResult": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ResultType"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable description of the outcome. On `Error`, describes what went wrong (missing fields, invalid values, rejection reason, etc.). Omitted from the response on `Success`.",
+            "nullable": true
+          },
+          "fullError": {
+            "type": "string",
+            "description": "Stack trace of the unhandled server exception. Present only when `type` is `Error` and the HTTP status code is 500. Always absent on HTTP 400 validation errors and HTTP 200 success responses.",
+            "nullable": true
+          },
+          "bondConditions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BondConditionCode"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetBondOptionsResult": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ResultType"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable description of the outcome. On `Error`, describes what went wrong (missing fields, invalid values, rejection reason, etc.). Omitted from the response on `Success`.",
+            "nullable": true
+          },
+          "fullError": {
+            "type": "string",
+            "description": "Stack trace of the unhandled server exception. Present only when `type` is `Error` and the HTTP status code is 500. Always absent on HTTP 400 validation errors and HTTP 200 success responses.",
+            "nullable": true
+          },
+          "bondOptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BondOptionCode"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetCaseLevelCodesResult": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ResultType"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable description of the outcome. On `Error`, describes what went wrong (missing fields, invalid values, rejection reason, etc.). Omitted from the response on `Success`.",
+            "nullable": true
+          },
+          "fullError": {
+            "type": "string",
+            "description": "Stack trace of the unhandled server exception. Present only when `type` is `Error` and the HTTP status code is 500. Always absent on HTTP 400 validation errors and HTTP 200 success responses.",
+            "nullable": true
+          },
+          "caseLevelCodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CaseLevelCode"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetCaseResult": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ResultType"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable description of the outcome. On `Error`, describes what went wrong (missing fields, invalid values, rejection reason, etc.). Omitted from the response on `Success`.",
+            "nullable": true
+          },
+          "fullError": {
+            "type": "string",
+            "description": "Stack trace of the unhandled server exception. Present only when `type` is `Error` and the HTTP status code is 500. Always absent on HTTP 400 validation errors and HTTP 200 success responses.",
+            "nullable": true
+          },
+          "case": {
+            "$ref": "#/components/schemas/JailCaseRecord"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetChargeStatusCodesResult": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ResultType"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable description of the outcome. On `Error`, describes what went wrong (missing fields, invalid values, rejection reason, etc.). Omitted from the response on `Success`.",
+            "nullable": true
+          },
+          "fullError": {
+            "type": "string",
+            "description": "Stack trace of the unhandled server exception. Present only when `type` is `Error` and the HTTP status code is 500. Always absent on HTTP 400 validation errors and HTTP 200 success responses.",
+            "nullable": true
+          },
+          "chargeStatusCodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChargeStatusCode"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetCourtsResult": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ResultType"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable description of the outcome. On `Error`, describes what went wrong (missing fields, invalid values, rejection reason, etc.). Omitted from the response on `Success`.",
+            "nullable": true
+          },
+          "fullError": {
+            "type": "string",
+            "description": "Stack trace of the unhandled server exception. Present only when `type` is `Error` and the HTTP status code is 500. Always absent on HTTP 400 validation errors and HTTP 200 success responses.",
+            "nullable": true
+          },
+          "courts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CourtCode"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetJudgesResult": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ResultType"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable description of the outcome. On `Error`, describes what went wrong (missing fields, invalid values, rejection reason, etc.). Omitted from the response on `Success`.",
+            "nullable": true
+          },
+          "fullError": {
+            "type": "string",
+            "description": "Stack trace of the unhandled server exception. Present only when `type` is `Error` and the HTTP status code is 500. Always absent on HTTP 400 validation errors and HTTP 200 success responses.",
+            "nullable": true
+          },
+          "judges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JudgeCode"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetLocationsResult": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ResultType"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable description of the outcome. On `Error`, describes what went wrong (missing fields, invalid values, rejection reason, etc.). Omitted from the response on `Success`.",
+            "nullable": true
+          },
+          "fullError": {
+            "type": "string",
+            "description": "Stack trace of the unhandled server exception. Present only when `type` is `Error` and the HTTP status code is 500. Always absent on HTTP 400 validation errors and HTTP 200 success responses.",
+            "nullable": true
+          },
+          "locations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocationCode"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetMovementResult": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ResultType"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable description of the outcome. On `Error`, describes what went wrong (missing fields, invalid values, rejection reason, etc.). Omitted from the response on `Success`.",
+            "nullable": true
+          },
+          "fullError": {
+            "type": "string",
+            "description": "Stack trace of the unhandled server exception. Present only when `type` is `Error` and the HTTP status code is 500. Always absent on HTTP 400 validation errors and HTTP 200 success responses.",
+            "nullable": true
+          },
+          "movement": {
+            "$ref": "#/components/schemas/JailMovementRecord"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetMovementTypesResult": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ResultType"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable description of the outcome. On `Error`, describes what went wrong (missing fields, invalid values, rejection reason, etc.). Omitted from the response on `Success`.",
+            "nullable": true
+          },
+          "fullError": {
+            "type": "string",
+            "description": "Stack trace of the unhandled server exception. Present only when `type` is `Error` and the HTTP status code is 500. Always absent on HTTP 400 validation errors and HTTP 200 success responses.",
+            "nullable": true
+          },
+          "movementTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MovementTypeCode"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "JailCaseCharge": {
+        "type": "object",
+        "properties": {
+          "chargeDescription": {
+            "type": "string",
+            "description": "Charge description.",
+            "nullable": true
+          },
+          "statuteCode": {
+            "maxLength": 50,
+            "type": "string",
+            "description": "Statute code.",
+            "nullable": true
+          },
+          "chargeLevel": {
+            "maxLength": 25,
+            "type": "string",
+            "description": "Charge level (e.g. Felony, Misdemeanor).",
+            "nullable": true
+          },
+          "chargeDegree": {
+            "maxLength": 1,
+            "type": "string",
+            "description": "Charge degree (e.g. 1st, 2nd, 3rd).",
+            "nullable": true
+          },
+          "disposition": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "Disposition of the charge.",
+            "nullable": true
+          },
+          "dispositionDescription": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "Human-readable description of Disposition.",
+            "nullable": true
+          },
+          "chargeReferenceNumber": {
+            "type": "string",
+            "description": "Reference number for this charge, resolved from its charge catalog entry. Null if the charge has no catalog linkage (e.g. arrest-imported charges not yet reconciled against the catalog).",
+            "nullable": true
+          },
+          "bondAmount": {
+            "type": "number",
+            "description": "Bond amount set for this individual charge (distinct from the case-level BondAmount — bond can be set per charge and gates release per charge).",
+            "format": "double",
+            "nullable": true
+          },
+          "uniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "SmartCOP internal identifier for this charge. Read-only.",
+            "nullable": true
+          },
+          "bookingAgency": {
+            "maxLength": 50,
+            "type": "string",
+            "description": "Name of the agency that booked this charge, resolved from the case's agency (JBCASE.AGENCYNAME) — the same value for every charge on a given case, since booking agency is not tracked per-charge in the underlying data.",
+            "nullable": true
+          },
+          "bookingAgencyAbbreviation": {
+            "maxLength": 10,
+            "type": "string",
+            "description": "Abbreviation/code for the agency that booked this charge, resolved from the case's agency (JBCASE.AGENCY, e.g. \"SRSO\") — the same value for every charge on a given case, since booking agency is not tracked per-charge in the underlying data.",
+            "nullable": true
+          },
+          "chargeSequenceNumber": {
+            "type": "integer",
+            "description": "Sequence number for this charge (JBCHARGE.CHARGEINT).",
+            "format": "int32"
+          },
+          "goc": {
+            "maxLength": 25,
+            "type": "string",
+            "description": "GOC (Group Offense Code) for this charge.",
+            "nullable": true
+          },
+          "gocDescription": {
+            "maxLength": 45,
+            "type": "string",
+            "description": "Human-readable description of GOC, resolved from the agency-configurable GOC catalog. Null if GOC has no catalog linkage.",
+            "nullable": true
+          },
+          "domesticViolence": {
+            "type": "boolean",
+            "description": "Whether this charge is flagged as domestic violence related."
+          },
+          "obts": {
+            "maxLength": 15,
+            "type": "string",
+            "description": "OBTS (Offense-Based Tracking System) number, resolved from the case's own OBTS number (JBCASE.OBTS) — the same value for every charge on a given case, since OBTS is assigned per arrest/booking event, not per-charge.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "JailCaseHeader": {
+        "type": "object",
+        "properties": {
+          "uniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "SmartCOP internal identifier for the case. Read-only — do not modify. Use this with `GET /Cases/GetCase` to retrieve the full record.",
+            "nullable": true
+          },
+          "caseNumber": {
+            "maxLength": 30,
+            "type": "string",
+            "description": "Agency-assigned case number.",
+            "nullable": true
+          },
+          "bookingNumber": {
+            "maxLength": 30,
+            "type": "string",
+            "description": "Booking number for inmate (primary subject).",
+            "nullable": true
+          },
+          "person": {
+            "$ref": "#/components/schemas/JailPerson"
+          },
+          "courtCaseNumber": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "Court case number assigned once the case is filed with the court. Null/empty for cases not yet filed.",
+            "nullable": true
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether the case is currently active."
+          },
+          "cancel": {
+            "type": "boolean",
+            "description": "Whether the case has been cancelled."
+          },
+          "judgeName": {
+            "maxLength": 60,
+            "type": "string",
+            "description": "Name of the judge associated with the case.",
+            "nullable": true
+          },
+          "createdDateTime": {
+            "type": "string",
+            "description": "Date and time the case was created.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "changedDateTime": {
+            "type": "string",
+            "description": "Date and time of the most recent change to this case.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "status": {
+            "maxLength": 50,
+            "type": "string",
+            "description": "Current case status (e.g. Active, Released).",
+            "nullable": true
+          },
+          "bondType": {
+            "maxLength": 60,
+            "type": "string",
+            "description": "Bond type: \"Bond By LEO\", \"Bond By Judge\", \"No Bond\", or null if no bond info has been entered.",
+            "nullable": true
+          },
+          "bondAmount": {
+            "type": "number",
+            "description": "Bond amount, applicable when BondType is \"Bond By LEO\" or \"Bond By Judge\". Null otherwise.",
+            "format": "double",
+            "nullable": true
+          },
+          "isInmateReleased": {
+            "type": "boolean",
+            "description": "Whether the subject has been released — their booking record has moved from JAILBOOK to the JBHISTO archive. Some Person fields (Street) aren't tracked historically and may be null for a released subject even though the case itself still has valid data."
+          }
+        },
+        "additionalProperties": false,
+        "example": {
+          "uniqueKey": "1JQSKZe3b0f8EbWmW7SICM",
+          "caseNumber": "2026-CASE-0045",
+          "bookingNumber": "BK2026-001234",
+          "person": {
+            "mniNumber": "MNI-123456",
+            "lastName": "Johnson",
+            "firstName": "Michael",
+            "physicalAddress": "123 Main St, Springfield, FL 32301"
+          },
+          "courtCaseNumber": "2026CF000123A",
+          "active": true,
+          "cancel": false,
+          "judgeName": "Hon. Jane Smith",
+          "createdDateTime": "2026-03-15T14:30:00",
+          "changedDateTime": "2026-03-16T09:45:00",
+          "status": "Active",
+          "bondType": "Bond By Judge",
+          "bondAmount": 1000,
+          "isInmateReleased": false
+        }
+      },
+      "JailCaseRecord": {
+        "type": "object",
+        "properties": {
+          "uniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "SmartCOP internal identifier for the case. Read-only — do not modify. Returned by the system and used to identify this case in follow-up API calls.",
+            "nullable": true
+          },
+          "caseNumber": {
+            "maxLength": 30,
+            "type": "string",
+            "description": "Agency-assigned case number.",
+            "nullable": true
+          },
+          "bookingNumber": {
+            "maxLength": 30,
+            "type": "string",
+            "description": "Booking number.",
+            "nullable": true
+          },
+          "person": {
+            "$ref": "#/components/schemas/JailPerson"
+          },
+          "createdDateTime": {
+            "type": "string",
+            "description": "Date and time the case was created.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "changedDateTime": {
+            "type": "string",
+            "description": "Date and time of the most recent change.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "arrestDate": {
+            "type": "string",
+            "description": "Date and time of arrest (JBCASE.ARR_DATE/ARR_TIME). Falls back to the subject's booking date (JAILBOOK/JBHISTO.BOOKDATE) when arrest date wasn't recorded on the case. Null if neither is available.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "status": {
+            "maxLength": 50,
+            "type": "string",
+            "description": "Current case status.",
+            "nullable": true
+          },
+          "courtCaseNumber": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "Court case number assigned once the case is filed with the court. Null/empty for cases not yet filed.",
+            "nullable": true
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether the case is currently active."
+          },
+          "cancel": {
+            "type": "boolean",
+            "description": "Whether the case has been cancelled."
+          },
+          "judgeName": {
+            "maxLength": 60,
+            "type": "string",
+            "description": "Name of the judge associated with the case.",
+            "nullable": true
+          },
+          "facility": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Facility where the subject is held.",
+            "nullable": true
+          },
+          "isInmateReleased": {
+            "type": "boolean",
+            "description": "Whether the subject has been released — their booking record has moved from JAILBOOK to the JBHISTO archive. Some fields (JudgeName, Street) aren't tracked historically and may be null for a released subject even though the case itself still has valid data."
+          },
+          "housingUnit": {
+            "maxLength": 50,
+            "type": "string",
+            "description": "Cell or housing unit.",
+            "nullable": true
+          },
+          "bondType": {
+            "maxLength": 60,
+            "type": "string",
+            "description": "Bond type: \"Bond By LEO\", \"Bond By Judge\", \"No Bond\", or null if no bond info has been entered.",
+            "nullable": true
+          },
+          "bondAmount": {
+            "type": "number",
+            "description": "Bond amount, applicable when BondType is \"Bond By LEO\" or \"Bond By Judge\". Null otherwise.",
+            "format": "double",
+            "nullable": true
+          },
+          "bondOptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BondOptionCode"
+            },
+            "description": "Bond options currently selected for this case, resolved from the agency-configurable bond option catalog (same entries as GET /Config/GetBondOptions). Pass the UniqueKey values back on JailCaseUpdate.BondOptions to update this case's selections.",
+            "nullable": true
+          },
+          "bondConditions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BondConditionCode"
+            },
+            "description": "Bond conditions currently selected for this case, resolved from the agency-configurable bond condition catalog (same entries as GET /Config/GetBondConditions). Pass the UniqueKey values back on JailCaseUpdate.BondConditions to update this case's selections.",
+            "nullable": true
+          },
+          "bondConditionOther": {
+            "type": "boolean",
+            "description": "Whether the \"Other\" bond condition is checked."
+          },
+          "bondConditionOtherComments": {
+            "type": "string",
+            "description": "Free-text comments for the \"Other\" bond condition.",
+            "nullable": true
+          },
+          "charges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JailCaseCharge"
+            },
+            "description": "Charges on this case.",
+            "nullable": true
+          },
+          "externalValidations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JailExternalValidationEntry"
+            },
+            "description": "External validation results submitted via SendExternalValidationResult.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "JailCaseUpdate": {
+        "type": "object",
+        "properties": {
+          "uniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "SmartCOP internal identifier of the case to update. If supplied, must match the request's top-level UniqueKey.",
+            "nullable": true
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether the case is currently active."
+          },
+          "cancel": {
+            "type": "boolean",
+            "description": "Whether the case has been cancelled."
+          },
+          "courtCaseNumber": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "Court case number assigned once the case is filed with the court. Null/empty for cases not yet filed.",
+            "nullable": true
+          },
+          "judgeName": {
+            "maxLength": 60,
+            "type": "string",
+            "description": "Name of the judge associated with the case. Free text — not validated against a catalog.",
+            "nullable": true
+          },
+          "bondType": {
+            "type": "string",
+            "description": "Bond type: \"Bond By LEO\", \"Bond By Judge\", or \"No Bond\". Null leaves the case's existing bond type/amount completely untouched — this is NOT a full-replace field like the 4 above.",
+            "nullable": true
+          },
+          "bondAmount": {
+            "type": "number",
+            "description": "Bond amount. Only meaningful when BondType is \"Bond By LEO\" or \"Bond By Judge\"; ignored (defaults to 0) otherwise. Only read when BondType is non-null.",
+            "format": "double",
+            "nullable": true
+          },
+          "bondOptions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "CfgBondOption.UniqueKey values to associate with this case. Null leaves existing bond options completely untouched. An empty list clears all bond options. A populated list replaces the full set.",
+            "nullable": true
+          },
+          "bondConditions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "CfgBondCondition.UniqueKey values to associate with this case. Null leaves existing bond conditions completely untouched. An empty list clears all bond conditions. A populated list replaces the full set.",
+            "nullable": true
+          },
+          "bondConditionOther": {
+            "type": "boolean",
+            "description": "Whether the \"Other\" bond condition applies. Null leaves the existing value untouched.",
+            "nullable": true
+          },
+          "bondConditionOtherComments": {
+            "maxLength": 255,
+            "type": "string",
+            "description": "Free-text comments for the \"Other\" bond condition. Null leaves the existing value untouched; empty string clears it.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "JailExternalValidationEntry": {
+        "type": "object",
+        "properties": {
+          "externalValidationID": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "External validation ID provided by the vendor.",
+            "nullable": true
+          },
+          "validationResult": {
+            "type": "string",
+            "description": "Text describing the validation result.",
+            "nullable": true
+          },
+          "submittedDateTime": {
+            "type": "string",
+            "description": "Date and time the result was submitted.",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "JailMovementHeader": {
+        "type": "object",
+        "properties": {
+          "uniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "SmartCOP internal identifier for the movement. Read-only — do not modify. Use this with `GET /Movements/GetMovement` to retrieve the full record.",
+            "nullable": true
+          },
+          "person": {
+            "$ref": "#/components/schemas/JailPerson"
+          },
+          "bookingNumber": {
+            "maxLength": 30,
+            "type": "string",
+            "description": "Booking number linked to this movement.",
+            "nullable": true
+          },
+          "movementDateTime": {
+            "type": "string",
+            "description": "Date and time the movement occurred.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "changedDateTime": {
+            "type": "string",
+            "description": "Date and time of the most recent change to this movement.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "movementType": {
+            "maxLength": 1,
+            "type": "string",
+            "description": "Single-character movement type code, matching JBMOVE.MOVETYPE (varchar(1)). Use `GET /Config/GetMovementTypes` for the current reference set.",
+            "nullable": true
+          },
+          "description": {
+            "maxLength": 75,
+            "type": "string",
+            "description": "OPTIONAL. Move description, may include information about source/destination of move.",
+            "nullable": true
+          },
+          "judgeUniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "Reference key (CFGJUDGE.UniqueKey) of the judge associated with this movement's court event, if any. Use with `JudgeName` to display the judge's name.",
+            "nullable": true
+          },
+          "judgeName": {
+            "type": "string",
+            "description": "READ-ONLY. Name of the judge referenced by `JudgeUniqueKey`, resolved from the judge configuration catalog. Null if `JudgeUniqueKey` is null or unresolvable.",
+            "nullable": true
+          },
+          "moveCompletedFlag": {
+            "type": "boolean",
+            "description": "Whether this movement's court event has been completed (has a result set) and no longer requires inmate movement."
+          },
+          "cancelled": {
+            "type": "boolean",
+            "description": "Whether the movement has been cancelled."
+          },
+          "inProgress": {
+            "type": "boolean",
+            "description": "Whether the movement is currently in progress (transport underway)."
+          },
+          "courtUniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "Reference key (CFGCOURT.UniqueKey) of the court associated with this movement, if any. Use with `CourtName` to display the court's name.",
+            "nullable": true
+          },
+          "courtName": {
+            "type": "string",
+            "description": "READ-ONLY. Name of the court referenced by `CourtUniqueKey`, resolved from the court configuration catalog. Null if `CourtUniqueKey` is null or unresolvable.",
+            "nullable": true
+          },
+          "locationUniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "Reference key (CFGMOVE.UniqueKey) of the external destination (e.g. hospital, other agency) for this movement, if any. Use with `LocationName` to display the location's description.",
+            "nullable": true
+          },
+          "locationName": {
+            "type": "string",
+            "description": "READ-ONLY. Description of the location referenced by `LocationUniqueKey`, resolved from the location configuration catalog. Null if `LocationUniqueKey` is null or unresolvable.",
+            "nullable": true
+          },
+          "isInmateReleased": {
+            "type": "boolean",
+            "description": "Whether the subject has been released — their booking record has moved from JAILBOOK to the JBHISTO archive. Some Person fields (Street) aren't tracked historically and may be null for a released subject."
+          }
+        },
+        "additionalProperties": false,
+        "example": {
+          "uniqueKey": "2dS9m5r6D8uhlsutq6uTz0",
+          "person": {
+            "mniNumber": "MNI-123456",
+            "lastName": "Johnson",
+            "firstName": "Michael",
+            "physicalAddress": "123 Main St, Springfield, FL 32301"
+          },
+          "bookingNumber": "BK2026-001234",
+          "movementDateTime": "2026-03-15T08:00:00",
+          "changedDateTime": "2026-03-15T08:05:00",
+          "movementType": "E",
+          "description": "Dorm B-2",
+          "judgeUniqueKey": "a3F9kL2mN8pQ7rS1tU4vW6",
+          "judgeName": "Hon. Jane Smith",
+          "courtUniqueKey": "b7G2mN5pQ8rS1tU4vW6xY9",
+          "courtName": "Circuit Court",
+          "locationUniqueKey": "c4H8kL2mN5pQ7rS1tU4vW6",
+          "locationName": "Shands Hospital",
+          "moveCompletedFlag": false,
+          "cancelled": false,
+          "inProgress": false,
+          "isInmateReleased": false
+        }
+      },
+      "JailMovementRecord": {
+        "required": [
+          "bookingNumber",
+          "mniNumber",
+          "movementDateTime",
+          "movementType"
+        ],
+        "type": "object",
+        "properties": {
+          "uniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "SmartCOP internal identifier automatically generated by the system. Use this to identify the movement in follow-up calls (e.g. as UpdateMovement's UniqueKey).",
+            "nullable": true
+          },
+          "mniNumber": {
+            "maxLength": 20,
+            "minLength": 1,
+            "type": "string",
+            "description": "MNI number of the subject."
+          },
+          "bookingNumber": {
+            "maxLength": 30,
+            "minLength": 1,
+            "type": "string",
+            "description": "Booking number."
+          },
+          "movementDateTime": {
+            "type": "string",
+            "description": "Date and time the movement occurred.",
+            "format": "date-time"
+          },
+          "movementType": {
+            "maxLength": 1,
+            "minLength": 1,
+            "type": "string",
+            "description": "Single-character movement type code, matching JBMOVE.MOVETYPE (varchar(1)). Use `GET /Config/GetMovementTypes` for the current reference set."
+          },
+          "description": {
+            "maxLength": 75,
+            "type": "string",
+            "description": "Move description, may include information about source/destination of move.",
+            "nullable": true
+          },
+          "judgeUniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "OPTIONAL. Reference key (CFGJUDGE.UniqueKey) of the judge associated with this movement's court event, if any. Must be an existing judge configuration UniqueKey — do not pass a judge's name here.",
+            "nullable": true
+          },
+          "judgeName": {
+            "type": "string",
+            "description": "READ-ONLY. Name of the judge referenced by `JudgeUniqueKey`, resolved from the judge configuration catalog.",
+            "nullable": true
+          },
+          "moveCompletedFlag": {
+            "type": "boolean",
+            "description": "READ-ONLY. Whether this movement's court event has been completed and no longer requires inmate movement."
+          },
+          "cancelled": {
+            "type": "boolean",
+            "description": "READ-ONLY. Whether the movement has been cancelled."
+          },
+          "inProgress": {
+            "type": "boolean",
+            "description": "READ-ONLY. Whether the movement is currently in progress (transport underway)."
+          },
+          "courtUniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "OPTIONAL. Reference key (CFGCOURT.UniqueKey) of the court associated with this movement, if any. Must be an existing court configuration UniqueKey — do not pass a court's name here. Use `GET /Config/GetCourts` for the current reference set.",
+            "nullable": true
+          },
+          "courtName": {
+            "type": "string",
+            "description": "READ-ONLY. Name of the court referenced by `CourtUniqueKey`, resolved from the court configuration catalog.",
+            "nullable": true
+          },
+          "locationUniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "OPTIONAL. Reference key (CFGMOVE.UniqueKey) of the external destination (e.g. hospital, other agency) for this movement, if any. Must be an existing, non-internal location — use `GET /Config/GetLocations` for the current reference set. Internal destinations (dorms/cells/facilities) cannot be used here.",
+            "nullable": true
+          },
+          "locationName": {
+            "type": "string",
+            "description": "READ-ONLY. Description of the location referenced by `LocationUniqueKey`, resolved from the location configuration catalog.",
+            "nullable": true
+          },
+          "person": {
+            "$ref": "#/components/schemas/JailPerson"
+          },
+          "isInmateReleased": {
+            "type": "boolean",
+            "description": "READ-ONLY. Whether the subject has been released — their booking record has moved from JAILBOOK to the JBHISTO archive. Some Person fields (Street) aren't tracked historically and may be null for a released subject."
+          },
+          "createdByPerNo": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "OPTIONAL. Personnel number who created/authorized the movement.",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
+            "description": "OPTIONAL. Free-text notes about this movement.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "example": {
+          "uniqueKey": "2dS9m5r6D8uhlsutq6uTz0",
+          "mniNumber": "MNI-123456",
+          "bookingNumber": "BK2026-001234",
+          "movementDateTime": "2026-03-15T08:00:00",
+          "movementType": "E",
+          "description": "Dorm B-2",
+          "judgeUniqueKey": "a3F9kL2mN8pQ7rS1tU4vW6",
+          "judgeName": "Hon. Jane Smith",
+          "courtUniqueKey": "b7G2mN5pQ8rS1tU4vW6xY9",
+          "courtName": "Circuit Court",
+          "locationUniqueKey": "c4H8kL2mN5pQ7rS1tU4vW6",
+          "locationName": "Shands Hospital",
+          "moveCompletedFlag": false,
+          "cancelled": false,
+          "inProgress": false,
+          "person": {
+            "lastName": "Johnson",
+            "firstName": "Michael",
+            "dateOfBirth": "1989-07-04T00:00:00",
+            "street": "123 Main St",
+            "city": "Springfield",
+            "state": "FL",
+            "zip": "32301",
+            "houseNo": "123",
+            "physicalAddress": "123 Main St, Springfield, FL 32301",
+            "uniqueKey": "0kR8mQ2pN5tV7wX1yZ3aBc",
+            "suffix": "Jr",
+            "sex": "M",
+            "race": "W",
+            "height": "6'1\"",
+            "weight": 195,
+            "eyeColor": "BRO",
+            "hairColor": "BRN",
+            "ssn": "412-34-5678",
+            "idNo": "D1234567890123",
+            "idState": "FL",
+            "phoneNumber": "555-123-4567",
+            "aliases": [
+              {
+                "uniqueKey": "1mS9nR3qO6uW8xY2zA4bCd",
+                "firstName": "Mike",
+                "lastName": "Johnson",
+                "suffix": "Jr"
+              }
+            ]
+          },
+          "isInmateReleased": false,
+          "createdByPerNo": "12345",
+          "notes": "Dorm move entered by classification desk."
+        }
+      },
+      "JailMovementUpdate": {
+        "required": [
+          "movementDateTime",
+          "movementType"
+        ],
+        "type": "object",
+        "properties": {
+          "uniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "SmartCOP internal identifier automatically generated by the system. DO NOT SET on CreateMovement requests — leave as null. Include only when updating an existing movement to identify which record to modify; if supplied on UpdateMovement, must match the request's top-level UniqueKey.",
+            "nullable": true
+          },
+          "mniNumber": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "MNI number of the subject. At least one of MNINumber/BookingNumber is required. If both are supplied, they must refer to the same JAILBOOK/JBHISTO record — a mismatch is rejected. If only MNINumber is supplied, it must resolve unambiguously to a single active booking (or, absent an active match, a single historical one).",
+            "nullable": true
+          },
+          "bookingNumber": {
+            "maxLength": 30,
+            "type": "string",
+            "description": "Booking number. At least one of MNINumber/BookingNumber is required. Must match an existing JAILBOOK/JBHISTO record.",
+            "nullable": true
+          },
+          "movementDateTime": {
+            "type": "string",
+            "description": "MANDATORY. Date and time the movement occurred.",
+            "format": "date-time"
+          },
+          "movementType": {
+            "maxLength": 1,
+            "minLength": 1,
+            "type": "string",
+            "description": "MANDATORY. Single-character movement type code, matching JBMOVE.MOVETYPE (varchar(1)). Must be one of GET /Config/GetMovementTypes' known codes (C, E, D, F, O) — matching is case-insensitive, and the value is normalized to uppercase before being saved. Any other value is rejected."
+          },
+          "description": {
+            "maxLength": 75,
+            "type": "string",
+            "description": "OPTIONAL. Move description, may include information about source/destination of move.",
+            "nullable": true
+          },
+          "judgeUniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "OPTIONAL. Reference key (CFGJUDGE.UniqueKey) of the judge associated with this movement's court event, if any. Must be an existing judge configuration UniqueKey — do not pass a judge's name here.",
+            "nullable": true
+          },
+          "courtUniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "OPTIONAL. Reference key (CFGCOURT.UniqueKey) of the court associated with this movement, if any. Must be an existing court configuration UniqueKey — do not pass a court's name here. Use GET /Config/GetCourts for the current reference set.",
+            "nullable": true
+          },
+          "locationUniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "OPTIONAL. Reference key (CFGMOVE.UniqueKey) of the external destination (e.g. hospital, other agency) for this movement, if any. Must be an existing, non-internal location — use GET /Config/GetLocations for the current reference set. Internal destinations (dorms/cells/facilities) cannot be used here.",
+            "nullable": true
+          },
+          "createdByPerNo": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "OPTIONAL. Personnel number who created/authorized the movement. If omitted, defaults to the calling application's authorized API identity (e.g. \"CivitekJail\") rather than being left blank.",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
+            "description": "OPTIONAL. Free-text notes about this movement.",
+            "nullable": true
+          },
+          "moveCompletedFlag": {
+            "type": "boolean",
+            "description": "OPTIONAL. Whether this movement's court event has been completed and no longer requires inmate movement — direct pass-through to JBMOVE.COMPLETE. Null leaves the existing value untouched on UpdateMovement (defaults to false on CreateMovement, which has no prior value).",
+            "nullable": true
+          },
+          "cancelled": {
+            "type": "boolean",
+            "description": "Whether the movement has been cancelled — direct pass-through to JBMOVE.CANCELED. Always submitted (full-replace, no leave-alone semantics), matching UpdateCase.Cancel. Defaults to false on CreateMovement, which has no prior value."
+          },
+          "inProgress": {
+            "type": "boolean",
+            "description": "OPTIONAL. Whether the movement is currently in progress (transport underway) — direct pass-through to JBMOVE.InProgress. Null leaves the existing value untouched on UpdateMovement (defaults to false on CreateMovement, which has no prior value — a movement is not usually created already in progress, but the field is not rejected if supplied).",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "JailPerson": {
+        "type": "object",
+        "properties": {
+          "mniNumber": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "MNI number of the primary subject.",
+            "nullable": true
+          },
+          "lastName": {
+            "maxLength": 30,
+            "type": "string",
+            "description": "Last name of the primary subject.",
+            "nullable": true
+          },
+          "firstName": {
+            "maxLength": 30,
+            "type": "string",
+            "description": "First name of the primary subject.",
+            "nullable": true
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "description": "Date of birth of the primary subject.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "street": {
+            "type": "string",
+            "description": "Street address of the primary subject.",
+            "nullable": true
+          },
+          "city": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "City of the primary subject's address.",
+            "nullable": true
+          },
+          "state": {
+            "maxLength": 2,
+            "type": "string",
+            "description": "State of the primary subject's address.",
+            "nullable": true
+          },
+          "zip": {
+            "maxLength": 5,
+            "type": "string",
+            "description": "ZIP code of the primary subject's address.",
+            "nullable": true
+          },
+          "houseNo": {
+            "maxLength": 6,
+            "type": "string",
+            "description": "House number of the primary subject's address.",
+            "nullable": true
+          },
+          "physicalAddress": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Free-text physical address for the primary subject, distinct from the structured Street/City/State/Zip breakdown above.",
+            "nullable": true
+          },
+          "uniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "SmartCOP internal identifier for this subject's JAILBOOK record. Read-only.",
+            "nullable": true
+          },
+          "suffix": {
+            "maxLength": 5,
+            "type": "string",
+            "description": "Name suffix (e.g. \"Jr\", \"Sr\", \"III\").",
+            "nullable": true
+          },
+          "sex": {
+            "maxLength": 1,
+            "type": "string",
+            "description": "Sex code.",
+            "nullable": true
+          },
+          "race": {
+            "maxLength": 2,
+            "type": "string",
+            "description": "Race code.",
+            "nullable": true
+          },
+          "height": {
+            "maxLength": 5,
+            "type": "string",
+            "description": "Height, as recorded at booking (free-text format, e.g. \"5'10\").",
+            "nullable": true
+          },
+          "weight": {
+            "type": "integer",
+            "description": "Weight in pounds, as recorded at booking.",
+            "format": "int32",
+            "nullable": true
+          },
+          "eyeColor": {
+            "maxLength": 3,
+            "type": "string",
+            "description": "Eye color code.",
+            "nullable": true
+          },
+          "hairColor": {
+            "maxLength": 3,
+            "type": "string",
+            "description": "Hair color code.",
+            "nullable": true
+          },
+          "ssn": {
+            "maxLength": 11,
+            "type": "string",
+            "description": "Social Security Number.",
+            "nullable": true
+          },
+          "idNo": {
+            "maxLength": 25,
+            "type": "string",
+            "description": "State-issued identification number, sourced from MNI (not tracked in JAILBOOK). Null if MNI enrichment is unavailable or no ID is on file.",
+            "nullable": true
+          },
+          "idState": {
+            "maxLength": 2,
+            "type": "string",
+            "description": "State that issued IdNo, sourced from MNI (not tracked in JAILBOOK). Null if MNI enrichment is unavailable or no ID is on file.",
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "Primary phone number for the subject, sourced from MNI. Read-only.",
+            "nullable": true
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JailPersonAlias"
+            },
+            "description": "Known aliases (alternate names) for the subject, sourced from MNI. Read-only.",
+            "nullable": true
+          },
+          "mniLastName": {
+            "maxLength": 30,
+            "type": "string",
+            "description": "MNI's current last name for this subject. Only present when it differs from LastName and MNI's demographic data was modified more recently than JAILBOOK's — signals a possible sync gap between the two systems.",
+            "nullable": true
+          },
+          "mniFirstName": {
+            "maxLength": 30,
+            "type": "string",
+            "description": "MNI's current first name for this subject. Only present when it differs from FirstName and MNI's demographic data was modified more recently than JAILBOOK's — signals a possible sync gap between the two systems.",
+            "nullable": true
+          },
+          "mniSuffix": {
+            "maxLength": 5,
+            "type": "string",
+            "description": "MNI's current name suffix for this subject. Only present when it differs from Suffix and MNI's demographic data was modified more recently than JAILBOOK's — signals a possible sync gap between the two systems.",
+            "nullable": true
+          },
+          "mniSex": {
+            "maxLength": 1,
+            "type": "string",
+            "description": "MNI's current sex code for this subject. Only present when it differs from Sex and MNI's demographic data was modified more recently than JAILBOOK's — signals a possible sync gap between the two systems.",
+            "nullable": true
+          },
+          "mniRace": {
+            "maxLength": 1,
+            "type": "string",
+            "description": "MNI's current race code for this subject. Only present when it differs from Race and MNI's demographic data was modified more recently than JAILBOOK's — signals a possible sync gap between the two systems.",
+            "nullable": true
+          },
+          "mniHeight": {
+            "maxLength": 5,
+            "type": "string",
+            "description": "MNI's current height for this subject. Only present when it differs from Height and MNI's demographic data was modified more recently than JAILBOOK's — signals a possible sync gap between the two systems.",
+            "nullable": true
+          },
+          "mniWeight": {
+            "type": "integer",
+            "description": "MNI's current weight (in pounds) for this subject. Only present when it differs from Weight and MNI's demographic data was modified more recently than JAILBOOK's — signals a possible sync gap between the two systems.",
+            "format": "int32",
+            "nullable": true
+          },
+          "mniEyeColor": {
+            "maxLength": 3,
+            "type": "string",
+            "description": "MNI's current eye color code for this subject. Only present when it differs from EyeColor and MNI's demographic data was modified more recently than JAILBOOK's — signals a possible sync gap between the two systems.",
+            "nullable": true
+          },
+          "mniHairColor": {
+            "maxLength": 3,
+            "type": "string",
+            "description": "MNI's current hair color code for this subject. Only present when it differs from HairColor and MNI's demographic data was modified more recently than JAILBOOK's — signals a possible sync gap between the two systems.",
+            "nullable": true
+          },
+          "mniSSN": {
+            "maxLength": 11,
+            "type": "string",
+            "description": "MNI's current Social Security Number for this subject. Only present when it differs from SSN and MNI's demographic data was modified more recently than JAILBOOK's — signals a possible sync gap between the two systems.",
+            "nullable": true
+          },
+          "mniDateOfBirth": {
+            "type": "string",
+            "description": "MNI's current date of birth for this subject. Only present when it differs from DateOfBirth and MNI's demographic data was modified more recently than JAILBOOK's — signals a possible sync gap between the two systems.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "mniAddress": {
+            "type": "string",
+            "description": "MNI's current address for this subject, formatted as a single display string (e.g. \"123 Main St, Springfield, FL 32301\"). Only present when it differs from (or fills a gap in) the Street/City/State/Zip fields above and MNI's demographic data was modified more recently than JAILBOOK's — signals a possible sync gap between the two systems.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "JailPersonAlias": {
+        "type": "object",
+        "properties": {
+          "uniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "SmartCOP internal identifier for this alias record (MNI_AKA.UNIQUEKEY). Read-only.",
+            "nullable": true
+          },
+          "firstName": {
+            "maxLength": 15,
+            "type": "string",
+            "description": "Alias first name.",
+            "nullable": true
+          },
+          "middleName": {
+            "maxLength": 15,
+            "type": "string",
+            "description": "Alias middle name.",
+            "nullable": true
+          },
+          "lastName": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "Alias last name.",
+            "nullable": true
+          },
+          "suffix": {
+            "maxLength": 5,
+            "type": "string",
+            "description": "Alias name suffix (e.g. \"Jr\", \"Sr\", \"III\"), sourced from MNI_AKA.TITLE.",
+            "nullable": true
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "description": "Date of birth associated with this alias, if known.",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "JudgeCode": {
+        "type": "object",
+        "properties": {
+          "uniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "SmartCOP internal identifier for this judge configuration entry. Use this value as `JudgeUniqueKey` on CreateMovement/UpdateMovement. Read-only — do not modify.",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the judge.",
+            "nullable": true
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether this judge configuration entry is currently active."
+          }
+        },
+        "additionalProperties": false
+      },
+      "LocationCode": {
+        "type": "object",
+        "properties": {
+          "uniqueKey": {
+            "maxLength": 22,
+            "type": "string",
+            "description": "SmartCOP internal identifier for this location. Use this value as `LocationUniqueKey` on CreateMovement/UpdateMovement. Read-only — do not modify.",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the location.",
+            "nullable": true
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether this location is currently active."
+          }
+        },
+        "additionalProperties": false
+      },
+      "MovementTypeCode": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "maxLength": 1,
+            "type": "string",
+            "description": "Movement type code value (matched to a movement's type).",
+            "nullable": true
+          },
+          "description": {
+            "maxLength": 50,
+            "type": "string",
+            "description": "Human-readable description of the movement type.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "example": {
+          "code": "E",
+          "description": "Dorm Move"
+        }
+      },
+      "PaginationMetadata": {
+        "type": "object",
+        "properties": {
+          "pageNumber": {
+            "type": "integer",
+            "description": "Current page number (1-indexed). Reflects the PageNumber sent in the request. Default: 1.",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "Number of records per page. Reflects the PageSize sent in the request. Default: 50. Maximum: 500.",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "description": "Total number of records matching the query across all pages.",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages for this result set. Calculated as ceil(TotalCount / PageSize).",
+            "format": "int32",
+            "readOnly": true
+          },
+          "hasNextPage": {
+            "type": "boolean",
+            "description": "True if there is a next page available. Use this to determine whether to request PageNumber + 1.",
+            "readOnly": true
+          },
+          "hasPreviousPage": {
+            "type": "boolean",
+            "description": "True if there is a previous page available (PageNumber > 1).",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": { }
+      },
+      "QueryCasesResult": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ResultType"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable description of the outcome. On `Error`, describes what went wrong (missing fields, invalid values, rejection reason, etc.). Omitted from the response on `Success`.",
+            "nullable": true
+          },
+          "fullError": {
+            "type": "string",
+            "description": "Stack trace of the unhandled server exception. Present only when `type` is `Error` and the HTTP status code is 500. Always absent on HTTP 400 validation errors and HTTP 200 success responses.",
+            "nullable": true
+          },
+          "cases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JailCaseHeader"
+            },
+            "nullable": true
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationMetadata"
+          }
+        },
+        "additionalProperties": false
+      },
+      "QueryMovementsResult": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ResultType"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable description of the outcome. On `Error`, describes what went wrong (missing fields, invalid values, rejection reason, etc.). Omitted from the response on `Success`.",
+            "nullable": true
+          },
+          "fullError": {
+            "type": "string",
+            "description": "Stack trace of the unhandled server exception. Present only when `type` is `Error` and the HTTP status code is 500. Always absent on HTTP 400 validation errors and HTTP 200 success responses.",
+            "nullable": true
+          },
+          "movements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JailMovementHeader"
+            },
+            "nullable": true
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationMetadata"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResultType": {
+        "enum": [
+          "Unknown",
+          "Success",
+          "Error",
+          "CertificateNotProvided",
+          "CertificateNotValid",
+          "CertificateNotVerified",
+          "CertificateRevoked",
+          "DataSourceError",
+          "DeserializationError",
+          "DataLogicError",
+          "ArgumentError"
+        ],
+        "type": "string"
+      },
+      "SendExternalValidationResultRequest": {
+        "required": [
+          "caseID",
+          "externalValidationID",
+          "validationResult"
+        ],
+        "type": "object",
+        "properties": {
+          "caseID": {
+            "maxLength": 22,
+            "minLength": 1,
+            "type": "string",
+            "description": "MANDATORY. SmartCOP internal identifier (`UniqueKey`) of the case to annotate. Use the `UniqueKey` returned by case query/read endpoints. System-generated — do not invent or modify values."
+          },
+          "externalValidationID": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string",
+            "description": "MANDATORY. Vendor-assigned external validation ID."
+          },
+          "validationResult": {
+            "minLength": 1,
+            "type": "string",
+            "description": "MANDATORY. Text describing the result of the external validation."
+          }
+        },
+        "additionalProperties": false
+      },
+      "SendExternalValidationResultResult": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ResultType"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable description of the outcome. On `Error`, describes what went wrong (missing fields, invalid values, rejection reason, etc.). Omitted from the response on `Success`.",
+            "nullable": true
+          },
+          "fullError": {
+            "type": "string",
+            "description": "Stack trace of the unhandled server exception. Present only when `type` is `Error` and the HTTP status code is 500. Always absent on HTTP 400 validation errors and HTTP 200 success responses.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwaggerErrorResponse": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ResultType"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable description of the outcome. On `Error`, describes what went wrong (missing fields, invalid values, rejection reason, etc.). Omitted from the response on `Success`.",
+            "nullable": true
+          },
+          "fullError": {
+            "type": "string",
+            "description": "Stack trace of the unhandled server exception. Present only when `type` is `Error` and the HTTP status code is 500. Always absent on HTTP 400 validation errors and HTTP 200 success responses.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateCaseRequest": {
+        "required": [
+          "case",
+          "uniqueKey"
+        ],
+        "type": "object",
+        "properties": {
+          "uniqueKey": {
+            "maxLength": 22,
+            "minLength": 1,
+            "type": "string",
+            "description": "MANDATORY. SmartCOP internal identifier of the case to update. Use the existing system-generated `UniqueKey`; do not change or invent values."
+          },
+          "case": {
+            "$ref": "#/components/schemas/JailCaseUpdate"
+          }
+        },
+        "additionalProperties": false,
+        "example": {
+          "uniqueKey": "1JQSKZe3b0f8EbWmW7SICM",
+          "case": {
+            "uniqueKey": "1JQSKZe3b0f8EbWmW7SICM",
+            "active": true,
+            "cancel": false,
+            "courtCaseNumber": "2026CF000123A",
+            "judgeName": "Hon. Jane Smith",
+            "bondType": "Bond By Judge",
+            "bondAmount": 1500,
+            "bondOptions": [
+              "BONDOPT-001"
+            ],
+            "bondConditions": [
+              "BONDCOND-001"
+            ],
+            "bondConditionOther": false,
+            "bondConditionOtherComments": ""
+          }
+        }
+      },
+      "UpdateCaseResult": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ResultType"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable description of the outcome. On `Error`, describes what went wrong (missing fields, invalid values, rejection reason, etc.). Omitted from the response on `Success`.",
+            "nullable": true
+          },
+          "fullError": {
+            "type": "string",
+            "description": "Stack trace of the unhandled server exception. Present only when `type` is `Error` and the HTTP status code is 500. Always absent on HTTP 400 validation errors and HTTP 200 success responses.",
+            "nullable": true
+          },
+          "uniqueKey": {
+            "type": "string",
+            "description": "SmartCOP internal identifier of the updated case. Null on error.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateMovementRequest": {
+        "required": [
+          "movement",
+          "uniqueKey"
+        ],
+        "type": "object",
+        "properties": {
+          "uniqueKey": {
+            "maxLength": 22,
+            "minLength": 1,
+            "type": "string",
+            "description": "MANDATORY. SmartCOP internal identifier of the movement to update. Use the existing system-generated `UniqueKey`; do not change or invent values."
+          },
+          "movement": {
+            "$ref": "#/components/schemas/JailMovementUpdate"
+          }
+        },
+        "additionalProperties": false,
+        "example": {
+          "uniqueKey": "2dS9m5r6D8uhlsutq6uTz0",
+          "movement": {
+            "uniqueKey": "2dS9m5r6D8uhlsutq6uTz0",
+            "mniNumber": "MNI-123456",
+            "bookingNumber": "BK2026-001234",
+            "movementDateTime": "2026-03-15T08:00:00",
+            "movementType": "E",
+            "description": "Dorm B-3",
+            "judgeUniqueKey": "a3F9kL2mN8pQ7rS1tU4vW6",
+            "courtUniqueKey": "b7G2mN5pQ8rS1tU4vW6xY9",
+            "locationUniqueKey": "c4H8kL2mN5pQ7rS1tU4vW6",
+            "createdByPerNo": "12345",
+            "notes": "Reassigned after classification review.",
+            "moveCompletedFlag": true,
+            "cancelled": false,
+            "inProgress": true
+          }
+        }
+      },
+      "UpdateMovementResult": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ResultType"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable description of the outcome. On `Error`, describes what went wrong (missing fields, invalid values, rejection reason, etc.). Omitted from the response on `Success`.",
+            "nullable": true
+          },
+          "fullError": {
+            "type": "string",
+            "description": "Stack trace of the unhandled server exception. Present only when `type` is `Error` and the HTTP status code is 500. Always absent on HTTP 400 validation errors and HTTP 200 success responses.",
+            "nullable": true
+          },
+          "uniqueKey": {
+            "type": "string",
+            "description": "SmartCOP internal identifier of the updated movement. Null on error.",
+            "nullable": true
+          },
+          "mniNumber": {
+            "type": "string",
+            "description": "Resolved MNI number for this movement's subject — useful when the request supplied only BookingNumber. Null on error.",
+            "nullable": true
+          },
+          "bookingNumber": {
+            "type": "string",
+            "description": "Resolved booking number for this movement's subject — useful when the request supplied only MNINumber. Null on error.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Paste the JWT token returned by /Auth/GetToken",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
+}

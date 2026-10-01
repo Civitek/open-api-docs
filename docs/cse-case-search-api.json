@@ -1,0 +1,271 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "CSE Case Search API",
+    "version": "v1",
+    "description": "REST/JSON modernization of the legacy CCIS SOAP `CseCaseSearch` operation (oscawebservice). Given a Uniform Case Number (UCN) for a Child Support Enforcement (CSE/SDU) case, returns the case status, filing details, case participants (payee/payor/dependents), receipts, disbursements, and term balances. The search endpoint uses POST with a request body so additional search criteria can be added in the future without breaking existing clients.\n\nThis specification does not document authentication/authorization for this service."
+  },
+  "servers": [
+    {
+      "url": "https://testapi.flclerktools.com/ccis",
+      "description": "Test"
+    }
+  ],
+  "tags": [
+    {
+      "name": "CSE Case Search",
+      "description": "Search for Child Support Enforcement (CSE/SDU) case details by Uniform Case Number (UCN)."
+    }
+  ],
+  "paths": {
+    "/cse-cases/search": {
+      "post": {
+        "tags": ["CSE Case Search"],
+        "summary": "Search for a CSE case",
+        "description": "Retrieves the Child Support Enforcement (CSE) case identified by the given Uniform Case Number (UCN), including case participants, receipts, disbursements, and term balances. A POST request body is used so additional search criteria can be added in the future without breaking existing clients.",
+        "operationId": "searchCseCase",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CseCaseSearchRequest" },
+              "examples": {
+                "byUcn": {
+                  "summary": "Search by UCN",
+                  "value": { "ucn": "13012025DR001234AX" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "CSE case retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CseCaseResponse" },
+                "examples": {
+                  "found": {
+                    "summary": "Example CSE case",
+                    "value": {
+                      "ucn": "13012025DR001234AX",
+                      "caseNumber": "2025DR001234",
+                      "countyCode": "13",
+                      "countyDescription": "Hillsborough",
+                      "caseTypeDescription": "DR",
+                      "caseStatus": "O",
+                      "uresaFlag": "N",
+                      "filedDate": "2025-01-15",
+                      "participants": [
+                        {
+                          "participantType": "P",
+                          "countyCode": "13",
+                          "firstName": "Jane",
+                          "middleName": "A",
+                          "lastName": "Doe",
+                          "dateOfBirth": "1985-06-01",
+                          "sex": "F",
+                          "address": {
+                            "line1": "123 Main St",
+                            "city": "Tampa",
+                            "state": "FL",
+                            "zip": "33602",
+                            "confidentialIndicator": "N"
+                          },
+                          "phoneNumber": "8135551234"
+                        },
+                        {
+                          "participantType": "D",
+                          "countyCode": "13",
+                          "firstName": "John",
+                          "lastName": "Smith",
+                          "dateOfBirth": "1983-02-10",
+                          "sex": "M"
+                        },
+                        {
+                          "participantType": "DP",
+                          "firstName": "Sam",
+                          "lastName": "Smith",
+                          "dateOfBirth": "2010-09-01",
+                          "depEmancipationDate": "2028-09-01"
+                        }
+                      ],
+                      "receipts": [
+                        { "paymentId": "R12345", "postDate": "2025-08-01", "postAmount": 150.00 }
+                      ],
+                      "disbursements": [
+                        { "checkNumber": "998877", "checkDate": "2025-08-05", "checkAmount": 145.00 }
+                      ],
+                      "termBalances": [
+                        {
+                          "termType": "CS",
+                          "assessmentFrequency": "M",
+                          "termAmount": 500.00,
+                          "maxAmount": 500.00,
+                          "termBalanceAmount": 1200.00,
+                          "payoffAmount": 1200.00,
+                          "nextAssessmentDate": "2025-09-01",
+                          "termDescription": "Current Support"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The `ucn` was missing or invalid.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "examples": {
+                  "missingUcn": {
+                    "summary": "Required data missing",
+                    "value": { "status": "Bad Request", "statusCode": 400, "errorMessage": "Required Data Missing" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No CSE case was found for the given UCN.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "examples": {
+                  "notFound": {
+                    "summary": "No data returned",
+                    "value": { "status": "Not Found", "statusCode": 404, "errorMessage": "No Data Returned" }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "503": {
+            "description": "The case data source is temporarily unavailable.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "examples": {
+                  "dbUnavailable": {
+                    "summary": "Database unavailable",
+                    "value": { "status": "Service Unavailable", "statusCode": 503, "errorMessage": "Database Unavailable" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CseCaseSearchRequest": {
+        "type": "object",
+        "required": ["ucn"],
+        "properties": {
+          "ucn": { "type": "string", "minLength": 20, "maxLength": 20, "description": "The Uniform Case Number (UCN) of the case being requested. Must be exactly 20 characters.", "example": "13012025DR001234AX" }
+        },
+        "description": "Search criteria for locating a CSE case. Additional optional search criteria may be added to this object in future versions."
+      },
+      "CseCaseResponse": {
+        "type": "object",
+        "allOf": [{ "$ref": "#/components/schemas/CseCase" }],
+        "description": "The CSE case matching the requested UCN."
+      },
+      "CseCase": {
+        "type": "object",
+        "properties": {
+          "ucn": { "type": "string", "description": "The Uniform Case Number for this case.", "example": "13012025DR001234AX" },
+          "caseNumber": { "type": "string", "description": "The Clerk's local case number for this case." },
+          "countyCode": { "type": "string", "description": "The FIPS county code the case is filed in." },
+          "countyDescription": { "type": "string", "description": "The county name the case is filed in." },
+          "caseTypeDescription": { "type": "string", "description": "The case type (e.g. DR)." },
+          "caseStatus": { "type": "string", "description": "The current case status value." },
+          "uresaFlag": { "type": "string", "description": "Indicates whether this is a URESA/UIFSA (interstate support) case." },
+          "filedDate": { "type": "string", "format": "date", "description": "The date the case was filed." },
+          "participants": { "type": "array", "items": { "$ref": "#/components/schemas/Participant" }, "description": "The payee(s), payor(s), and dependent(s) associated with this case." },
+          "receipts": { "type": "array", "items": { "$ref": "#/components/schemas/Receipt" }, "description": "Payments received and posted to this case." },
+          "disbursements": { "type": "array", "items": { "$ref": "#/components/schemas/Disbursement" }, "description": "Payments disbursed from this case." },
+          "termBalances": { "type": "array", "items": { "$ref": "#/components/schemas/TermBalance" }, "description": "Support obligation terms and current balances for this case." }
+        }
+      },
+      "Participant": {
+        "type": "object",
+        "properties": {
+          "participantType": { "type": "string", "enum": ["P", "D", "DP"], "description": "The role of this participant on the case: P = Payee, D = Payor, DP = Dependent." },
+          "countyCode": { "type": "string", "description": "The FIPS county code associated with this participant record." },
+          "firstName": { "type": "string" },
+          "middleName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "dateOfBirth": { "type": "string", "format": "date" },
+          "sex": { "type": "string", "description": "The sex documented for this participant." },
+          "address": { "$ref": "#/components/schemas/Address" },
+          "phoneNumber": { "type": "string", "description": "Phone number on file for this participant. Only present for payee/payor participants." },
+          "depEmancipationDate": { "type": "string", "format": "date", "description": "The date the dependent is/was no longer subject to support (emancipation date). Only present for dependent participants." }
+        },
+        "description": "A payee, payor, or dependent associated with this CSE case."
+      },
+      "Address": {
+        "type": "object",
+        "properties": {
+          "line1": { "type": "string" },
+          "line2": { "type": "string" },
+          "city": { "type": "string" },
+          "state": { "type": "string" },
+          "zip": { "type": "string" },
+          "confidentialIndicator": { "type": "string", "description": "Indicates whether this address is confidential." }
+        },
+        "description": "Only present for payee/payor participants."
+      },
+      "Receipt": {
+        "type": "object",
+        "properties": {
+          "paymentId": { "type": "string", "description": "The unique identifier for this posted payment." },
+          "postDate": { "type": "string", "format": "date", "description": "The date the payment was posted." },
+          "postAmount": { "type": "number", "format": "double", "description": "The amount of the payment posted." }
+        }
+      },
+      "Disbursement": {
+        "type": "object",
+        "properties": {
+          "checkNumber": { "type": "string", "description": "The disbursement check number." },
+          "checkDate": { "type": "string", "format": "date", "description": "The date the check was issued." },
+          "checkAmount": { "type": "number", "format": "double", "description": "The amount of the check." }
+        }
+      },
+      "TermBalance": {
+        "type": "object",
+        "properties": {
+          "termType": { "type": "string", "description": "The code identifying the type of support term (e.g. current support, arrears)." },
+          "assessmentFrequency": { "type": "string", "description": "How often this term is assessed (e.g. monthly)." },
+          "termAmount": { "type": "number", "format": "double", "description": "The assessed amount for this term." },
+          "maxAmount": { "type": "number", "format": "double", "description": "The maximum assessed amount for this term." },
+          "termBalanceAmount": { "type": "number", "format": "double", "description": "The current outstanding balance for this term." },
+          "payoffAmount": { "type": "number", "format": "double", "description": "The amount required to pay off this term in full." },
+          "nextAssessmentDate": { "type": "string", "format": "date", "description": "The date of the next scheduled assessment." },
+          "termDescription": { "type": "string", "description": "The description of this support term." }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "description": "HTTP status reason phrase (e.g. 'Bad Request')." },
+          "statusCode": { "type": "integer", "format": "int32", "description": "HTTP status code." },
+          "errorMessage": { "type": "string", "description": "A human readable error message." }
+        },
+        "description": "Standard error response returned by the service."
+      }
+    }
+  }
+}
