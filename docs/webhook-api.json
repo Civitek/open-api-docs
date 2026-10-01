@@ -1,0 +1,244 @@
+{
+	"openapi": "3.0.3",
+	"info": {
+		"title": "Payment Webhook API",
+		"version": "1.0.0",
+		"description": "Webhook endpoint for payment notifications."
+	},
+	"paths": {
+		"/webhooks/payment": {
+			"post": {
+				"summary": "Send Payment Notification",
+				"operationId": "sendPaymentNotification",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PaymentWebhookPayload"
+							},
+							"example": {
+								"orderId": 11207,
+								"orderDate": "2025-05-23T18:03:39.760+00:00",
+								"paymentAmount": 124.2,
+								"status": "CLOSED",
+								"paymentReference": "123456SD45",
+								"paymentItems": [
+									{
+										"itemKey": "4BA0752C71",
+										"sku": "case_number",
+										"instanceId": "DR23",
+										"amount": 120.0,
+										"attributes": [
+											{
+												"attribute": "ReferenceId",
+												"value": "123456SD45"
+											}
+										]
+									}
+								],
+								"paymentInfo": {
+									"paymentMethod": "CreditCard",
+									"cardHolderName": "Fccc Testing",
+									"cardSummary": "1111",
+									"cardType": "visa"
+								},
+								"customer": {
+									"phone": "9999999999",
+									"email": "mymail@mail.com",
+									"firstName": "First Name",
+									"lastName": "Last Name"
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Webhook received successfully"
+					},
+					"400": {
+						"description": "Invalid webhook payload"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"500": {
+						"description": "Internal server error"
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"PaymentWebhookPayload": {
+				"type": "object",
+				"required": [
+					"orderId",
+					"orderDate",
+					"paymentAmount",
+					"status",
+					"paymentReference",
+					"paymentItems",
+					"paymentInfo",
+					"customer"
+				],
+				"properties": {
+					"orderId": {
+						"type": "integer",
+						"format": "int64",
+						"example": 11207
+					},
+					"orderDate": {
+						"type": "string",
+						"format": "date-time",
+						"example": "2025-05-23T18:03:39.760+00:00"
+					},
+					"paymentAmount": {
+						"type": "number",
+						"format": "double",
+						"example": 124.2
+					},
+					"status": {
+						"type": "string",
+						"example": "Success",
+						"enum": [
+							"Success",
+							"Refused",
+							"Failed",
+							"Cancelled",
+							"PendingPayment",
+							"PendingSettle",
+							"Review"
+						]
+					},
+					"paymentReference": {
+						"type": "string",
+						"description": "A unique identifier provided by you in the payment request and returned in the webhook response to help you reconcile the payment.",
+						"example": "123456SD45"
+					},
+					"paymentItems": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/PaymentItem"
+						}
+					},
+					"paymentInfo": {
+						"$ref": "#/components/schemas/PaymentInfo"
+					},
+					"customer": {
+						"$ref": "#/components/schemas/Customer"
+					}
+				}
+			},
+			"PaymentItem": {
+				"type": "object",
+				"required": [
+					"itemKey",
+					"sku",
+					"instanceId",
+					"amount",
+					"attributes"
+				],
+				"properties": {
+					"itemKey": {
+						"type": "string",
+						"example": "4BA0752C71"
+					},
+					"sku": {
+						"type": "string",
+						"example": "case_number"
+					},
+					"instanceId": {
+						"type": "string",
+						"example": "DR23"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double",
+						"example": 120.0
+					},
+					"attributes": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/PaymentItemAttribute"
+						}
+					}
+				}
+			},
+			"PaymentItemAttribute": {
+				"type": "object",
+				"required": [
+					"attribute",
+					"value"
+				],
+				"properties": {
+					"attribute": {
+						"type": "string",
+						"example": "ReferenceId"
+					},
+					"value": {
+						"type": "string",
+						"example": "123456SD45"
+					}
+				}
+			},
+			"PaymentInfo": {
+				"type": "object",
+				"required": [
+					"paymentMethod",
+					"cardHolderName",
+					"cardSummary",
+					"cardType"
+				],
+				"properties": {
+					"paymentMethod": {
+						"type": "string",
+						"example": "CreditCard"
+					},
+					"cardHolderName": {
+						"type": "string",
+						"example": "Fccc Testing"
+					},
+					"cardSummary": {
+						"type": "string",
+						"example": "1111"
+					},
+					"cardType": {
+						"type": "string",
+						"example": "visa"
+					}
+				}
+			},
+			"Customer": {
+				"type": "object",
+				"required": [
+					"phone",
+					"email",
+					"firstName",
+					"lastName"
+				],
+				"properties": {
+					"phone": {
+						"type": "string",
+						"example": "9999999999"
+					},
+					"email": {
+						"type": "string",
+						"format": "email",
+						"example": "mymail@mail.com"
+					},
+					"firstName": {
+						"type": "string",
+						"example": "First Name"
+					},
+					"lastName": {
+						"type": "string",
+						"example": "Last Name"
+					}
+				}
+			}
+		}
+	}
+}
