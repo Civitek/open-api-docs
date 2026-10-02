@@ -10,6 +10,11 @@
 			"post": {
 				"summary": "Send Payment Notification",
 				"operationId": "sendPaymentNotification",
+				"security": [
+					{
+						"basicAuth": []
+					}
+				],
 				"requestBody": {
 					"required": true,
 					"content": {
@@ -238,6 +243,19 @@
 						"example": "Last Name"
 					}
 				}
+			}
+		},
+		"securitySchemes": {
+			"basicAuth": {
+				"type": "http",
+				"scheme": "basic",
+				"description": "Basic Authentication using username and password."
+			},
+			"bearerAuth": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT",
+				"description": "Use the **refresh_token** as the Bearer credential on `/api/auth/refresh`. Must be kept secure and not exposed outside the application."
 			}
 		}
 	}
